@@ -1,0 +1,91 @@
+# =============================================================================
+# Sellzy – Production deployment to Vercel
+# -----------------------------------------------------------------------------
+# This workflow lives under `_example.github/` so it stays INACTIVE until you
+# explicitly enable it. To activate, rename the parent folder:
+#
+#   mv _example.github .github
+#   git add .github && git rm -r _example.github
+#   git commit -m "chore: enable github actions"
+#
+# Once renamed, the workflow deploys all three apps (web, admin, api) to
+# Vercel in parallel on every push to `main`.
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#
+#   VERCEL_TOKEN              https://vercel.com/account/tokens
+#   VERCEL_ORG_ID             read from `.vercel/project.json` after `vercel link`
+#   VERCEL_PROJECT_ID_WEB     `vercel link` inside apps/web   then read .vercel/project.json
+#   VERCEL_PROJECT_ID_ADMIN   `vercel link` inside apps/admin then read .vercel/project.json
+#   VERCEL_PROJECT_ID_API     `vercel link` inside apps/api   then read .vercel/project.json
+#
+# Each Vercel project also needs the env variables from the matching
+# `.env.example` (apps/web/.env.example, apps/admin/.env.example,
+# apps/api/.env.example) populated with real production values.
+# =============================================================================
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "turbo.json"
+
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  Deploy:
+    name: Deploy ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: Web
+            project_id: VERCEL_PROJECT_ID_WEB
+          - app: Admin
+            project_id: VERCEL_PROJECT_ID_ADMIN
+          - app: API
+            project_id: VERCEL_PROJECT_ID_API
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets[matrix.project_id] }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel
+
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Prebuilt Artifacts
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

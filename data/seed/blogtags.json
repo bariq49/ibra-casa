@@ -1,0 +1,68 @@
+[
+  {
+    "_id": "ad0000000000000000000001",
+    "name": "Metal Wall Art",
+    "slug": "metal-wall-art",
+    "description": "Articles about metal wall panels and hanging décor.",
+    "isActive": true,
+    "order": 1,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000002",
+    "name": "Tree of Life",
+    "slug": "tree-of-life",
+    "description": "Tree of Life motifs and symbolism in home décor.",
+    "isActive": true,
+    "order": 2,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000003",
+    "name": "Aesthetic Decor",
+    "slug": "aesthetic-decor",
+    "description": "Aesthetic sculptures and shelf accents.",
+    "isActive": true,
+    "order": 3,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000004",
+    "name": "Metal Finishes",
+    "slug": "metal-finishes",
+    "description": "Matte black, gold, bronze, copper, and more.",
+    "isActive": true,
+    "order": 4,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000005",
+    "name": "Styling Tips",
+    "slug": "styling-tips",
+    "description": "How to style metal décor in real rooms.",
+    "isActive": true,
+    "order": 5,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000006",
+    "name": "Home Decor",
+    "slug": "home-decor",
+    "description": "General home décor guidance.",
+    "isActive": true,
+    "order": 6,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  }
+]

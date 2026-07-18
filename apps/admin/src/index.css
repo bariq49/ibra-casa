@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Sellzy Custom Palette */
+  --font-sans: "DM Sans", sans-serif;
+  --font-heading: "DM Sans", sans-serif;
+  
+  --color-primary-lighter: #CAF8E4;
+  --color-primary-light: #5ED9BA;
+  --color-primary-main: #088178;
+  --color-primary-dark: #056D6E;
+  --color-primary-darker: #04535C;
+
+  --color-secondary-lighter: #D6E4FF;
+  --color-secondary-light: #84A9FF;
+  --color-secondary-main: #3366FF;
+  --color-secondary-dark: #1939B7;
+  --color-secondary-darker: #091A7A;
+
+  --color-info-lighter: #D0F2FF;
+  --color-info-light: #74CAFF;
+  --color-info-main: #1890FF;
+  --color-info-dark: #0C53B7;
+  --color-info-darker: #04297A;
+
+  --color-success-lighter: #E9FCD4;
+  --color-success-light: #AAF27F;
+  --color-success-main: #54D62C;
+  --color-success-dark: #229A16;
+  --color-success-darker: #08660D;
+
+  --color-warning-lighter: #FFF7CD;
+  --color-warning-light: #FFE16A;
+  --color-warning-main: #FFC107;
+  --color-warning-dark: #B78103;
+  --color-warning-darker: #7A4F01;
+
+  --color-error-lighter: #FCD1CA;
+  --color-error-light: #EF6168;
+  --color-error-main: #CB0233;
+  --color-error-dark: #AE013C;
+  --color-error-darker: #920140;
+
+  --color-grey-100: #F9FAFB;
+  --color-grey-200: #F4F6F8;
+  --color-grey-300: #DFE3E8;
+  --color-grey-400: #C4CDD5;
+  --color-grey-500: #919EAB;
+  --color-grey-600: #637381;
+  --color-grey-700: #454F5B;
+  --color-grey-800: #212B36;
+  --color-grey-900: #161C24;
+
+  --color-chart-01-01: #F7D2FF;
+  --color-chart-01-02: #D0AEFF;
+  --color-chart-01-03: #9E86FF;
+  --color-chart-01-04: #826AF9;
+  
+  --color-chart-02-01: #CCFAFF;
+  --color-chart-02-02: #A5F3FF;
+  --color-chart-02-03: #83CFFF;
+  --color-chart-02-04: #2D99FF;
+  
+  --color-chart-03-01: #C0F2DC;
+  --color-chart-03-02: #A4F7CC;
+  --color-chart-03-03: #60F1C8;
+  --color-chart-03-04: #2CD9C5;
+  
+  --color-chart-04-01: #FFF3D6;
+  --color-chart-04-02: #FFF7AE;
+  --color-chart-04-03: #FFEF5A;
+  --color-chart-04-04: #FFE700;
+  
+  --color-chart-05-01: #FFF2D4;
+  --color-chart-05-02: #FFBD98;
+  --color-chart-05-03: #FF8F6D;
+  --color-chart-05-04: #FF6C40;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@layer utilities {
+  :root {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    font-weight: 500;
+    color: var(--color-primary-main);
+    text-decoration: inherit;
+  }
+  a:hover {
+    color: var(--color-primary-dark);
+  }
+
+  h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+  }
+
+  .scrollbarHider {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbarHide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar for sidebar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.4);
+  }
+
+  button:hover {
+    cursor: pointer;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      color: #212529;
+      background-color: #ffffff;
+    }
+    a:hover {
+      color: var(--color-primary-darker);
+    }
+    button {
+      background-color: #f9f9f9;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --background: #FFFFFF;
+    --foreground: #212529;
+    --card: #FFFFFF;
+    --card-foreground: #212529;
+    --popover: #FFFFFF;
+    --popover-foreground: #212529;
+    --primary: #088178;
+    --primary-foreground: #FFFFFF;
+    --secondary: #3366FF;
+    --secondary-foreground: #FFFFFF;
+    --muted: #F4F6F8;
+    --muted-foreground: #495057;
+    --accent: #F9FAFB;
+    --accent-foreground: #212529;
+    --destructive: #CB0233;
+    --destructive-foreground: #FFFFFF;
+    --border: #DFE3E8;
+    --input: #DFE3E8;
+    --ring: #088178;
+    --chart-1: #826AF9;
+    --chart-2: #2D99FF;
+    --chart-3: #2CD9C5;
+    --chart-4: #FFE700;
+    --chart-5: #FF6C40;
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #212529;
+    --sidebar-primary: #088178;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #F4F6F8;
+    --sidebar-accent-foreground: #212529;
+    --sidebar-border: #DFE3E8;
+    --sidebar-ring: #088178;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: #161C24;
+    --foreground: #FFFFFF;
+    --card: #212B36;
+    --card-foreground: #FFFFFF;
+    --popover: #212B36;
+    --popover-foreground: #FFFFFF;
+    --primary: #088178;
+    --primary-foreground: #FFFFFF;
+    --secondary: #3366FF;
+    --secondary-foreground: #FFFFFF;
+    --muted: #454F5B;
+    --muted-foreground: #919EAB;
+    --accent: #212B36;
+    --accent-foreground: #FFFFFF;
+    --destructive: #CB0233;
+    --destructive-foreground: #FFFFFF;
+    --border: #454F5B;
+    --input: #454F5B;
+    --ring: #088178;
+    --chart-1: #F7D2FF;
+    --chart-2: #CCFAFF;
+    --chart-3: #C0F2DC;
+    --chart-4: #FFF3D6;
+    --chart-5: #FFF2D4;
+    --sidebar: #161C24;
+    --sidebar-foreground: #FFFFFF;
+    --sidebar-primary: #088178;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #212B36;
+    --sidebar-accent-foreground: #FFFFFF;
+    --sidebar-border: #454F5B;
+    --sidebar-ring: #088178;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,90 @@
+[
+  {
+    "_id": "a80000000000000000000001",
+    "name": "0.5 kg",
+    "value": "0.5kg",
+    "slug": "0-5kg",
+    "displayOrder": 0,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 0
+  },
+  {
+    "_id": "a80000000000000000000002",
+    "name": "1 kg",
+    "value": "1kg",
+    "slug": "1kg",
+    "displayOrder": 1,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 0
+  },
+  {
+    "_id": "a80000000000000000000003",
+    "name": "1.5 kg",
+    "value": "1.5kg",
+    "slug": "1-5kg",
+    "displayOrder": 2,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 5
+  },
+  {
+    "_id": "a80000000000000000000004",
+    "name": "2 kg",
+    "value": "2kg",
+    "slug": "2kg",
+    "displayOrder": 3,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 8
+  },
+  {
+    "_id": "a80000000000000000000005",
+    "name": "2.5 kg",
+    "value": "2.5kg",
+    "slug": "2-5kg",
+    "displayOrder": 4,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 12
+  },
+  {
+    "_id": "a80000000000000000000006",
+    "name": "3 kg",
+    "value": "3kg",
+    "slug": "3kg",
+    "displayOrder": 5,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 15
+  },
+  {
+    "_id": "a80000000000000000000007",
+    "name": "4 kg",
+    "value": "4kg",
+    "slug": "4kg",
+    "displayOrder": 6,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 20
+  },
+  {
+    "_id": "a80000000000000000000008",
+    "name": "5 kg",
+    "value": "5kg",
+    "slug": "5kg",
+    "displayOrder": 7,
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0,
+    "priceModifier": 25
+  }
+]

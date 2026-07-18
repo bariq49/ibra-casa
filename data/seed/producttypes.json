@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "a70000000000000000000001",
+    "name": "featured",
+    "slug": "featured",
+    "type": "collection",
+    "title": "Featured Home Decor",
+    "description": "Handpicked metal wall art and aesthetic sculptures for modern homes.",
+    "banner": "",
+    "bannerImages": [],
+    "isActive": true,
+    "displayOrder": 1,
+    "bgColor": "#ffffff",
+    "bannerPages": [],
+    "productBases": ["a60000000000000000000001"],
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  }
+]

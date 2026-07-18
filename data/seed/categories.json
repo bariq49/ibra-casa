@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "a10000000000000000000001",
+    "name": "Home and Wall Decor",
+    "slug": "home-and-wall-decor",
+    "parent": null,
+    "path": "",
+    "level": 0,
+    "order": 0,
+    "isActive": true,
+    "isFavorite": true,
+    "description": "Metal wall art, sculptural décor, and statement pieces designed to elevate living rooms, hallways, and feature walls.",
+    "image": "",
+    "icon": "",
+    "productBases": ["a60000000000000000000001"],
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a10000000000000000000002",
+    "name": "Aesthetic Products",
+    "slug": "aesthetic-products",
+    "parent": null,
+    "path": "",
+    "level": 0,
+    "order": 1,
+    "isActive": true,
+    "isFavorite": true,
+    "description": "Curated aesthetic home accents and sculptural metal décor for modern, minimalist, and artistic interiors.",
+    "image": "",
+    "icon": "",
+    "productBases": ["a60000000000000000000001"],
+    "createdAt": "2026-07-14T00:00:00.000Z",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "__v": 0
+  }
+]
