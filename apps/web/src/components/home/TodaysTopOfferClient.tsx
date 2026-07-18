@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, Variants } from "motion/react";
-import Container from "../../common/Container";
-import ProductCard from "../../common/products/ProductCard";
+import Container from "../common/Container";
+import ProductCard from "../common/products/ProductCard";
 import { ApiProduct } from "@/hooks/useProducts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { SectionHeader } from "../../common/SectionHeader";
+import { SectionHeader } from "../common/SectionHeader";
 import {
   Carousel,
   CarouselContent,
