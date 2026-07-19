@@ -24,9 +24,8 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import useAuthStore from "@/store/useAuthStore";
 
-const API_URL = (
-  import.meta.env.VITE_NEXT_PUBLIC_API_URL || "http://localhost:8000"
-).replace(/\/+$/, "");
+import { getApiBaseUrl } from "@/lib/config";
+const API_URL = getApiBaseUrl();
 
 type WebsiteIcon = {
   _id: string;

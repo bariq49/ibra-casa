@@ -48,6 +48,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { getApiBaseUrl } from "@/lib/config";
 
 interface WebsiteConfig {
   _id: string;
@@ -228,7 +229,7 @@ export default function WebsiteConfigPage() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/website-config/page/${pageType}`,
+        `${getApiBaseUrl()}/api/website-config/page/${pageType}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -280,7 +281,7 @@ export default function WebsiteConfigPage() {
 
     try {
       await axios.delete(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/website-config/${configToDelete}`,
+        `${getApiBaseUrl()}/api/website-config/${configToDelete}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -321,7 +322,7 @@ export default function WebsiteConfigPage() {
     // Update on server
     try {
       await axios.put(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/website-config/reorder`,
+        `${getApiBaseUrl()}/api/website-config/reorder`,
         {
           pageType: activeTab,
           configs: newConfigs.map((c: WebsiteConfig) => ({ id: c._id })),

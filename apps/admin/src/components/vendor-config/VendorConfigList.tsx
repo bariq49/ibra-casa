@@ -46,6 +46,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { getApiBaseUrl } from "@/lib/config";
 
 interface Address {
   street?: string;
@@ -135,7 +136,7 @@ const VendorConfigList = () => {
         },
       };
       const response = await axios.get(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/vendors/requests`,
+        `${getApiBaseUrl()}/api/vendors/requests`,
         config
       );
       setVendors(response.data.data || []);
@@ -163,7 +164,7 @@ const VendorConfigList = () => {
       };
       const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
       const response = await axios.get(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/users?page=${page}&perPage=20${searchParam}`,
+        `${getApiBaseUrl()}/api/users?page=${page}&perPage=20${searchParam}`,
         config
       );
       // Handle response with pagination data
@@ -261,7 +262,7 @@ const VendorConfigList = () => {
         },
       };
       await axios.post(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/vendors/create`,
+        `${getApiBaseUrl()}/api/vendors/create`,
         vendorForm,
         config
       );
@@ -324,7 +325,7 @@ const VendorConfigList = () => {
         },
       };
       await axios.put(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/vendors/${editingVendor._id}`,
+        `${getApiBaseUrl()}/api/vendors/${editingVendor._id}`,
         {
           storeName: vendorForm.storeName,
           description: vendorForm.description,
@@ -390,7 +391,7 @@ const VendorConfigList = () => {
         },
       };
       await axios.put(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/vendors/${id}/status`,
+        `${getApiBaseUrl()}/api/vendors/${id}/status`,
         { status },
         config
       );

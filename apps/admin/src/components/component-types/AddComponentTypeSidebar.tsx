@@ -22,6 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
+import { getApiBaseUrl } from "@/lib/config";
 
 interface ComponentType {
   _id: string;
@@ -197,7 +198,7 @@ export default function AddComponentTypeSidebar({
 
       if (editingType) {
         await axios.put(
-          `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/component-types/${editingType._id}`,
+          `${getApiBaseUrl()}/api/component-types/${editingType._id}`,
           payload,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -209,7 +210,7 @@ export default function AddComponentTypeSidebar({
         });
       } else {
         await axios.post(
-          `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/component-types`,
+          `${getApiBaseUrl()}/api/component-types`,
           payload,
           {
             headers: { Authorization: `Bearer ${token}` },

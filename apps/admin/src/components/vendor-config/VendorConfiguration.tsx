@@ -28,6 +28,7 @@ import { Settings, Save, Loader2 } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getApiBaseUrl } from "@/lib/config";
 
 const vendorConfigSchema = z.object({
   vendorEnabled: z.boolean(),
@@ -71,7 +72,7 @@ const VendorConfiguration = () => {
         },
       };
       const response = await axios.get(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/vendors/config`,
+        `${getApiBaseUrl()}/api/vendors/config`,
         config
       );
 
@@ -112,7 +113,7 @@ const VendorConfiguration = () => {
       };
 
       await axios.put(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/vendors/config`,
+        `${getApiBaseUrl()}/api/vendors/config`,
         data,
         config
       );

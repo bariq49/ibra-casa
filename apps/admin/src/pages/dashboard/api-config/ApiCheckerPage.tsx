@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import adminApi from "@/lib/config";
+import adminApi, { getApiBaseUrl } from "@/lib/config";
 
 interface Parameter {
   name: string;
@@ -165,7 +165,7 @@ export default function ApiCheckerPage() {
 
   const generateCodeSnippet = (lang: string) => {
     if (!selectedEndpoint) return "";
-    const baseUrl = import.meta.env.VITE_NEXT_PUBLIC_API_URL || "https://api.yourdomain.com";
+    const baseUrl = getApiBaseUrl();
     const pathUrl = `${baseUrl}${selectedEndpoint.path}`;
     const method = selectedEndpoint.method.toUpperCase();
 

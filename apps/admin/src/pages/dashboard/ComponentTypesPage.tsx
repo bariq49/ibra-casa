@@ -19,6 +19,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import AddComponentTypeSidebar from "@/components/component-types/AddComponentTypeSidebar";
+import { getApiBaseUrl } from "@/lib/config";
 
 interface ComponentType {
   _id: string;
@@ -56,7 +57,7 @@ export default function ComponentTypesPage() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/component-types`,
+        `${getApiBaseUrl()}/api/component-types`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -104,7 +105,7 @@ export default function ComponentTypesPage() {
 
     try {
       await axios.delete(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/component-types/${typeToDelete}`,
+        `${getApiBaseUrl()}/api/component-types/${typeToDelete}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -134,7 +135,7 @@ export default function ComponentTypesPage() {
   const handleToggleStatus = async (id: string) => {
     try {
       await axios.patch(
-        `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/component-types/${id}/toggle`,
+        `${getApiBaseUrl()}/api/component-types/${id}/toggle`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -12,17 +12,14 @@ interface AdminApiConfig {
   isProduction: boolean;
 }
 
-/** Strip trailing slashes so `https://api.example.com/` + `/api` does not become `//api`. */
+/**
+ * Canonical API origin (no trailing slash).
+ * Always use this instead of raw VITE_NEXT_PUBLIC_API_URL to avoid `//api` redirects.
+ */
 export const getApiBaseUrl = (): string => {
-  const apiUrl = import.meta.env.VITE_NEXT_PUBLIC_API_URL;
-
-  if (!apiUrl) {
-    throw new Error(
-      "VITE_NEXT_PUBLIC_API_URL environment variable is not defined",
-    );
-  }
-
-  return apiUrl.replace(/\/+$/, "");
+  const apiUrl =
+    import.meta.env.VITE_NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  return String(apiUrl).replace(/\/+$/, "");
 };
 
 /**

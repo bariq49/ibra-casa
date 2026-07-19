@@ -46,9 +46,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const API_URL = (
-  import.meta.env.VITE_NEXT_PUBLIC_API_URL || "http://localhost:8000"
-).replace(/\/+$/, "");
+import { getApiBaseUrl } from "@/lib/config";
+const API_URL = getApiBaseUrl();
 
 type StoreConfig = {
   enableStripe: boolean;

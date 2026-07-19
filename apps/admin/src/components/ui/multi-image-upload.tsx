@@ -21,9 +21,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const NEXT_PUBLIC_API_URL = (
-  import.meta.env.VITE_NEXT_PUBLIC_API_URL || "http://localhost:8000"
-).replace(/\/+$/, "");
+import { getApiBaseUrl } from "@/lib/config";
+const NEXT_PUBLIC_API_URL = getApiBaseUrl();
 
 interface MultiImageUploadProps {
   value: string[];

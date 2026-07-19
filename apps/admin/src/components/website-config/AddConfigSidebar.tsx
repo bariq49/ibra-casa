@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getApiBaseUrl } from "@/lib/config";
 
 interface AddConfigSidebarProps {
   open: boolean;
@@ -91,7 +92,7 @@ export default function AddConfigSidebar({
       setLoadingTypes(true);
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/component-types?active=true`,
+          `${getApiBaseUrl()}/api/component-types?active=true`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -140,7 +141,7 @@ export default function AddConfigSidebar({
       if (editingConfig?._id) {
         // Update existing
         await axios.put(
-          `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/website-config/${editingConfig._id}`,
+          `${getApiBaseUrl()}/api/website-config/${editingConfig._id}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -153,7 +154,7 @@ export default function AddConfigSidebar({
       } else {
         // Create new
         await axios.post(
-          `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/website-config`,
+          `${getApiBaseUrl()}/api/website-config`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -201,7 +202,7 @@ export default function AddConfigSidebar({
         formDataUpload.append("image", file);
 
         const response = await axios.post(
-          `${import.meta.env.VITE_NEXT_PUBLIC_API_URL}/api/upload`,
+          `${getApiBaseUrl()}/api/upload`,
           formDataUpload,
           {
             headers: {
