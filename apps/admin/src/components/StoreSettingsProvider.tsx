@@ -3,8 +3,9 @@ import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { useStoreSettingsStore } from "@/store/useStoreSettingsStore";
 
-const API_URL =
-  import.meta.env.VITE_NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = (
+  import.meta.env.VITE_NEXT_PUBLIC_API_URL || "http://localhost:8000"
+).replace(/\/+$/, "");
 
 export default function StoreSettingsProvider({
   children,

@@ -12,10 +12,8 @@ interface AdminApiConfig {
   isProduction: boolean;
 }
 
-/**
- * Get API configuration for admin
- */
-export const getAdminApiConfig = (): AdminApiConfig => {
+/** Strip trailing slashes so `https://api.example.com/` + `/api` does not become `//api`. */
+export const getApiBaseUrl = (): string => {
   const apiUrl = import.meta.env.VITE_NEXT_PUBLIC_API_URL;
 
   if (!apiUrl) {
@@ -23,6 +21,15 @@ export const getAdminApiConfig = (): AdminApiConfig => {
       "VITE_NEXT_PUBLIC_API_URL environment variable is not defined",
     );
   }
+
+  return apiUrl.replace(/\/+$/, "");
+};
+
+/**
+ * Get API configuration for admin
+ */
+export const getAdminApiConfig = (): AdminApiConfig => {
+  const apiUrl = getApiBaseUrl();
 
   const isProduction =
     import.meta.env.VITE_APP_ENV === "production" ||

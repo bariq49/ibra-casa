@@ -96,10 +96,16 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   process.env.PRODUCTION_ADMIN_URL,
   process.env.PRODUCTION_CLIENT_URL,
-  // Add production URLs - new domain
+  // Comma-separated extra origins from env (e.g. preview deployments)
+  ...(process.env.CORS_ORIGINS?.split(",").map((o) => o.trim()) || []),
+  // Production URLs
   "https://sellzy.reactbd.com",
   "https://admin.sellzy.reactbd.com",
   "https://api.sellzy.reactbd.com",
+  // Ibra Casa Vercel deployments
+  "https://ibra-casa-admin.vercel.app",
+  "https://ibra-casa.vercel.app",
+  "https://ibra-casa-web.vercel.app",
 
   // Add localhost for development
   "http://localhost:3000",
@@ -107,7 +113,6 @@ const allowedOrigins = [
   "http://localhost:8081", // iOS simulator
   "http://10.0.2.2:8081", // Android emulator
   "http://10.0.2.2:8000", // Android emulator direct access
-  // "http://192.168.1.100:8081", // Replace with your actual local IP for physical devices
 ].filter(Boolean) as string[]; // Remove any undefined values
 
 app.use(
@@ -124,11 +129,12 @@ app.use(
         return callback(null, true);
       }
 
-      // Check if origin is in our allowed list or if it's a subdomain of reactbd.com
+      // Check if origin is in our allowed list, reactbd.com, or this project's Vercel apps
       if (
         allowedOrigins.indexOf(origin) !== -1 ||
         origin.endsWith(".reactbd.com") ||
-        origin.includes("localhost")
+        origin.includes("localhost") ||
+        /^https:\/\/ibra-casa(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin)
       ) {
         callback(null, true);
       } else {
