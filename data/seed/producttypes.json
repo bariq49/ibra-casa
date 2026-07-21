@@ -31,10 +31,10 @@
     "bannerImages": [],
     "isActive": true,
     "displayOrder": 2,
-    "bgColor": "#FFEB69",
+    "bgColor": "#F4F3F5",
     "productBasesBg": {
-      "home-decor": "#FFEB69",
-      "beauty": "#FFEB69"
+      "home-decor": "#F4F3F5",
+      "beauty": "#F4F3F5"
     },
     "productBases": [
       "a60000000000000000000001"
@@ -53,10 +53,10 @@
     "bannerImages": [],
     "isActive": true,
     "displayOrder": 3,
-    "bgColor": "#92BDF5",
+    "bgColor": "#F4F3F5",
     "productBasesBg": {
-      "home-decor": "#92BDF5",
-      "beauty": "#92BDF5"
+      "home-decor": "#F4F3F5",
+      "beauty": "#F4F3F5"
     },
     "productBases": [
       "a60000000000000000000001"

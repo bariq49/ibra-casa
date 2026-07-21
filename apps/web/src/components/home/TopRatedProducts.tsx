@@ -12,7 +12,7 @@ interface TopRatedProductsProps {
 
 const TopRatedProducts = async ({
   slug = "top-rated",
-  bgColor = "#FFEB69",
+  bgColor = "#F4F3F5",
   locale,
 }: TopRatedProductsProps & { locale?: string }) => {
   if (locale) setRequestLocale(locale);

@@ -113,7 +113,7 @@ const MostLovedProductsClient = ({
     productType?.productBasesBg?.["home-decor"] ||
     productType?.productBasesBg?.beauty ||
     productType?.bgColor ||
-    "#92BDF5";
+    "#F4F3F5";
 
   if (products.length === 0) return null;
 

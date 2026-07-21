@@ -27,14 +27,14 @@ const NewlyLaunchedProducts = async ({
 
   if (typeRes.data?.length) productType = typeRes.data[0];
 
-  const withBg = products.map((p) => ({ ...p, bg: p.bg || "#ffeff6" }));
+  const withBg = products.map((p) => ({ ...p, bg: p.bg || "#ffffff" }));
   if (!withBg.length) return null;
 
   const bgColor =
     productType?.productBasesBg?.["home-decor"] ||
     productType?.productBasesBg?.beauty ||
     productType?.bgColor ||
-    "#FFEB69";
+    "#F4F3F5";
 
   return (
     <NewlyLaunchedProductsClient

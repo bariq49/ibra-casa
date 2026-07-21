@@ -40,7 +40,7 @@ const NewlyLaunchedProductsClient = ({
   products,
   productType,
   slug,
-  bgColor = "#FFEB69",
+  bgColor = "#F4F3F5",
 }: NewlyLaunchedProductsClientProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
