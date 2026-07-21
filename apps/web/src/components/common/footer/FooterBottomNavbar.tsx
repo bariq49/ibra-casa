@@ -16,7 +16,7 @@ const footerBottomNavItems = [
     label: "My Order",
     isProtected: true,
   },
-  { href: "/user/wishlist-style-v2", icon: Heart, label: "Wishlist", isProtected: true },
+  { href: "/wishlist-style-v1", icon: Heart, label: "Wishlist", isProtected: false },
   { href: "/user/dashboard", icon: UserCircle, label: "My Account", isProtected: true },
 ];
 

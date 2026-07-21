@@ -71,15 +71,14 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
       </h3>
 
       {!isLoggedIn && (
-        <div className="bg-warning-lighter text-warning-dark px-4 py-3 rounded-[8px] font-dm-sans text-[15px] flex items-center gap-2">
-          <span>⚠️</span>
-          Please login to select a payment method.
+        <div className="bg-muted text-light-secondary-text px-4 py-3 rounded-[8px] font-dm-sans text-[15px]">
+          Checking out as a guest — your order confirmation will be sent to the
+          email you provide above.
         </div>
       )}
 
       <fieldset
-        disabled={!isLoggedIn}
-        className={`flex flex-col gap-4 ${!isLoggedIn ? "opacity-60 pointer-events-none" : ""}`}
+        className="flex flex-col gap-4"
       >
         {settings.enableBankTransfer && (
           <label

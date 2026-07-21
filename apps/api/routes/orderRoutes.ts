@@ -13,7 +13,7 @@ import {
   getPendingQCOrders,
   confirmOrderQC,
 } from "../controllers/orderController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, optionalAuth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -172,7 +172,7 @@ router.route("/search-products").get(protect, searchProductsForOrders);
  *       401:
  *         description: Unauthorized
  */
-router.route("/").get(protect, getOrders).post(protect, createOrderFromCart);
+router.route("/").get(protect, getOrders).post(optionalAuth, createOrderFromCart);
 
 /**
  * @swagger
@@ -232,7 +232,7 @@ router.route("/").get(protect, getOrders).post(protect, createOrderFromCart);
  *       401:
  *         description: Unauthorized
  */
-router.route("/cod").post(protect, createCODOrder);
+router.route("/cod").post(optionalAuth, createCODOrder);
 
 /**
  * @swagger
@@ -282,7 +282,7 @@ router.route("/cod").post(protect, createCODOrder);
  */
 router
   .route("/:id")
-  .get(protect, getOrderById)
+  .get(optionalAuth, getOrderById)
   .put(protect, updateOrder)
   .delete(protect, deleteOrder);
 

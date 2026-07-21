@@ -1,6 +1,4 @@
-import React from "react";
 import { Link } from "@/i18n/routing";
-import { redirect } from "next/navigation";
 import Image from "next/image";
 import {
   ChevronRight,
@@ -42,11 +40,7 @@ export default async function OrderSuccessPage({
   // Check if user is logged in
   const { isLoggedIn } = await getServerSession();
 
-  if (!isLoggedIn) {
-    redirect("/?error=login-required&message=Please log in to view your order");
-  }
-
-  // Server-side fetch
+  // Server-side fetch (guest orders are publicly readable by ID)
   const orderResponse = await fetchOrderByIdAction(orderId);
   const order = orderResponse?.success ? orderResponse.order : null;
 
@@ -62,11 +56,13 @@ export default async function OrderSuccessPage({
           exist, or you may not have permission to view it.
         </p>
         <div className="flex gap-4">
-          <Link href="/user/orders">
-            <button className="bg-primary text-white font-bold px-8 py-3 rounded-full hover:bg-primary-dark transition-colors">
-              View My Orders
-            </button>
-          </Link>
+          {isLoggedIn ? (
+            <Link href="/user/orders">
+              <button className="bg-primary text-white font-bold px-8 py-3 rounded-full hover:bg-primary-dark transition-colors">
+                View My Orders
+              </button>
+            </Link>
+          ) : null}
           <Link href="/">
             <button className="bg-slate-200 text-slate-700 font-bold px-8 py-3 rounded-full hover:bg-slate-300 transition-colors">
               Return Home
@@ -76,7 +72,6 @@ export default async function OrderSuccessPage({
       </Container>
     );
   }
-
   const isPaymentPending = order.paymentStatus === "pending";
 
   const computedSubtotal =

@@ -52,6 +52,9 @@ const CheckoutClient = ({
   } | null>(null);
   const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [checkoutSnapshot, setCheckoutSnapshot] = useState<CartItem[] | null>(null);
+  const [guestAddress, setGuestAddress] = useState<Record<string, any> | null>(
+    null,
+  );
   const router = useRouter();
 
   const isLoggedIn = serverIsLoggedIn || clientIsAuth;
@@ -76,12 +79,12 @@ const CheckoutClient = ({
 
   // Keep `hasValidAddress` in sync if they have *any* address selected
   useEffect(() => {
-    if (selectedAddressId) {
+    if (isLoggedIn && selectedAddressId) {
       setHasValidAddress(true);
-    } else {
+    } else if (isLoggedIn && !selectedAddressId) {
       setHasValidAddress(false);
     }
-  }, [selectedAddressId]);
+  }, [selectedAddressId, isLoggedIn]);
 
   // Ensure whenever the user explicitly modifies their address list, the active index tracks gracefully
   useEffect(() => {
@@ -98,13 +101,6 @@ const CheckoutClient = ({
     setMounted(true);
   }, []);
 
-  // Auto-open auth modal if user is not logged in
-  useEffect(() => {
-    if (mounted && !isLoggedIn) {
-      onAuthOpen("login");
-    }
-  }, [mounted, isLoggedIn, onAuthOpen]);
-
   // Redirect to cart if empty
   useEffect(() => {
     if (
@@ -120,9 +116,34 @@ const CheckoutClient = ({
 
   if (!mounted) return null;
 
+  const resolveShippingAddress = () => {
+    if (isLoggedIn && activeAddressObj) {
+      return {
+        ...activeAddressObj,
+        street: activeAddressObj.apartment || activeAddressObj.city || "N/A",
+        postalCode: activeAddressObj.zipCode,
+      };
+    }
+    if (guestAddress) {
+      return {
+        ...guestAddress,
+        street: guestAddress.apartment || guestAddress.city || "N/A",
+        postalCode: guestAddress.zipCode,
+        emailAddress: guestAddress.emailAddress,
+      };
+    }
+    return null;
+  };
+
   const handlePlaceOrder = async () => {
-    if (!selectedAddressId || !activeAddressObj) {
-      toast.error("Please select a shipping address");
+    const shippingAddress = resolveShippingAddress();
+    if (!shippingAddress) {
+      toast.error("Please confirm your shipping address");
+      return;
+    }
+
+    if (!isLoggedIn && !shippingAddress.emailAddress) {
+      toast.error("Please enter your email address");
       return;
     }
 
@@ -155,12 +176,10 @@ const CheckoutClient = ({
         });
         const payload = {
           items: itemsPayload,
-          shippingAddress: {
-            ...activeAddressObj,
-            street:
-              activeAddressObj.apartment || activeAddressObj.city || "N/A",
-            postalCode: activeAddressObj.zipCode,
-          },
+          shippingAddress,
+          ...(!isLoggedIn
+            ? { guestEmail: shippingAddress.emailAddress }
+            : {}),
         };
         const response = await api.post("/api/orders/cod", payload);
         newOrder = response.data?.data || response.data?.order;
@@ -175,13 +194,11 @@ const CheckoutClient = ({
         });
         const payload = {
           items: itemsPayload,
-          shippingAddress: {
-            ...activeAddressObj,
-            street:
-              activeAddressObj.apartment || activeAddressObj.city || "N/A",
-            postalCode: activeAddressObj.zipCode,
-          },
+          shippingAddress,
           paymentMethod: "stripe",
+          ...(!isLoggedIn
+            ? { guestEmail: shippingAddress.emailAddress }
+            : {}),
         };
         const response = await api.post("/api/orders", payload);
         newOrder = response.data?.order;
@@ -203,7 +220,7 @@ const CheckoutClient = ({
             await new Promise((resolve) => setTimeout(resolve, 1500));
             useCartStore.getState().clearCart();
             window.location.href = sessionResponse.data.url;
-            return; // Exit early to navigate safely
+            return;
           } else {
             throw new Error("Failed to initialize Stripe checkout.");
           }
@@ -228,18 +245,16 @@ const CheckoutClient = ({
         error.message ||
         "Failed to place order.";
       setOrderStatus({
-        step: "error", // assuming error step could be indicated or just keep it open
+        step: "error",
         message: `Error: ${errorMessage}. Please refresh or go back.`,
       });
       toast.error(errorMessage);
-      // Wait for 3 seconds before closing so user sees the message
       setTimeout(() => {
         setIsPlacingOrder(false);
         setCheckoutSnapshot(null);
       }, 3000);
     }
   };
-
   return (
     <>
       {isPlacingOrder && <OrderProcessingModal status={orderStatus} />}
@@ -261,47 +276,32 @@ const CheckoutClient = ({
           <div className="w-full xl:flex-[1_0_0] flex flex-col gap-8 md:gap-12 lg:min-w-[60%]">
             {!isLoggedIn ? (
               <div className="w-full flex flex-col bg-background border border-border rounded-[16px] overflow-hidden">
-                {/* Header */}
                 <div className="bg-muted px-6 md:px-8 py-5 border-b border-border">
                   <h3 className="font-urbanist font-bold text-[20px] text-light-primary-text">
-                    Already have an account ?
+                    Checkout as guest
                   </h3>
                 </div>
-
-                {/* Body */}
-                <div className="p-6 md:p-8 flex flex-col gap-6">
-                  <div className="flex flex-col sm:flex-row gap-4 w-full">
-                    <input
-                      type="text"
-                      placeholder="User Name"
-                      className="flex-1 h-[52px] rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:border-primary outline-none transition-colors"
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      className="flex-1 h-[52px] rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:border-primary outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <p className="font-dm-sans text-[15px] font-medium text-light-secondary-text">
-                      Don&apos;t have an account?{" "}
-                      <button
-                        type="button"
-                        onClick={() => onAuthOpen("register")}
-                        className="text-primary font-bold hover:underline"
-                      >
-                        Create Account
-                      </button>
-                    </p>
+                <div className="p-6 md:p-8 flex flex-col gap-4">
+                  <p className="font-dm-sans text-[15px] text-light-secondary-text">
+                    You can complete your purchase without an account. Prefer a
+                    saved address and order history?{" "}
                     <button
                       type="button"
                       onClick={() => onAuthOpen("login")}
-                      className="bg-primary hover:bg-primary-dark transition-all text-white font-dm-sans font-bold text-[16px] rounded-[80px] h-[48px] px-10 shadow-color-primary whitespace-nowrap self-start sm:self-auto"
+                      className="text-primary font-bold hover:underline"
                     >
-                      Login
+                      Log in
+                    </button>{" "}
+                    or{" "}
+                    <button
+                      type="button"
+                      onClick={() => onAuthOpen("register")}
+                      className="text-primary font-bold hover:underline"
+                    >
+                      create an account
                     </button>
-                  </div>
+                    .
+                  </p>
                 </div>
               </div>
             ) : (
@@ -331,9 +331,11 @@ const CheckoutClient = ({
                 hasMultipleAddresses={existingAddresses.length > 1}
               />
             ) : (
-              <ShipmentAddressForm onAddressValid={setHasValidAddress} />
+              <ShipmentAddressForm
+                onAddressValid={setHasValidAddress}
+                onGuestAddressChange={setGuestAddress}
+              />
             )}
-
             <AddressSidebar
               isOpen={addressSidebarOpen}
               onOpenChange={setAddressSidebarOpen}

@@ -7,6 +7,38 @@ interface DecodedToken extends JwtPayload {
   id: string;
 }
 
+/** Attach user when a valid Bearer token is present; otherwise continue as guest. */
+const optionalAuth = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (
+      !req.headers.authorization ||
+      !req.headers.authorization.startsWith("Bearer")
+    ) {
+      return next();
+    }
+
+    const token = req.headers.authorization.split(" ")[1];
+    if (!token || token === "undefined" || token === "null") {
+      return next();
+    }
+
+    try {
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET!,
+      ) as DecodedToken;
+      const user = await User.findById(decoded.id).select("-password");
+      if (user) {
+        req.user = user as any;
+      }
+    } catch {
+      // Invalid/expired token → treat as guest
+    }
+
+    next();
+  },
+);
+
 // Protect routes
 const protect = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   let token;
@@ -245,6 +277,7 @@ const adminOrVendor = (req: Request, res: Response, next: NextFunction) => {
 
 export {
   protect,
+  optionalAuth,
   admin,
   employee,
   incharge,

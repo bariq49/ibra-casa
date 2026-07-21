@@ -46,17 +46,20 @@ interface CityData {
 interface ShipmentAddressFormProps {
   onAddressValid?: (isValid: boolean, id?: string) => void;
   onAddressSaved?: (id: string) => void;
+  onGuestAddressChange?: (address: Record<string, any> | null) => void;
   isEmbedded?: boolean;
 }
 
 const ShipmentAddressForm = ({
   onAddressValid,
   onAddressSaved,
+  onGuestAddressChange,
   isEmbedded = false,
 }: ShipmentAddressFormProps) => {
   const { user, token, isAuthenticated, login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [guestConfirmed, setGuestConfirmed] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -69,7 +72,6 @@ const ShipmentAddressForm = ({
     zipCode: "",
     apartment: "",
     deliveryTime: "08:00 AM - 11:00 AM",
-    shipmentType: "Flat Rate Shipment",
     addressType: "Home Address",
   });
 
@@ -87,6 +89,7 @@ const ShipmentAddressForm = ({
     formData.firstName &&
     formData.lastName &&
     formData.phoneNumber &&
+    formData.emailAddress &&
     formData.country &&
     formData.city &&
     formData.state &&
@@ -95,12 +98,27 @@ const ShipmentAddressForm = ({
 
   // Check validity whenever data changes
   useEffect(() => {
-    const isValid = !!(
-      isFormValid &&
-      addressId // An address physically exists on the backend
-    );
-    if (onAddressValid) onAddressValid(isValid, addressId || undefined);
-  }, [isFormValid, addressId, onAddressValid]);
+    if (isAuthenticated) {
+      const isValid = !!(isFormValid && addressId);
+      if (onAddressValid) onAddressValid(isValid, addressId || undefined);
+      return;
+    }
+
+    // Guests: form is valid once fields are filled (confirmed or live)
+    const isValid = isFormValid && guestConfirmed;
+    if (onAddressValid) onAddressValid(isValid);
+    if (onGuestAddressChange) {
+      onGuestAddressChange(isValid ? { ...formData } : null);
+    }
+  }, [
+    isFormValid,
+    addressId,
+    isAuthenticated,
+    guestConfirmed,
+    formData,
+    onAddressValid,
+    onGuestAddressChange,
+  ]);
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -170,22 +188,30 @@ const ShipmentAddressForm = ({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (!isAuthenticated) setGuestConfirmed(false);
   };
 
   const handleSave = async () => {
-    if (!user?._id) return;
-
-    // Validate requirements
     if (
       !formData.firstName ||
       !formData.lastName ||
       !formData.phoneNumber ||
+      !formData.emailAddress ||
       !formData.country ||
       !formData.city ||
       !formData.state ||
       !formData.zipCode
     ) {
       toast.error("Please fill in all mandatory address fields");
+      return;
+    }
+
+    // Guest checkout: confirm address locally (no account save)
+    if (!isAuthenticated || !user?._id) {
+      setGuestConfirmed(true);
+      if (onAddressValid) onAddressValid(true);
+      if (onGuestAddressChange) onGuestAddressChange({ ...formData });
+      toast.success("Shipping details confirmed");
       return;
     }
 
@@ -198,11 +224,9 @@ const ShipmentAddressForm = ({
       if (response.success && response.addresses) {
         toast.success(response.message);
 
-        // Update local zustand store so it persists visually immediately
         if (token) {
           login({ ...user, addresses: response.addresses }, token);
 
-          // Extract new ID if created
           const updatedDefault = response.addresses.find(
             (a: any) => a.isDefault,
           );
@@ -234,17 +258,17 @@ const ShipmentAddressForm = ({
           <h3 className="font-urbanist font-bold text-[20px] text-light-primary-text">
             Shipment Address
           </h3>
-          {addressId && (
+          {addressId || guestConfirmed ? (
             <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-bold">
               Verified ✅
             </span>
-          )}
+          ) : null}
         </div>
       )}
 
       <fieldset
-        disabled={!isAuthenticated || isLoading}
-        className={`p-6 md:p-8 flex flex-col gap-6 ${!isAuthenticated || isLoading ? "opacity-60 pointer-events-none" : ""}`}
+        disabled={isLoading}
+        className={`p-6 md:p-8 flex flex-col gap-6 ${isLoading ? "opacity-60 pointer-events-none" : ""}`}
       >
         {/* Row 1 & 2 - Personal Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
@@ -277,10 +301,14 @@ const ShipmentAddressForm = ({
             name="emailAddress"
             value={formData.emailAddress}
             onChange={handleInputChange}
-            readOnly
-            disabled
-            placeholder="Email Address"
-            className="w-full h-[52px] rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:border-primary outline-none transition-colors bg-muted/50 text-light-disabled-text cursor-not-allowed pointer-events-none"
+            readOnly={isAuthenticated}
+            disabled={isAuthenticated}
+            placeholder="Email Address *"
+            className={`w-full h-[52px] rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:border-primary outline-none transition-colors ${
+              isAuthenticated
+                ? "bg-muted/50 text-light-disabled-text cursor-not-allowed pointer-events-none"
+                : "bg-background"
+            }`}
           />
         </div>
 
@@ -293,7 +321,7 @@ const ShipmentAddressForm = ({
                 variant="outline"
                 role="combobox"
                 aria-expanded={openCountry}
-                disabled={!isAuthenticated || isLoading}
+                disabled={isLoading}
                 className="w-full h-[52px] justify-between bg-background rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-left font-normal"
               >
                 {formData.country ? formData.country : "Country / Region *"}
@@ -310,13 +338,14 @@ const ShipmentAddressForm = ({
                       <CommandItem
                         key={country.isoCode}
                         value={country.name}
-                        onSelect={(currentValue) => {
+                        onSelect={() => {
                           setFormData((prev) => ({
                             ...prev,
                             country: country.name,
                             state: "",
                             city: "",
                           }));
+                          if (!isAuthenticated) setGuestConfirmed(false);
                           setOpenCountry(false);
                         }}
                       >
@@ -345,7 +374,7 @@ const ShipmentAddressForm = ({
                   variant="outline"
                   role="combobox"
                   aria-expanded={openState}
-                  disabled={!isAuthenticated || isLoading}
+                  disabled={isLoading}
                   className="w-full h-[52px] justify-between bg-background rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-left font-normal"
                 >
                   {formData.state ? formData.state : "State / Province *"}
@@ -362,12 +391,13 @@ const ShipmentAddressForm = ({
                         <CommandItem
                           key={st.isoCode}
                           value={st.name}
-                          onSelect={(currentValue) => {
+                          onSelect={() => {
                             setFormData((prev) => ({
                               ...prev,
                               state: st.name,
                               city: "",
                             }));
+                            if (!isAuthenticated) setGuestConfirmed(false);
                             setOpenState(false);
                           }}
                         >
@@ -393,7 +423,7 @@ const ShipmentAddressForm = ({
               name="state"
               value={formData.state}
               onChange={handleInputChange}
-              disabled={!isAuthenticated || isLoading}
+              disabled={isLoading}
               placeholder="State *"
               className="w-full h-[52px] bg-background rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors"
             />
@@ -403,11 +433,11 @@ const ShipmentAddressForm = ({
           {citiesList.length > 0 ? (
             <Popover open={openCity} onOpenChange={setOpenCity}>
               <PopoverTrigger asChild>
-                  <Button
+                <Button
                   variant="outline"
                   role="combobox"
                   aria-expanded={openCity}
-                  disabled={!isAuthenticated || isLoading}
+                  disabled={isLoading}
                   className="w-full h-[52px] justify-between bg-background rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-left font-normal"
                 >
                   {formData.city ? formData.city : "City *"}
@@ -424,11 +454,12 @@ const ShipmentAddressForm = ({
                         <CommandItem
                           key={cityData.name}
                           value={cityData.name}
-                          onSelect={(currentValue) => {
+                          onSelect={() => {
                             setFormData((prev) => ({
                               ...prev,
                               city: cityData.name,
                             }));
+                            if (!isAuthenticated) setGuestConfirmed(false);
                             setOpenCity(false);
                           }}
                         >
@@ -454,7 +485,7 @@ const ShipmentAddressForm = ({
               name="city"
               value={formData.city}
               onChange={handleInputChange}
-              disabled={!isAuthenticated || isLoading}
+              disabled={isLoading}
               placeholder="City *"
               className="w-full h-[52px] rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:border-primary outline-none transition-colors"
             />
@@ -465,7 +496,7 @@ const ShipmentAddressForm = ({
             name="zipCode"
             value={formData.zipCode}
             onChange={handleInputChange}
-            disabled={!isAuthenticated || isLoading}
+            disabled={isLoading}
             placeholder="ZIP Code *"
             className="w-full h-[52px] rounded-[12px] border border-border px-4 font-dm-sans text-[16px] focus:border-primary outline-none transition-colors"
           />
@@ -512,41 +543,6 @@ const ShipmentAddressForm = ({
           </div>
         </div>
 
-        {/* Shipment Type */}
-        <div className="flex flex-col gap-3 mt-2">
-          <span className="font-dm-sans text-[15px] font-medium text-light-secondary-text">
-            Shipment Type
-          </span>
-          <div className="flex gap-8 flex-wrap">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input
-                type="radio"
-                name="shipmentType"
-                value="Flat Rate Shipment"
-                checked={formData.shipmentType === "Flat Rate Shipment"}
-                onChange={handleInputChange}
-                className="size-5 accent-primary text-primary focus:ring-primary border-border"
-              />
-              <span className="font-dm-sans text-[14px] text-light-primary-text group-hover:text-primary transition-colors">
-                Flat Rate Shipment
-              </span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input
-                type="radio"
-                name="shipmentType"
-                value="Free Shipment"
-                checked={formData.shipmentType === "Free Shipment"}
-                onChange={handleInputChange}
-                className="size-5 accent-primary text-primary focus:ring-primary border-border"
-              />
-              <span className="font-dm-sans text-[14px] text-light-primary-text group-hover:text-primary transition-colors">
-                Free Shipment
-              </span>
-            </label>
-          </div>
-        </div>
-
         {/* Address Type */}
         <div className="flex flex-col gap-3 mt-2">
           <span className="font-dm-sans text-[15px] font-medium text-light-secondary-text">
@@ -588,7 +584,13 @@ const ShipmentAddressForm = ({
             disabled={!isFormValid || isLoading}
             className="h-[48px] px-10 rounded-[80px] bg-primary text-white font-dm-sans font-semibold text-[16px] hover:bg-primary-dark shadow-color-primary transition-all flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Saving..." : "Save Address"}
+            {isLoading
+              ? "Saving..."
+              : isAuthenticated
+                ? "Save Address"
+                : guestConfirmed
+                  ? "Address Confirmed"
+                  : "Confirm Address"}
           </button>
         </div>
       </fieldset>

@@ -45,23 +45,25 @@ export const createCheckoutSession = asyncHandler(
         return;
       }
 
-      if (!req.user) {
-        res.status(401).json({ success: false, message: "Not authorized" });
-        return;
-      }
-
       const order = await Order.findById(orderId).populate("items.productId");
       if (!order) {
         res.status(404).json({ success: false, message: "Order not found" });
         return;
       }
 
-      if (!order.userId.equals(req.user._id)) {
-        res.status(403).json({
-          success: false,
-          message: "Not authorized to pay for this order",
-        });
-        return;
+      const isGuestOrder = Boolean(order.isGuest);
+      if (!isGuestOrder) {
+        if (!req.user) {
+          res.status(401).json({ success: false, message: "Not authorized" });
+          return;
+        }
+        if (!order.userId?.equals(req.user._id)) {
+          res.status(403).json({
+            success: false,
+            message: "Not authorized to pay for this order",
+          });
+          return;
+        }
       }
 
       if (order.isPaid || order.paymentStatus === "paid") {
@@ -74,10 +76,16 @@ export const createCheckoutSession = asyncHandler(
 
       const amountInCents = Math.round(order.total * 100);
       const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+      const customerEmail =
+        (isGuestOrder
+          ? order.guestEmail ||
+            (order.shippingAddress as any)?.emailAddress ||
+            (order.shippingAddress as any)?.email
+          : req.user?.email) || undefined;
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
-        customer_email: req.user.email,
+        ...(customerEmail ? { customer_email: customerEmail } : {}),
         line_items: [
           {
             price_data: {
@@ -92,11 +100,15 @@ export const createCheckoutSession = asyncHandler(
         ],
         mode: "payment",
         success_url: `${clientUrl}/en/success/${order._id}?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${clientUrl}/en/user/orders/${order._id}`,
+        cancel_url: isGuestOrder
+          ? `${clientUrl}/en/checkout`
+          : `${clientUrl}/en/user/orders/${order._id}`,
         client_reference_id: order._id.toString(),
         metadata: {
           orderId: order._id.toString(),
-          userId: req.user._id.toString(),
+          ...(req.user?._id
+            ? { userId: req.user._id.toString() }
+            : { isGuest: "true" }),
         },
       });
 

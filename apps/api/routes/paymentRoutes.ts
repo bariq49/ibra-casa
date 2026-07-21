@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, optionalAuth } from "../middleware/authMiddleware.js";
 import {
   createPaymentIntent,
   createCheckoutSession,
@@ -111,6 +111,6 @@ router.post("/create-intent", protect, createPaymentIntent);
  *       500:
  *         description: Server error
  */
-router.post("/create-checkout-session", protect, createCheckoutSession);
+router.post("/create-checkout-session", optionalAuth, createCheckoutSession);
 
 export default router;

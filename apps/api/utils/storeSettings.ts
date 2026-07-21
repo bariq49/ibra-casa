@@ -29,7 +29,7 @@ const defaultsFromEnv = (): Omit<StoreSettings, "apiLogLevel"> & {
     process.env.FREE_DELIVERY_THRESHOLD || "999",
   ),
   currency: (process.env.CURRENCY || "USD").toUpperCase(),
-  storeName: process.env.STORE_NAME || "Sellzy",
+  storeName: process.env.STORE_NAME || "Ibra Casa",
   supportEmail: process.env.SUPPORT_EMAIL || "",
   apiLogLevel: "error",
 });

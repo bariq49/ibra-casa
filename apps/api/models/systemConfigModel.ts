@@ -62,7 +62,7 @@ const systemConfigSchema = new mongoose.Schema<ISystemConfigDocument>(
     },
     storeName: {
       type: String,
-      default: "Sellzy",
+      default: "Ibra Casa",
     },
     supportEmail: {
       type: String,

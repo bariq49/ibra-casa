@@ -3,12 +3,10 @@ import { persist } from "zustand/middleware";
 import { Product } from "@/components/common/products/ProductCard";
 import { calculateCartTotals } from "@/lib/priceUtils";
 import Cookies from "js-cookie";
-import { toast } from "sonner";
 import api, { API_ENDPOINTS } from "@/lib/api";
-import { useHeaderStore } from "./useHeaderStore";
 
 export interface CartItem {
-  id: string | number; // Represents the unique cart item reference
+  id: string | number;
   product: Product;
   quantity: number;
   color?: any;
@@ -17,14 +15,24 @@ export interface CartItem {
 
 interface CartStore {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity?: number, color?: any, size?: any) => Promise<any> | null;
+  addToCart: (
+    product: Product,
+    quantity?: number,
+    color?: any,
+    size?: any,
+  ) => Promise<any> | null;
   removeFromCart: (cartItemId: string | number) => Promise<any> | null;
-  updateQuantity: (cartItemId: string | number, quantity: number) => Promise<any> | null;
+  updateQuantity: (
+    cartItemId: string | number,
+    quantity: number,
+  ) => Promise<any> | null;
   clearCart: () => void;
   setCartItems: (items: CartItem[]) => void;
   getSubtotal: () => number;
   getTotalItems: () => number;
 }
+
+const isAuthenticated = () => Boolean(Cookies.get("token"));
 
 export const useCartStore = create<CartStore>()(
   persist(
@@ -34,21 +42,16 @@ export const useCartStore = create<CartStore>()(
       setCartItems: (items) => set({ cartItems: items }),
 
       addToCart: (product, quantity = 1, color, size) => {
-        if (!Cookies.get("token")) {
-          useHeaderStore.getState().onAuthOpen("login");
-          return null;
-        }
-
         const pId = (product as any)._id || product.id;
-        // Generate a pseudo-id locally for variations if DB _id isn't instantly known
-        const pseudoId = `${pId}-${color?._id || 'default'}-${size?._id || 'default'}`;
-        
-        // Optimistic UI update
+        const pseudoId = `${pId}-${color?._id || "default"}-${size?._id || "default"}`;
+
         set((state) => {
-          // Because API returns true _id, matching pseudoId locally keeps UI fast until full sync applies the real _id
-          // As a fallback, we aggressively check equality of properties
           const existingItem = state.cartItems.find(
-            (item) => item.id === pseudoId || (item.product._id === pId && item.color?._id === color?._id && item.size?._id === size?._id)
+            (item) =>
+              item.id === pseudoId ||
+              (item.product._id === pId &&
+                item.color?._id === color?._id &&
+                item.size?._id === size?._id),
           );
           if (existingItem) {
             return {
@@ -67,14 +70,16 @@ export const useCartStore = create<CartStore>()(
           };
         });
 
-        // Backend Sync
+        // Guests keep cart in localStorage only
+        if (!isAuthenticated()) return Promise.resolve({ guest: true });
+
         const req = api.post(API_ENDPOINTS.CART.BASE, {
           productId: pId,
           quantity,
           ...(color && { colorId: color._id }),
-          ...(size && { sizeId: size._id })
+          ...(size && { sizeId: size._id }),
         });
-        
+
         req.catch((error) => {
           console.error("Cart API Sync Error", error);
         });
@@ -83,46 +88,38 @@ export const useCartStore = create<CartStore>()(
       },
 
       removeFromCart: (cartItemId) => {
-        if (!Cookies.get("token")) {
-          useHeaderStore.getState().onAuthOpen("login");
-          return null;
-        }
-
         set((state) => ({
           cartItems: state.cartItems.filter((item) => item.id !== cartItemId),
         }));
 
+        if (!isAuthenticated()) return Promise.resolve({ guest: true });
+
         const req = api.delete(`${API_ENDPOINTS.CART.BASE}/${cartItemId}`);
-        req.catch(error => console.error("Cart API Sync Error", error));
+        req.catch((error) => console.error("Cart API Sync Error", error));
         return req;
       },
 
       updateQuantity: (cartItemId, quantity) => {
-        if (!Cookies.get("token")) {
-          useHeaderStore.getState().onAuthOpen("login");
-          return null;
-        }
-
         const newQuantity = Math.max(1, quantity);
         set((state) => ({
           cartItems: state.cartItems.map((item) =>
-            item.id === cartItemId
-              ? { ...item, quantity: newQuantity }
-              : item,
+            item.id === cartItemId ? { ...item, quantity: newQuantity } : item,
           ),
         }));
 
+        if (!isAuthenticated()) return Promise.resolve({ guest: true });
+
         const req = api.put(API_ENDPOINTS.CART.BASE, {
           cartItemId,
-          quantity: newQuantity
+          quantity: newQuantity,
         });
-        req.catch(error => console.error("Cart API Sync Error", error));
+        req.catch((error) => console.error("Cart API Sync Error", error));
         return req;
       },
 
       clearCart: () => {
         set({ cartItems: [] });
-        if (Cookies.get("token")) {
+        if (isAuthenticated()) {
           const req = api.delete(API_ENDPOINTS.CART.BASE);
           req.catch((error) => console.error("Cart API Sync Error", error));
         }
@@ -141,7 +138,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "cart-storage", // prefix for localStorage key
+      name: "cart-storage",
       partialize: (state) => ({
         cartItems: state.cartItems.map((item) => {
           const p = item.product as any;

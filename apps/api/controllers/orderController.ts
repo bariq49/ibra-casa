@@ -58,12 +58,6 @@ export const getOrders = asyncHandler(async (req: any, res: Response) => {
 // @route   GET /api/orders/:id
 // @access  Private
 export const getOrderById = asyncHandler(async (req: any, res: Response) => {
-  if (!req.user) {
-    res.status(401);
-    throw new Error("Not authorized");
-  }
-
-  // Validate ObjectId format before querying
   const orderId = req.params.id;
   if (!orderId || !orderId.match(/^[0-9a-fA-F]{24}$/)) {
     res.status(404);
@@ -77,10 +71,20 @@ export const getOrderById = asyncHandler(async (req: any, res: Response) => {
     throw new Error("Order not found");
   }
 
-  // Check ownership: user must own the order or be an admin
+  // Guest orders are viewable by anyone with the order ID (confirmation link)
+  if (order.isGuest) {
+    res.json(order);
+    return;
+  }
+
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Not authorized");
+  }
+
   if (
     req.user.role === "admin" ||
-    order.userId.toString() === req.user._id.toString()
+    (order.userId && order.userId.toString() === req.user._id.toString())
   ) {
     res.json(order);
   } else {
@@ -90,11 +94,16 @@ export const getOrderById = asyncHandler(async (req: any, res: Response) => {
 });
 
 export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
-  const { items, shippingAddress } = req.body;
+  const { items, shippingAddress, guestEmail } = req.body;
+  const isGuest = !req.user;
 
-  if (!req.user) {
-    res.status(401);
-    throw new Error("Not authorized");
+  if (isGuest) {
+    const email =
+      guestEmail || shippingAddress?.emailAddress || shippingAddress?.email;
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      res.status(400);
+      throw new Error("A valid email is required for guest checkout");
+    }
   }
 
   const storeSettings = await getStoreSettings();
@@ -103,13 +112,11 @@ export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
     throw new Error("Cash on Delivery is currently disabled");
   }
 
-  // Validate that items are provided
   if (!items || !Array.isArray(items) || items.length === 0) {
     res.status(400);
     throw new Error("Cart items are required");
   }
 
-  // Validate shipping address
   if (
     !shippingAddress ||
     !shippingAddress.firstName ||
@@ -126,8 +133,7 @@ export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
     );
   }
 
-  // Validate each item structure
-  const baseItems = items.map((item) => {
+  const baseItems = items.map((item: any) => {
     if (!item._id || !item.name || !item.price || !item.quantity) {
       res.status(400);
       throw new Error("Invalid item structure");
@@ -142,21 +148,33 @@ export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
   });
   const validItems = await enrichItemsWithVendorSnapshot(baseItems);
 
-  // Calculate subtotal (items only)
   const subtotal = validItems.reduce((acc, item) => {
     return acc + item.price * item.quantity;
   }, 0);
 
-  // Calculate shipping and tax from store settings (admin panel)
   const shipping = calcShipping(subtotal, storeSettings);
   const tax = subtotal * storeSettings.taxRate;
-
-  // Calculate final total
   const total = subtotal + shipping + tax;
 
-  // Create COD order with "confirmed" status
+  const resolvedGuestEmail = (
+    guestEmail ||
+    shippingAddress?.emailAddress ||
+    shippingAddress?.email ||
+    ""
+  )
+    .toString()
+    .trim()
+    .toLowerCase();
+
+  const actorName = isGuest
+    ? `${shippingAddress.firstName} ${shippingAddress.lastName}`.trim() ||
+      "Guest"
+    : req.user.name || req.user.email;
+
   const order = await Order.create({
-    userId: req.user._id,
+    ...(isGuest
+      ? { isGuest: true, guestEmail: resolvedGuestEmail }
+      : { userId: req.user._id, isGuest: false }),
     items: validItems,
     subtotal,
     tax,
@@ -166,23 +184,23 @@ export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
     paymentStatus: "pending",
     paymentMethod: "cod",
     shippingAddress,
-    codAmount: total, // Set COD amount to total
-    // Initialize status history
+    codAmount: total,
     status_history: [
       {
         status: "confirmed",
         changed_at: new Date(),
         changed_by: {
-          id: req.user._id,
-          name: req.user.name || req.user.email,
+          ...(isGuest ? {} : { id: req.user._id }),
+          name: actorName,
         },
-        notes: "COD order created and confirmed",
+        notes: isGuest
+          ? "Guest COD order created and confirmed"
+          : "COD order created and confirmed",
       },
     ],
     stockReduced: true,
   });
 
-  // Reduce product stock when COD order is created
   const Product = (await import("../models/productModel.js")).default;
   for (const item of validItems) {
     await Product.findByIdAndUpdate(
@@ -192,29 +210,30 @@ export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
     );
   }
 
-  // Create in-app notification for order placed
   try {
-    // Add Order to User's list of orders
-    await User.findByIdAndUpdate(req.user._id, {
-      $push: { orders: order._id },
-    });
-
-    // Clear user cart from DB
-    await Cart.findOneAndUpdate({ userId: req.user._id }, { items: [] });
-
-    await notificationService.notifyOrderPlaced(req.user._id, order);
+    if (!isGuest) {
+      await User.findByIdAndUpdate(req.user._id, {
+        $push: { orders: order._id },
+      });
+      await Cart.findOneAndUpdate({ userId: req.user._id }, { items: [] });
+      await notificationService.notifyOrderPlaced(req.user._id, order);
+    }
   } catch (notifError) {
     console.error("❌ Failed to create notification:", notifError);
-    // Don't fail order creation if notification fails
   }
 
-  // Send order confirmation email
   try {
-    const user = await User.findById(req.user._id);
-    if (user) {
-      const emailResult = await sendOrderConfirmationEmail({
-        userEmail: user.email,
-        userName: user.name || user.email,
+    const userEmail = isGuest
+      ? resolvedGuestEmail
+      : (await User.findById(req.user._id))?.email;
+    const userName = isGuest
+      ? actorName
+      : (await User.findById(req.user._id))?.name || userEmail;
+
+    if (userEmail) {
+      await sendOrderConfirmationEmail({
+        userEmail,
+        userName: userName || userEmail,
         order: {
           // @ts-ignore
           _id: order._id,
@@ -231,7 +250,6 @@ export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
       "❌ Failed to send COD order confirmation email:",
       emailError,
     );
-    // Don't fail order creation if email fails
   }
 
   res.status(201).json({
@@ -246,11 +264,21 @@ export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
 // @access  Private
 export const createOrderFromCart = asyncHandler(
   async (req: any, res: Response) => {
-    const { items, shippingAddress, paymentMethod = "stripe" } = req.body;
+    const {
+      items,
+      shippingAddress,
+      paymentMethod = "stripe",
+      guestEmail,
+    } = req.body;
+    const isGuest = !req.user;
 
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized");
+    if (isGuest) {
+      const email =
+        guestEmail || shippingAddress?.emailAddress || shippingAddress?.email;
+      if (!email || typeof email !== "string" || !email.includes("@")) {
+        res.status(400);
+        throw new Error("A valid email is required for guest checkout");
+      }
     }
 
     const storeSettings = await getStoreSettings();
@@ -266,13 +294,11 @@ export const createOrderFromCart = asyncHandler(
       throw new Error("Card payments are currently disabled");
     }
 
-    // Validate that items are provided
     if (!items || !Array.isArray(items) || items.length === 0) {
       res.status(400);
       throw new Error("Cart items are required");
     }
 
-    // Validate shipping address
     if (
       !shippingAddress ||
       !shippingAddress.firstName ||
@@ -289,8 +315,7 @@ export const createOrderFromCart = asyncHandler(
       );
     }
 
-    // Validate each item structure
-    const baseItems = items.map((item) => {
+    const baseItems = items.map((item: any) => {
       if (!item._id || !item.name || !item.price || !item.quantity) {
         res.status(400);
         throw new Error("Invalid item structure");
@@ -305,21 +330,33 @@ export const createOrderFromCart = asyncHandler(
     });
     const validItems = await enrichItemsWithVendorSnapshot(baseItems);
 
-    // Calculate subtotal (items only)
     const subtotal = validItems.reduce((acc, item) => {
       return acc + item.price * item.quantity;
     }, 0);
 
-    // Calculate shipping and tax from store settings (admin panel)
     const shipping = calcShipping(subtotal, storeSettings);
     const tax = subtotal * storeSettings.taxRate;
-
-    // Calculate final total
     const total = subtotal + shipping + tax;
 
-    // Create order with "pending" status (will be updated to "paid" after successful payment)
+    const resolvedGuestEmail = (
+      guestEmail ||
+      shippingAddress?.emailAddress ||
+      shippingAddress?.email ||
+      ""
+    )
+      .toString()
+      .trim()
+      .toLowerCase();
+
+    const actorName = isGuest
+      ? `${shippingAddress.firstName} ${shippingAddress.lastName}`.trim() ||
+        "Guest"
+      : req.user.name || req.user.email;
+
     const order = await Order.create({
-      userId: req.user._id,
+      ...(isGuest
+        ? { isGuest: true, guestEmail: resolvedGuestEmail }
+        : { userId: req.user._id, isGuest: false }),
       items: validItems,
       subtotal,
       tax,
@@ -327,47 +364,46 @@ export const createOrderFromCart = asyncHandler(
       total,
       status: "pending",
       paymentStatus: "pending",
-      paymentMethod, // From checkout request (defaults to stripe)
+      paymentMethod,
       shippingAddress,
-      // Initialize COD amount for potential COD orders
       codAmount: 0,
-      // Initialize status history
       status_history: [
         {
           status: "pending",
           changed_at: new Date(),
           changed_by: {
-            id: req.user._id,
-            name: req.user.name || req.user.email,
+            ...(isGuest ? {} : { id: req.user._id }),
+            name: actorName,
           },
-          notes: "Order created",
+          notes: isGuest ? "Guest order created" : "Order created",
         },
       ],
     });
 
-    // Create in-app notification for order placed
     try {
-      // Add Order to User's list of orders
-      await User.findByIdAndUpdate(req.user._id, {
-        $push: { orders: order._id },
-      });
-
-      // Clear user cart from DB
-      await Cart.findOneAndUpdate({ userId: req.user._id }, { items: [] });
-
-      await notificationService.notifyOrderPlaced(req.user._id, order);
+      if (!isGuest) {
+        await User.findByIdAndUpdate(req.user._id, {
+          $push: { orders: order._id },
+        });
+        await Cart.findOneAndUpdate({ userId: req.user._id }, { items: [] });
+        await notificationService.notifyOrderPlaced(req.user._id, order);
+      }
     } catch (notifError) {
       console.error("❌ Failed to create notification:", notifError);
-      // Don't fail order creation if notification fails
     }
 
-    // Send order confirmation email
     try {
-      const user = await User.findById(req.user._id);
-      if (user) {
-        const emailResult = await sendOrderConfirmationEmail({
-          userEmail: user.email,
-          userName: user.name || user.email,
+      const userEmail = isGuest
+        ? resolvedGuestEmail
+        : (await User.findById(req.user._id))?.email;
+      const userName = isGuest
+        ? actorName
+        : (await User.findById(req.user._id))?.name || userEmail;
+
+      if (userEmail) {
+        await sendOrderConfirmationEmail({
+          userEmail,
+          userName: userName || userEmail,
           order: {
             // @ts-ignore
             _id: order._id,
@@ -381,7 +417,6 @@ export const createOrderFromCart = asyncHandler(
       }
     } catch (emailError) {
       console.error("❌ Failed to send order confirmation email:", emailError);
-      // Don't fail the order creation if email fails
     }
 
     res.status(201).json({

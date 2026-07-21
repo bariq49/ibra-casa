@@ -104,7 +104,16 @@ const orderSchema = new mongoose.Schema<IOrderDocument>(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
+    },
+    isGuest: {
+      type: Boolean,
+      default: false,
+    },
+    guestEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
     },
     items: [orderItemSchema],
     subtotal: {
@@ -327,7 +336,7 @@ const orderSchema = new mongoose.Schema<IOrderDocument>(
           id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: false,
           },
           name: {
             type: String,
