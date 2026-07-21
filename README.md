@@ -1,8 +1,6 @@
 <div align="center">
 
-# Sellzy — Multi-Vendor E-Commerce Platform
-
-![Sellzy preview](./public/preview.png)
+# Ibra Casa — Multi-Vendor E-Commerce Platform
 
 A production-ready, multi-vendor commerce stack built as a `pnpm` + Turborepo monorepo: a Next.js storefront, a Vite/React admin, and an Express + MongoDB API.
 
@@ -146,21 +144,3 @@ Detailed walkthrough: **[sellzy-setup.md → Deploying with GitHub Actions](./se
 - **License:** Sold under the ThemeForest Regular / Extended license — see [LICENSE](./LICENSE).
 - **Support:** Item support covered for 6 months from purchase via the ThemeForest item page.
 - **Updates:** Future versions ship through the same ThemeForest item; pull the latest zip and re-run `pnpm install`.
-
----
-
-<div align="center">
-
-Built with ❤️ for YOU. Happy shipping.
-
-Crafted by **[reactbd.com](https://reactbd.com)**
-
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/reactbd)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=fff)](https://github.com/noorjsdivs)
-[![YouTube](https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=fff)](https://www.youtube.com/@reactjsBD)
-[![X / Twitter](https://img.shields.io/badge/Follow-000?logo=x&logoColor=fff)](https://x.com/NoorMoh74531005)
-[![Website](https://img.shields.io/badge/reactbd.com-088178?logo=googlechrome&logoColor=fff)](https://reactbd.com)
-
-If Sellzy saved you time, consider [buying me a coffee ☕](https://buymeacoffee.com/reactbd) — it keeps the updates coming.
-
-</div>
