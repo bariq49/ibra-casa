@@ -116,12 +116,19 @@ const CheckoutClient = ({
 
   if (!mounted) return null;
 
-  const resolveShippingAddress = () => {
+  const resolveShippingAddress = (): {
+    street: string;
+    postalCode: string;
+    emailAddress?: string;
+    [key: string]: any;
+  } | null => {
     if (isLoggedIn && activeAddressObj) {
       return {
         ...activeAddressObj,
         street: activeAddressObj.apartment || activeAddressObj.city || "N/A",
         postalCode: activeAddressObj.zipCode,
+        emailAddress:
+          activeAddressObj.emailAddress || user?.email || undefined,
       };
     }
     if (guestAddress) {

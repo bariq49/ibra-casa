@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import {
   Select,
@@ -66,6 +67,7 @@ import {
   Loader2,
   Plus,
   Trash,
+  Trash2,
   ChevronLeft,
   ChevronRight,
   RefreshCw,
@@ -186,7 +188,12 @@ export default function ProductsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(
+    new Set(),
+  );
+  const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
 
   const axiosPrivate = useAxiosPrivate();
@@ -519,6 +526,7 @@ export default function ProductsPage() {
 
       const response = await axiosPrivate.get("/products", { params });
       setProducts(response.data.products || []);
+      setSelectedProducts(new Set());
       setTotal(response.data.total || 0);
       setTotalPages(
         response.data.totalPages ||
@@ -990,6 +998,11 @@ export default function ProductsPage() {
         description: "Product deleted successfully",
       });
       setIsDeleteModalOpen(false);
+      setSelectedProducts((prev) => {
+        const next = new Set(prev);
+        next.delete(selectedProduct._id);
+        return next;
+      });
       fetchProducts(true); // Reset to page 1 and refetch
     } catch (error: unknown) {
       let errorMessage = "Failed to delete product";
@@ -1005,6 +1018,59 @@ export default function ProductsPage() {
           : "Error",
         description: errorMessage,
       });
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedProducts(new Set(products.map((p) => p._id)));
+    } else {
+      setSelectedProducts(new Set());
+    }
+  };
+
+  const handleSelectProduct = (productId: string, checked: boolean) => {
+    setSelectedProducts((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(productId);
+      else next.delete(productId);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedProducts.size === 0) return;
+
+    setBulkDeleteLoading(true);
+    try {
+      await Promise.all(
+        Array.from(selectedProducts).map((productId) =>
+          axiosPrivate.delete(`/products/${productId}`),
+        ),
+      );
+
+      toast({
+        title: "Success",
+        description: `${selectedProducts.size} product(s) deleted successfully`,
+      });
+
+      setIsBulkDeleteModalOpen(false);
+      setSelectedProducts(new Set());
+      fetchProducts(true);
+    } catch (error: unknown) {
+      let errorMessage = "Failed to delete selected products";
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: errorMessage,
+      });
+    } finally {
+      setBulkDeleteLoading(false);
     }
   };
 
@@ -1140,6 +1206,16 @@ export default function ProductsPage() {
             </div>
             {isAdmin && canPerformCRUD && (
               <>
+                {selectedProducts.size > 0 && (
+                  <Button
+                    onClick={() => setIsBulkDeleteModalOpen(true)}
+                    variant="destructive"
+                    className="flex-1 sm:flex-none justify-center h-9 font-['DM_Sans',sans-serif] shadow-sm text-sm"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete {selectedProducts.size}
+                  </Button>
+                )}
                 <Button
                   onClick={() => setIsBulkUploadModalOpen(true)}
                   variant="outline"
@@ -1298,6 +1374,20 @@ export default function ProductsPage() {
               <Table className="min-w-full">
                 <TableHeader>
                   <TableRow className="border-b border-border/50 bg-[#F8F9FA] hover:bg-[#F8F9FA]">
+                    {isAdmin && canPerformCRUD && (
+                      <TableHead className="w-[48px] py-3 border-b border-border/50">
+                        <Checkbox
+                          checked={
+                            products.length > 0 &&
+                            selectedProducts.size === products.length
+                          }
+                          onCheckedChange={(checked) =>
+                            handleSelectAll(checked === true)
+                          }
+                          aria-label="Select all products"
+                        />
+                      </TableHead>
+                    )}
                     <TableHead className="font-semibold whitespace-nowrap font-['DM_Sans',sans-serif] text-sm text-[#495057] uppercase py-3 border-b border-border/50">
                       Product
                     </TableHead>
@@ -1326,86 +1416,101 @@ export default function ProductsPage() {
                       key={product._id}
                       className={`border-b border-border/30 transition-colors hover:bg-muted/50 ${
                         index % 2 === 0 ? "bg-background" : "bg-muted/20"
-                      }`}
+                      } ${selectedProducts.has(product._id) ? "bg-primary/5" : ""}`}
                     >
+                      {isAdmin && canPerformCRUD && (
+                        <TableCell className="py-3 w-[48px]">
+                          <Checkbox
+                            checked={selectedProducts.has(product._id)}
+                            onCheckedChange={(checked) =>
+                              handleSelectProduct(product._id, checked === true)
+                            }
+                            aria-label={`Select ${product.name}`}
+                          />
+                        </TableCell>
+                      )}
                       <TableCell className="py-3">
-                        <div className="flex items-center">
-                          {product?.images && product.images.length > 0 ? (
-                            <>
-                              {product.images.slice(0, 3).map((img, i) => (
-                                <div
-                                  key={i}
-                                  className={`h-10 w-10 rounded-full overflow-hidden bg-muted shadow-sm border shrink-0 ${
-                                    i > 0 ? "-ml-3" : ""
-                                  } ring-2 ring-white relative z-${30 - i * 10}`}
-                                >
-                                  <img
-                                    src={img}
-                                    alt={`${product?.name} image ${i + 1}`}
-                                    className="h-full w-full object-cover"
-                                    onError={(e) => {
-                                      const target = e.currentTarget;
-                                      const currentSrc = target.src;
-                                      if (
-                                        currentSrc.includes(
-                                          "/placeholder-image.jpg",
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex items-center shrink-0">
+                            {product?.images && product.images.length > 0 ? (
+                              <>
+                                {product.images.slice(0, 3).map((img, i) => (
+                                  <div
+                                    key={i}
+                                    className={`h-10 w-10 rounded-full overflow-hidden bg-muted shadow-sm border shrink-0 ${
+                                      i > 0 ? "-ml-3" : ""
+                                    } ring-2 ring-white relative z-${30 - i * 10}`}
+                                  >
+                                    <img
+                                      src={img}
+                                      alt={`${product?.name} image ${i + 1}`}
+                                      className="h-full w-full object-cover"
+                                      onError={(e) => {
+                                        const target = e.currentTarget;
+                                        const currentSrc = target.src;
+                                        if (
+                                          currentSrc.includes(
+                                            "/placeholder-image.jpg",
+                                          )
                                         )
-                                      )
-                                        return;
-                                      if (
-                                        currentSrc.includes("cloudinary.com") &&
-                                        !target.dataset.retryCount
-                                      ) {
-                                        target.dataset.retryCount = "1";
-                                        setTimeout(() => {
-                                          target.src = `${currentSrc}${currentSrc.includes("?") ? "&" : "?"}retry=${Date.now()}`;
-                                        }, 2000);
-                                      } else if (
-                                        target.dataset.retryCount === "1"
-                                      ) {
-                                        target.dataset.retryCount = "2";
-                                        setTimeout(() => {
-                                          target.src = `${currentSrc.split("retry=")[0]}retry=${Date.now()}`;
-                                        }, 5000);
-                                      } else {
-                                        target.src = "/placeholder-image.jpg";
-                                      }
-                                    }}
-                                  />
-                                </div>
-                              ))}
-                              {product.images.length > 3 && (
-                                <div className="flex -ml-3 h-10 w-10 items-center justify-center rounded-full bg-[#F8F9FA] border border-[#E9ECEF] text-xs font-bold text-gray-600 shrink-0 ring-2 ring-white z-0 overflow-hidden font-['DM_Sans',sans-serif]">
-                                  +{product.images.length - 3}
-                                </div>
-                              )}
-                            </>
-                          ) : (
-                            <div className="h-10 w-10 rounded-full overflow-hidden bg-muted shadow-sm border shrink-0 ring-2 ring-white relative">
-                              <img
-                                src={product?.image || "/placeholder-image.jpg"}
-                                alt={product?.name || "Placeholder"}
-                                className="h-full w-full object-cover"
-                                onError={(e) => {
-                                  (e.currentTarget as HTMLImageElement).src =
-                                    "/placeholder-image.jpg";
-                                }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium text-foreground py-3">
-                        <div className="flex flex-col">
-                          <span
-                            className="max-w-[150px] sm:max-w-xs truncate text-[#212529] font-semibold font-['DM_Sans',sans-serif] text-sm"
-                            title={product?.name}
-                          >
-                            {product?.name}
-                          </span>
-                          <span className="text-xs text-[#6C757D] font-['Outfit',sans-serif] capitalize truncate max-w-[150px] sm:max-w-xs">
-                            {product?.productBase?.title || "Base"}
-                          </span>
+                                          return;
+                                        if (
+                                          currentSrc.includes(
+                                            "cloudinary.com",
+                                          ) &&
+                                          !target.dataset.retryCount
+                                        ) {
+                                          target.dataset.retryCount = "1";
+                                          setTimeout(() => {
+                                            target.src = `${currentSrc}${currentSrc.includes("?") ? "&" : "?"}retry=${Date.now()}`;
+                                          }, 2000);
+                                        } else if (
+                                          target.dataset.retryCount === "1"
+                                        ) {
+                                          target.dataset.retryCount = "2";
+                                          setTimeout(() => {
+                                            target.src = `${currentSrc.split("retry=")[0]}retry=${Date.now()}`;
+                                          }, 5000);
+                                        } else {
+                                          target.src = "/placeholder-image.jpg";
+                                        }
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                                {product.images.length > 3 && (
+                                  <div className="flex -ml-3 h-10 w-10 items-center justify-center rounded-full bg-[#F8F9FA] border border-[#E9ECEF] text-xs font-bold text-gray-600 shrink-0 ring-2 ring-white z-0 overflow-hidden font-['DM_Sans',sans-serif]">
+                                    +{product.images.length - 3}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <div className="h-10 w-10 rounded-full overflow-hidden bg-muted shadow-sm border shrink-0 ring-2 ring-white relative">
+                                <img
+                                  src={
+                                    product?.image || "/placeholder-image.jpg"
+                                  }
+                                  alt={product?.name || "Placeholder"}
+                                  className="h-full w-full object-cover"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src =
+                                      "/placeholder-image.jpg";
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span
+                              className="max-w-[150px] sm:max-w-xs truncate text-[#212529] font-semibold font-['DM_Sans',sans-serif] text-sm"
+                              title={product?.name}
+                            >
+                              {product?.name}
+                            </span>
+                            <span className="text-xs text-[#6C757D] font-['Outfit',sans-serif] capitalize truncate max-w-[150px] sm:max-w-xs">
+                              {product?.productBase?.title || "Base"}
+                            </span>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="py-3">
@@ -1505,7 +1610,9 @@ export default function ProductsPage() {
                   {products.length === 0 && (
                     <TableRow>
                       <TableCell
-                        colSpan={isAdmin ? 11 : 10}
+                        colSpan={
+                          isAdmin ? (canPerformCRUD ? 7 : 6) : 5
+                        }
                         className="text-center py-12 text-muted-foreground"
                       >
                         <div className="flex flex-col items-center gap-2">
@@ -1547,9 +1654,24 @@ export default function ProductsPage() {
               products.map((product) => (
                 <div
                   key={product._id}
-                  className="rounded-lg border border-border/50 bg-card p-4 shadow-sm hover:shadow-md transition-shadow"
+                  className={`rounded-lg border border-border/50 bg-card p-4 shadow-sm hover:shadow-md transition-shadow ${
+                    selectedProducts.has(product._id)
+                      ? "border-primary/40 bg-primary/5"
+                      : ""
+                  }`}
                 >
                   <div className="flex gap-4">
+                    {isAdmin && canPerformCRUD && (
+                      <div className="pt-1 shrink-0">
+                        <Checkbox
+                          checked={selectedProducts.has(product._id)}
+                          onCheckedChange={(checked) =>
+                            handleSelectProduct(product._id, checked === true)
+                          }
+                          aria-label={`Select ${product.name}`}
+                        />
+                      </div>
+                    )}
                     {/* Product Image */}
                     <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-md overflow-hidden bg-muted shadow-sm border shrink-0">
                       <img
@@ -2942,6 +3064,49 @@ export default function ProductsPage() {
               className="bg-destructive hover:bg-destructive/90 w-full sm:w-auto"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation */}
+      <AlertDialog
+        open={isBulkDeleteModalOpen}
+        onOpenChange={setIsBulkDeleteModalOpen}
+      >
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg sm:text-xl">
+              Delete selected products?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              This action cannot be undone. This will permanently delete{" "}
+              <span className="font-semibold">
+                {selectedProducts.size} product(s)
+              </span>
+              .
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel
+              className="w-full sm:w-auto mt-0"
+              disabled={bulkDeleteLoading}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={bulkDeleteLoading}
+              className="bg-destructive hover:bg-destructive/90 w-full sm:w-auto"
+            >
+              {bulkDeleteLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                `Delete ${selectedProducts.size}`
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
