@@ -80,7 +80,7 @@ const BottomHeader = ({
 
   return (
     <div
-      className={`border-y border-border hidden xl:flex header-bottom bg-background z-40 transition-all duration-300 ${
+      className={`border-y border-border hidden xl:flex header-bottom bg-white z-40 transition-all duration-300 ${
         isSticky
           ? "fixed top-0 left-0 w-full shadow-md animate-fadeInDown"
           : "relative"

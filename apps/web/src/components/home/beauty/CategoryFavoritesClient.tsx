@@ -54,18 +54,8 @@ const CategoryFavoritesClient = ({
             transition={{ duration: 0.45 }}
             className="max-w-2xl"
           >
-            <h2
-              className="text-light-primary-text leading-tight"
-              style={{
-                fontFamily: "'Urbanist', sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(24px, 3vw, 32px)",
-              }}
-            >
-              Featured Categories
-            </h2>
             <p
-              className="mt-2 text-light-secondary-text text-[15px] sm:text-base leading-relaxed"
+              className="text-light-primary-text text-[15px] sm:text-base md:text-lg leading-relaxed max-w-xl"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               Discover furniture designed for the future of living, work, and

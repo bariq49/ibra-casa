@@ -345,7 +345,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                   });
                 }
               }}
-              className="w-full sm:flex-1 h-12 rounded-[80px] bg-sellzy-teal hover:bg-sellzy-teal/90 text-foreground font-semibold text-[16px] gap-2 shadow-color-primary"
+              className="w-full sm:flex-1 h-12 rounded-[80px] bg-sellzy-teal hover:bg-primary text-foreground hover:text-primary-foreground font-semibold text-[16px] gap-2 shadow-color-primary border-none"
             >
               <ShoppingCart className="size-5" />
               Add to Cart
@@ -360,7 +360,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         <button
           type="button"
           onClick={handleShare}
-          className="flex items-center gap-2.5 text-secondary hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2.5 text-light-primary-text hover:text-primary transition-colors"
         >
           <Share2 className="size-5" />
           <span className="text-[16px]">Share</span>
@@ -370,8 +370,10 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           type="button"
           onClick={handleCompare}
           className={cn(
-            "flex items-center gap-2.5 transition-opacity",
-            isCompared ? "text-primary" : "text-secondary hover:opacity-80",
+            "flex items-center gap-2.5 transition-colors",
+            isCompared
+              ? "text-primary"
+              : "text-light-primary-text hover:text-primary",
           )}
         >
           <GitCompare className="size-5" />
@@ -389,12 +391,6 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           <p className="text-light-secondary-text">
             Estimated Delivery Time 5-7 Days
           </p>
-        </div>
-        <div className="flex items-start gap-4 w-full">
-          <p className="font-semibold text-light-primary-text w-30 shrink-0">
-            SKU :
-          </p>
-          <p className="text-light-secondary-text">{product.sku || "N/A"}</p>
         </div>
         <div className="flex items-start gap-4 w-full">
           <p className="font-semibold text-light-primary-text w-30 shrink-0">

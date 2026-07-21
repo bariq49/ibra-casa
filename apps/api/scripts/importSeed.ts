@@ -46,6 +46,7 @@ const REPLACE_COLLECTIONS = [
   "blogtags",
   "comments",
   "todaysoffers",
+  "bannertypes",
 ];
 
 const OBJECT_ID_RE = /^[a-fA-F0-9]{24}$/;
@@ -117,6 +118,22 @@ async function importSeedData() {
     const db = mongoose.connection.db;
     if (!db) throw new Error("Database not resolved.");
 
+    // Always wipe catalog collections first so leftover docs from older seeds
+    // (or collections without a matching JSON file) do not stick around.
+    console.log("Clearing catalog collections...");
+    for (const collectionName of REPLACE_COLLECTIONS) {
+      try {
+        const deleted = await db.collection(collectionName).deleteMany({});
+        if (deleted.deletedCount > 0) {
+          console.log(
+            `Cleared ${deleted.deletedCount} docs from ${collectionName}`,
+          );
+        }
+      } catch {
+        // Collection may not exist yet — ignore.
+      }
+    }
+
     for (const file of files) {
       const collectionName = file.replace(".json", "");
 
@@ -133,13 +150,6 @@ async function importSeedData() {
 
       // Cast _id and all ObjectId-looking ref fields (category, brand, colors, …)
       data = data.map((doc: any) => castObjectIds(doc) as any);
-
-      if (REPLACE_COLLECTIONS.includes(collectionName)) {
-        const deleted = await db.collection(collectionName).deleteMany({});
-        console.log(
-          `Cleared ${deleted.deletedCount} existing docs from ${collectionName}`,
-        );
-      }
 
       if (data.length > 0) {
         const bulkOps = data.map((doc: any) => ({

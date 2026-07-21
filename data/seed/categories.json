@@ -29,7 +29,7 @@
     "order": 1,
     "isActive": true,
     "isFavorite": true,
-    "description": "Statement pieces for modern living spaces.",
+    "description": "Redefine rest with our organic collection.",
     "image": "",
     "icon": "",
     "productBases": [
@@ -49,7 +49,7 @@
     "order": 2,
     "isActive": true,
     "isFavorite": true,
-    "description": "Warm ambient lighting for every room.",
+    "description": "Redefine rest with our organic collection.",
     "image": "",
     "icon": "",
     "productBases": [
@@ -69,47 +69,7 @@
     "order": 3,
     "isActive": true,
     "isFavorite": true,
-    "description": "Curated accents that complete the look.",
-    "image": "",
-    "icon": "",
-    "productBases": [
-      "a60000000000000000000001"
-    ],
-    "createdAt": "2026-07-21T00:00:00.000Z",
-    "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
-  },
-  {
-    "_id": "a10000000000000000000005",
-    "name": "Living Room",
-    "slug": "living-room",
-    "parent": null,
-    "path": "",
-    "level": 0,
-    "order": 4,
-    "isActive": true,
-    "isFavorite": false,
-    "description": "Comfort-first furniture for everyday living.",
-    "image": "",
-    "icon": "",
-    "productBases": [
-      "a60000000000000000000001"
-    ],
-    "createdAt": "2026-07-21T00:00:00.000Z",
-    "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
-  },
-  {
-    "_id": "a10000000000000000000006",
-    "name": "Dining",
-    "slug": "dining",
-    "parent": null,
-    "path": "",
-    "level": 0,
-    "order": 5,
-    "isActive": true,
-    "isFavorite": false,
-    "description": "Tables and dining accents for gatherings.",
+    "description": "Redefine rest with our organic collection.",
     "image": "",
     "icon": "",
     "productBases": [

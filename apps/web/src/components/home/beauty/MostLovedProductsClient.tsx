@@ -110,7 +110,10 @@ const MostLovedProductsClient = ({
 
   // Get banner block colors natively from productType or use default
   const bgColor =
-    productType?.productBasesBg?.beauty || productType?.bgColor || "#92BDF5";
+    productType?.productBasesBg?.["home-decor"] ||
+    productType?.productBasesBg?.beauty ||
+    productType?.bgColor ||
+    "#92BDF5";
 
   if (products.length === 0) return null;
 
@@ -120,15 +123,15 @@ const MostLovedProductsClient = ({
         <div className="relative px-0 pt-8 md:pt-6 lg:pt-8 pb-12 min-h-[500px]">
           {/* Mobile Solid Background with rounded corners */}
           <div
-            className="absolute inset-0 z-0 pointer-events-none md:hidden rounded-[24px] md:rounded-[48px]"
+            className="absolute inset-0 z-0 pointer-events-none md:hidden rounded-xl"
             style={{ backgroundColor: bgColor }}
           />
 
           {/* Desktop SVG Background Cutout from Figma - Restructured to sit inside overflow-hidden container */}
-          <div className="absolute inset-0 z-0 pointer-events-none hidden md:flex justify-start items-start w-full h-full overflow-hidden rounded-[48px]">
+          <div className="absolute inset-0 z-0 pointer-events-none hidden md:flex justify-start items-start w-full h-full overflow-hidden rounded-xl">
             {/* The SVG is placed in its native size relative to the top left, but container handles the actual bottom & right bounds dynamically */}
             <div
-              className="absolute inset-0 rounded-[48px]"
+              className="absolute inset-0 rounded-xl"
               style={{ backgroundColor: bgColor }}
             />
             {/* We subtract the white notch from the top-left area instead of drawing the whole 1728px SVG. 

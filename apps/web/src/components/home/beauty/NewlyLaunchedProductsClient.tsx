@@ -69,14 +69,14 @@ const NewlyLaunchedProductsClient = ({
         <div className="relative px-0 pt-8 md:pt-6 lg:pt-8 pb-12 min-h-[500px]">
           {/* Mobile solid background */}
           <div
-            className="absolute inset-0 z-0 pointer-events-none md:hidden rounded-[24px]"
+            className="absolute inset-0 z-0 pointer-events-none md:hidden rounded-xl"
             style={{ backgroundColor: bgColor }}
           />
 
           {/* Desktop: solid fill + white top-left notch for the title */}
-          <div className="absolute inset-0 z-0 pointer-events-none hidden md:block overflow-hidden rounded-[48px]">
+          <div className="absolute inset-0 z-0 pointer-events-none hidden md:block overflow-hidden rounded-xl">
             <div
-              className="absolute inset-0 rounded-[48px]"
+              className="absolute inset-0 rounded-xl"
               style={{ backgroundColor: bgColor }}
             />
             <svg
@@ -97,10 +97,10 @@ const NewlyLaunchedProductsClient = ({
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6 md:mb-14 lg:mb-16 w-full px-6 sm:px-10 lg:px-14">
             <div className="relative max-w-max w-full flex flex-col items-start gap-1 md:-mt-8">
               <SectionHeader
-                title="Newly Launched Products"
+                title={productType?.title || "Newly Launched Products"}
                 description={
                   productType?.description ||
-                  "Up to 69% discount for limited time 🔥"
+                  "Fresh arrivals designed for modern living."
                 }
                 align="left"
               />

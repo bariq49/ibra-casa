@@ -1,0 +1,68 @@
+[
+  {
+    "_id": "a40000000000000000000001",
+    "name": "Matte Black",
+    "value": "#1a1a1a",
+    "slug": "matte-black",
+    "displayOrder": 0,
+    "priceModifier": 0,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a40000000000000000000002",
+    "name": "Antique Gold",
+    "value": "#c5a572",
+    "slug": "antique-gold",
+    "displayOrder": 1,
+    "priceModifier": 12,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a40000000000000000000003",
+    "name": "Bronze",
+    "value": "#8b5a2b",
+    "slug": "bronze",
+    "displayOrder": 2,
+    "priceModifier": 8,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a40000000000000000000004",
+    "name": "Ivory White",
+    "value": "#f5f0e8",
+    "slug": "ivory-white",
+    "displayOrder": 3,
+    "priceModifier": 0,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a40000000000000000000005",
+    "name": "Walnut",
+    "value": "#5c4033",
+    "slug": "walnut",
+    "displayOrder": 4,
+    "priceModifier": 10,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a40000000000000000000006",
+    "name": "Brushed Brass",
+    "value": "#d4a84b",
+    "slug": "brushed-brass",
+    "displayOrder": 5,
+    "priceModifier": 15,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  }
+]

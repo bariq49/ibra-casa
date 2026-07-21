@@ -41,6 +41,7 @@ export const getTodaysOffer = asyncHandler(async (_req, res) => {
     description: offer.description,
     endsAt: offer.endsAt,
     isActive: offer.isActive,
+    bgColor: offer.bgColor || "#F4F3F5",
     products,
   });
 });
@@ -61,6 +62,7 @@ export const getTodaysOfferAdmin = asyncHandler(async (_req, res) => {
     description: offer.description,
     endsAt: offer.endsAt,
     isActive: offer.isActive,
+    bgColor: offer.bgColor || "#F4F3F5",
     products: offer.products || [],
     productIds: (offer.products || []).map((p: any) =>
       typeof p === "object" && p?._id ? String(p._id) : String(p),
@@ -72,11 +74,12 @@ export const getTodaysOfferAdmin = asyncHandler(async (_req, res) => {
 // @route   PUT /api/todays-offer
 // @access  Admin
 export const updateTodaysOffer = asyncHandler(async (req, res) => {
-  const { title, description, products, endsAt, isActive } = req.body;
+  const { title, description, products, endsAt, isActive, bgColor } = req.body;
   const offer = await getOrCreateOffer();
 
   if (title !== undefined) offer.title = String(title).trim();
   if (description !== undefined) offer.description = String(description).trim();
+  if (bgColor !== undefined) offer.bgColor = String(bgColor).trim();
   if (Array.isArray(products)) {
     offer.products = products.filter(Boolean);
   }
@@ -102,6 +105,7 @@ export const updateTodaysOffer = asyncHandler(async (req, res) => {
     description: offer.description,
     endsAt: offer.endsAt,
     isActive: offer.isActive,
+    bgColor: offer.bgColor || "#F4F3F5",
     products: offer.products || [],
     productIds: (offer.products || []).map((p: any) =>
       typeof p === "object" && p?._id ? String(p._id) : String(p),

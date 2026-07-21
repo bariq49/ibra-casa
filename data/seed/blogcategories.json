@@ -1,0 +1,46 @@
+[
+  {
+    "_id": "ac0000000000000000000001",
+    "name": "Interior Styling",
+    "slug": "interior-styling",
+    "description": "Ideas for arranging furniture, lighting, and d\u00e9cor in real rooms.",
+    "isActive": true,
+    "order": 1,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ac0000000000000000000002",
+    "name": "Materials & Craft",
+    "slug": "materials-and-craft",
+    "description": "Guides to wood, metal, ceramic, and textile finishes.",
+    "isActive": true,
+    "order": 2,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ac0000000000000000000003",
+    "name": "Lighting Ideas",
+    "slug": "lighting-ideas",
+    "description": "How to layer ambient, task, and accent lighting at home.",
+    "isActive": true,
+    "order": 3,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ac0000000000000000000004",
+    "name": "Care & Longevity",
+    "slug": "care-and-longevity",
+    "description": "Simple care tips to keep furniture and d\u00e9cor looking new.",
+    "isActive": true,
+    "order": 4,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  }
+]

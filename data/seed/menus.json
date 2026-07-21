@@ -1,0 +1,67 @@
+[
+  {
+    "_id": "aa0000000000000000000001",
+    "title": "Home",
+    "href": "/",
+    "order": 1,
+    "isActive": true,
+    "isMega": false,
+    "subItems": [],
+    "megaData": [],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "aa0000000000000000000002",
+    "title": "Shop",
+    "href": "/shop",
+    "order": 2,
+    "isActive": true,
+    "isMega": false,
+    "subItems": [],
+    "megaData": [],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "aa0000000000000000000003",
+    "title": "About",
+    "href": "/about",
+    "order": 3,
+    "isActive": true,
+    "isMega": false,
+    "subItems": [],
+    "megaData": [],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "aa0000000000000000000004",
+    "title": "Journal",
+    "href": "/blogs",
+    "order": 4,
+    "isActive": true,
+    "isMega": false,
+    "subItems": [],
+    "megaData": [],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "aa0000000000000000000005",
+    "title": "Contact Us",
+    "href": "/contact",
+    "order": 5,
+    "isActive": true,
+    "isMega": false,
+    "subItems": [],
+    "megaData": [],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  }
+]

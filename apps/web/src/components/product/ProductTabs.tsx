@@ -262,7 +262,6 @@ export default function ProductTabs({ product }: { product: FullProduct }) {
 
   // Build additional info rows from product fields
   const additionalInfoRows: { label: string; value: string }[] = [
-    ...(product.sku ? [{ label: "SKU", value: product.sku }] : []),
     ...(product.category?.name
       ? [{ label: "Category", value: product.category.name }]
       : []),
@@ -425,8 +424,8 @@ export default function ProductTabs({ product }: { product: FullProduct }) {
             onClick={() => setActiveTab(tab.id)}
             className={`md:px-8 md:py-3 px-4 py-2 rounded-full text-base font-medium font-dm-sans transition-all duration-200 whitespace-nowrap ${
               activeTab === tab.id
-                ? "bg-primary-light/10 text-primary-light"
-                : "text-foreground hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-light-primary-text hover:bg-gray-100"
             }`}
           >
             {tab.label}
@@ -444,7 +443,7 @@ export default function ProductTabs({ product }: { product: FullProduct }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="w-full border border-border rounded-3xl overflow-hidden bg-white"
+            className="w-full border border-border rounded-xl overflow-hidden bg-white"
           >
             {/* Title bar */}
             <div className="bg-gray-200 px-6 py-4 border-b border-border">
@@ -544,7 +543,7 @@ export default function ProductTabs({ product }: { product: FullProduct }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="w-full border border-border rounded-3xl overflow-hidden bg-white"
+            className="w-full border border-border rounded-xl overflow-hidden bg-white"
           >
             {/* Title bar */}
             <div className="bg-gray-200 px-6 py-4 border-b border-border">

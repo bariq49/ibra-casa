@@ -1,0 +1,90 @@
+[
+  {
+    "_id": "ad0000000000000000000001",
+    "name": "Living Room",
+    "slug": "living-room",
+    "description": "",
+    "isActive": true,
+    "order": 1,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000002",
+    "name": "Lighting",
+    "slug": "lighting",
+    "description": "",
+    "isActive": true,
+    "order": 2,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000003",
+    "name": "Minimalism",
+    "slug": "minimalism",
+    "description": "",
+    "isActive": true,
+    "order": 3,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000004",
+    "name": "Styling Tips",
+    "slug": "styling-tips",
+    "description": "",
+    "isActive": true,
+    "order": 4,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000005",
+    "name": "Materials",
+    "slug": "materials",
+    "description": "",
+    "isActive": true,
+    "order": 5,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000006",
+    "name": "Home Office",
+    "slug": "home-office",
+    "description": "",
+    "isActive": true,
+    "order": 6,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000007",
+    "name": "Seasonal Decor",
+    "slug": "seasonal-decor",
+    "description": "",
+    "isActive": true,
+    "order": 7,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad0000000000000000000008",
+    "name": "Small Spaces",
+    "slug": "small-spaces",
+    "description": "",
+    "isActive": true,
+    "order": 8,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  }
+]

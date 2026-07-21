@@ -227,7 +227,7 @@
     @apply cursor-pointer;
   }
   .topHeaderNavBtn {
-    @apply text-sm font-thin text-foreground/90 relative px-6 border-r border-r-foreground/50 hover:text-foreground ease-in-out transition-all duration-300;
+    @apply text-base font-normal text-foreground/90 relative px-6 border-r border-r-foreground/50 hover:text-foreground ease-in-out transition-all duration-300;
   }
   .hoverEffect {
     @apply transition-all ease-in-out duration-300;

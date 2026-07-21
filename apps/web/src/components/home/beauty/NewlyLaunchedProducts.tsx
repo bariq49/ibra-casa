@@ -31,7 +31,10 @@ const NewlyLaunchedProducts = async ({
   if (!withBg.length) return null;
 
   const bgColor =
-    productType?.productBasesBg?.beauty || productType?.bgColor || "#FFEB69";
+    productType?.productBasesBg?.["home-decor"] ||
+    productType?.productBasesBg?.beauty ||
+    productType?.bgColor ||
+    "#FFEB69";
 
   return (
     <NewlyLaunchedProductsClient

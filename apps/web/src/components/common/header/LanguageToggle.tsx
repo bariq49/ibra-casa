@@ -2,21 +2,12 @@
 
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
-import {
-  EnglishFlag,
-  FrenchFlag,
-  GermanFlag,
-  ItalianFlag,
-  SingaporeFlag,
-} from "@/components/svgs/HeaderFlags";
+import { EnglishFlag, FrenchFlag } from "@/components/svgs/HeaderFlags";
 import { ChevronDown } from "lucide-react";
 
 const LOCALES = [
   { code: "en", name: "English", icon: <EnglishFlag /> },
-  { code: "de", name: "German", icon: <GermanFlag /> },
   { code: "fr", name: "French", icon: <FrenchFlag /> },
-  { code: "it", name: "Italian", icon: <ItalianFlag /> },
-  { code: "en-SG", name: "Singapore", icon: <SingaporeFlag /> },
 ];
 
 const LanguageToggle = () => {
@@ -29,9 +20,9 @@ const LanguageToggle = () => {
     <div className="relative group">
       <Link
         href="#"
-        className="text-sm text-foreground inline-flex items-center gap-x-2 py-3.5"
+        className="text-base text-foreground inline-flex items-center gap-x-2 py-3.5"
       >
-        <span className="inline-flex items-center justify-center size-7 bg-primary-dark rounded-full">
+        <span className="inline-flex items-center justify-center size-5 shrink-0">
           {currentLocaleItem.icon}
         </span>
         {currentLocaleItem.name}
@@ -49,9 +40,7 @@ const LanguageToggle = () => {
               scroll={false}
               className="flex items-center gap-x-2 relative text-foreground group-hover/item:text-primary"
             >
-              <span
-                className={`w-8 h-8 ${locale === l.code ? "bg-primary/8" : "bg-gray-100"} group-hover/item:bg-primary/8 inline-flex items-center justify-center rounded-full`}
-              >
+              <span className="size-5 inline-flex items-center justify-center shrink-0">
                 {l.icon}
               </span>
               {l.name}

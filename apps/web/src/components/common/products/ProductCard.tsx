@@ -214,11 +214,11 @@ const ProductCard = ({
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col gap-4 items-start p-4 relative shrink-0 w-full grow justify-between">
-          <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col items-start p-4 relative shrink-0 w-full grow">
+          <div className="flex flex-col gap-1.5 w-full">
             <Link
               href={`/product/${pSlug}`}
-              className="font-Urbanist font-bold leading-7 relative shrink-0 text-light-primary-text text-[18px] line-clamp-2 hover:text-primary transition-colors"
+              className="font-Urbanist font-bold leading-6 relative shrink-0 text-light-primary-text text-[18px] line-clamp-1 hover:text-primary transition-colors"
             >
               {pTitle}
             </Link>
@@ -230,7 +230,7 @@ const ProductCard = ({
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 items-start relative shrink-0 w-full">
+            <div className="flex flex-col gap-2 items-start relative shrink-0 w-full mt-1">
               <div className="flex gap-3 items-start leading-7.5 relative shrink-0 text-[20px] whitespace-nowrap flex-wrap">
                 <p className="font-Urbanist font-bold relative shrink-0 text-light-primary-text">
                   <PriceFormatter amount={discountedPrice} />
@@ -249,7 +249,7 @@ const ProductCard = ({
             </div>
           </div>
 
-          <div className="flex gap-4 items-end relative shrink-0 w-full mt-auto pt-2">
+          <div className="flex gap-4 items-end relative shrink-0 w-full mt-auto pt-3">
             <WishlistBtn product={product} />
             <AddToCartBtn product={product} variant="beauty" />
           </div>
@@ -458,7 +458,7 @@ const ProductCard = ({
       </div>
 
       <div className="pt-2">
-        <h5 className="text-base leading-6 font-semibold font-dm-sans mb-4 line-clamp-2 min-h-12">
+        <h5 className="text-base leading-6 font-semibold font-dm-sans mb-1.5 line-clamp-1">
           <Link
             href={`/product/${pSlug}`}
             className="hover:text-primary hoverEffect font-medium"
@@ -466,7 +466,7 @@ const ProductCard = ({
             {pTitle}
           </Link>
         </h5>
-        <Ratings className="mb-4" rating={pStars} totalReviews={pRating} />
+        <Ratings className="mb-3" rating={pStars} totalReviews={pRating} />
         <div className="flex items-center gap-x-3 mb-2">
           <span className="text-base font-semibold text-primary">
             <PriceFormatter amount={discountedPrice} />

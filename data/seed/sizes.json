@@ -1,0 +1,68 @@
+[
+  {
+    "_id": "a30000000000000000000001",
+    "name": "Small",
+    "value": "small",
+    "slug": "small",
+    "displayOrder": 0,
+    "priceModifier": 0,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a30000000000000000000002",
+    "name": "Medium",
+    "value": "medium",
+    "slug": "medium",
+    "displayOrder": 1,
+    "priceModifier": 15,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a30000000000000000000003",
+    "name": "Large",
+    "value": "large",
+    "slug": "large",
+    "displayOrder": 2,
+    "priceModifier": 30,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a30000000000000000000004",
+    "name": "50 cm",
+    "value": "50cm",
+    "slug": "50cm",
+    "displayOrder": 3,
+    "priceModifier": 0,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a30000000000000000000005",
+    "name": "60 cm",
+    "value": "60cm",
+    "slug": "60cm",
+    "displayOrder": 4,
+    "priceModifier": 20,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a30000000000000000000006",
+    "name": "70 cm",
+    "value": "70cm",
+    "slug": "70cm",
+    "displayOrder": 5,
+    "priceModifier": 35,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  }
+]

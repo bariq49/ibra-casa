@@ -1,0 +1,21 @@
+[
+  {
+    "_id": "ab0000000000000000000001",
+    "name": "Ibra Casa Editors",
+    "slug": "ibra-casa-editors",
+    "image": "",
+    "role": "Editorial Team",
+    "bio": "Design notes, material guides, and practical styling advice for modern homes.",
+    "socialLinks": {
+      "twitter": "",
+      "linkedin": "",
+      "facebook": "",
+      "instagram": "",
+      "website": ""
+    },
+    "isActive": true,
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  }
+]

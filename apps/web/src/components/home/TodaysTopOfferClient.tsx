@@ -91,6 +91,7 @@ interface TodaysTopOfferClientProps {
   title?: string;
   description?: string;
   endsAt?: string;
+  bgColor?: string;
 }
 
 const TodaysTopOfferClient = ({
@@ -98,6 +99,7 @@ const TodaysTopOfferClient = ({
   title = "Today's Top Offer",
   description = "Up to 69% discount for limited time 🔥",
   endsAt,
+  bgColor = "#F4F3F5",
 }: TodaysTopOfferClientProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
@@ -123,7 +125,7 @@ const TodaysTopOfferClient = ({
   return (
     <section className="py-10 md:py-14 lg:py-[70px] w-full relative">
       <Container className="relative h-full">
-        <div className="absolute inset-0 z-0 hidden lg:block pointer-events-none overflow-hidden rounded-[32px]">
+        <div className="absolute inset-0 z-0 hidden lg:block pointer-events-none overflow-hidden rounded-xl">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1728 823"
@@ -132,13 +134,20 @@ const TodaysTopOfferClient = ({
             preserveAspectRatio="xMinYMin slice"
           >
             <path
-              d="M1728 775C1728 801.51 1706.51 823 1680 823H48C21.4904 823 0 801.51 0 775V148C0 121.49 21.4903 100 48 100H472.5C512.328 100 546.9 77.5038 564.205 44.5248C576.235 21.6001 596.482 0 622.371 0H1680C1706.51 0 1728 21.4903 1728 48V775Z"
-              fill="#FFD6EF"
+              d="M1728 811C1728 817.627 1722.627 823 1716 823H12C5.373 823 0 817.627 0 811V112C0 105.373 5.373 100 12 100H472.5C512.328 100 546.9 77.5038 564.205 44.5248C576.235 21.6001 596.482 0 622.371 0H1716C1722.627 0 1728 5.373 1728 12V811Z"
+              fill={bgColor}
             />
           </svg>
         </div>
 
-        <div className="relative z-10 w-full min-h-[500px] rounded-[24px] bg-primary-lighter lg:bg-transparent overflow-hidden lg:overflow-visible pt-8 lg:pt-0 pb-10">
+        {/* Mobile / tablet solid background — desktop uses the SVG shape above */}
+        <div
+          className="absolute inset-0 z-0 rounded-xl lg:hidden pointer-events-none"
+          style={{ backgroundColor: bgColor }}
+          aria-hidden
+        />
+
+        <div className="relative z-10 w-full min-h-[500px] overflow-hidden lg:overflow-visible pt-8 lg:pt-0 pb-10">
           <div className="px-4 md:px-8 xl:px-12 w-full h-full">
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-[24px] mb-[68px] flex-wrap relative">
               <SectionHeader

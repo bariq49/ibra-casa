@@ -101,13 +101,13 @@ const TopSellingProductsClient = ({
   }, [products]);
 
   // Get banner block colors natively from productType or use defaults
-  const bgColor = productType?.bgColor || "#FDE047";
+  const bgColor = productType?.bgColor || "#F4F3F5";
 
   return (
     <section className="py-10 md:py-14 lg:py-[70px]">
       <Container>
         <div
-          className="relative px-0 pt-10 md:pt-0 pb-12 overflow-hidden min-h-[500px] rounded-[24px]"
+          className="relative px-0 pt-10 md:pt-0 pb-12 overflow-hidden min-h-[500px] rounded-xl"
           style={{ backgroundColor: bgColor }}
         >
           {/* White cutout notch at the top center to create the curve over the yellow background */}

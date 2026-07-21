@@ -233,7 +233,7 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
           <div className="flex items-center justify-center p-8">
             <Button
               variant="outline"
-              className="rounded-full px-8 border-primary text-primary-light hover:bg-primary-light/5 h-12 font-semibold"
+              className="rounded-full px-8 border-primary text-primary hover:bg-primary/5 h-12 font-semibold"
               onClick={handleWriteReviewClick}
             >
               Write your review

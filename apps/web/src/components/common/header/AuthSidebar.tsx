@@ -17,15 +17,6 @@ import API_ENDPOINTS from "@/constants/endpoints";
 import Image from "next/image";
 import { toast } from "sonner";
 
-// Firebase imports
-import { auth } from "@/lib/firebase/config";
-import {
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  signInWithPopup,
-  AuthProvider,
-} from "firebase/auth";
-
 // Helper to safely extract error messages from unknown catch values
 interface ApiError {
   code?: string;
@@ -310,72 +301,6 @@ const AuthSidebar = () => {
     }
   };
 
-  const handleOAuth = async (providerName: "google" | "facebook") => {
-    setIsLoading(true);
-    try {
-      let provider: AuthProvider;
-      if (providerName === "google") {
-        provider = new GoogleAuthProvider();
-      } else {
-        provider = new FacebookAuthProvider();
-      }
-
-      // 1. Authenticate with Firebase
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const idToken = await user.getIdToken();
-
-      // 2. Send user data to backend
-      const response = await api.post("/api/auth/oauth", {
-        avatar: user.photoURL,
-        authProvider: providerName,
-        idToken,
-      });
-
-      const data = response.data;
-      const token = data.data?.token;
-
-      if (!token) {
-        throw new Error("Invalid response from server: missing token");
-      }
-
-      // 3. Log user in
-      login(data.data, token);
-      toast.success(
-        `${providerName.charAt(0).toUpperCase() + providerName.slice(1)} Login successful!`,
-      );
-
-      // Close sidebar after a short delay
-      setTimeout(() => {
-        onAuthClose();
-        setIsLoading(false);
-      }, 500);
-    } catch (error: unknown) {
-      const err = toApiError(error);
-      console.warn(`${providerName} auth error:`, err.message || error);
-
-      // Handle Firebase specific errors gracefully
-      if (err.code === "auth/popup-closed-by-user") {
-        toast.error("Sign-in popup was closed before completing.");
-      } else if (
-        err.code === "auth/account-exists-with-different-credential"
-      ) {
-        toast.error(
-          "An account already exists with the same email address but different sign-in credentials.",
-        );
-      } else {
-        const message =
-          err.data?.message ||
-          err.response?.data?.message ||
-          err.message ||
-          `${providerName} authentication failed`;
-        toast.error(message);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const renderHeader = () => {
     let title = "";
     switch (currentView) {
@@ -414,56 +339,18 @@ const AuthSidebar = () => {
   const renderLoginView = () => (
     <div
       key="login"
-      className="flex flex-col gap-y-8 animate-in fade-in slide-in-from-right-4 duration-300"
+      className="flex flex-col gap-y-8 animate-in fade-in slide-in-from-right-4 duration-300 w-full"
     >
       <div className="flex justify-center">
         <Image
           src="/images/authentication/login-illustration.png"
           alt="login"
-          className="max-w-[200px]"
+          className="max-w-[200px] mx-auto"
           width={200}
           height={200}
         />
       </div>
-      <div className="flex flex-col gap-y-6">
-        <div className="flex gap-x-4">
-          <button
-            type="button"
-            onClick={() => handleOAuth("google")}
-            disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-x-2 py-3 border border-border rounded-full hover:bg-muted transition-colors font-medium disabled:opacity-50"
-          >
-            <img
-              src="https://www.google.com/favicon.ico"
-              alt="Google"
-              className="size-4"
-            />
-            Google
-          </button>
-          <button
-            type="button"
-            onClick={() => handleOAuth("facebook")}
-            disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-x-2 py-3 border border-border rounded-full hover:bg-muted transition-colors font-medium disabled:opacity-50"
-          >
-            <span className="text-blue-600 font-bold">f</span>
-            Facebook
-          </button>
-        </div>
-        <div className="text-center relative py-4">
-          <span
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
-            <span className="w-full border-t border-gray-200"></span>
-          </span>
-          <span className="relative flex justify-center text-sm">
-            <span className="px-4 bg-background text-muted-foreground">
-              Or log in with
-            </span>
-          </span>
-        </div>
-
+      <div className="flex flex-col gap-y-6 w-full">
         <form onSubmit={handleLogin} className="flex flex-col gap-y-4">
           <div className="relative">
             <input
@@ -525,7 +412,7 @@ const AuthSidebar = () => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 text-white rounded-full font-bold shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
+            className="w-full h-14 rounded-full font-bold bg-primary text-primary-foreground hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
           >
             {isLoading ? (
               <Loader2 className="size-5 animate-spin" />
@@ -551,54 +438,16 @@ const AuthSidebar = () => {
   const renderRegisterView = () => (
     <div
       key="register"
-      className="flex flex-col gap-y-8 animate-in fade-in slide-in-from-right-4 duration-300"
+      className="flex flex-col gap-y-8 animate-in fade-in slide-in-from-right-4 duration-300 w-full"
     >
       <div className="flex justify-center">
         <img
           src="/images/authentication/register-illustration.png"
           alt="register"
-          className="max-w-[200px]"
+          className="max-w-[200px] mx-auto"
         />
       </div>
-      <div className="flex flex-col gap-y-6">
-        <div className="flex gap-x-4">
-          <button
-            type="button"
-            onClick={() => handleOAuth("google")}
-            disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-x-2 py-3 border border-border rounded-full hover:bg-muted transition-colors font-medium disabled:opacity-50"
-          >
-            <img
-              src="https://www.google.com/favicon.ico"
-              alt="Google"
-              className="size-4"
-            />
-            Google
-          </button>
-          <button
-            type="button"
-            onClick={() => handleOAuth("facebook")}
-            disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-x-2 py-3 border border-border rounded-full hover:bg-muted transition-colors font-medium disabled:opacity-50"
-          >
-            <span className="text-blue-600 font-bold">f</span>
-            Facebook
-          </button>
-        </div>
-        <div className="text-center relative py-4">
-          <span
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
-            <span className="w-full border-t border-gray-200"></span>
-          </span>
-          <span className="relative flex justify-center text-sm">
-            <span className="px-4 bg-background text-muted-foreground">
-              Or sign up with
-            </span>
-          </span>
-        </div>
-
+      <div className="flex flex-col gap-y-6 w-full">
         <form onSubmit={handleRegister} className="flex flex-col gap-y-4">
           <div className="grid grid-cols-2 gap-x-4">
             <div className="relative">
@@ -717,7 +566,7 @@ const AuthSidebar = () => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 text-white rounded-full font-bold shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
+            className="w-full h-14 rounded-full font-bold bg-primary text-primary-foreground hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
           >
             {isLoading ? (
               <Loader2 className="size-5 animate-spin" />
@@ -784,7 +633,7 @@ const AuthSidebar = () => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 text-white rounded-full font-bold shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
+            className="w-full h-14 rounded-full font-bold bg-primary text-primary-foreground hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
           >
             {isLoading ? (
               <Loader2 className="size-5 animate-spin" />
@@ -938,7 +787,7 @@ const AuthSidebar = () => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 text-white rounded-full font-bold shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
+            className="w-full h-14 rounded-full font-bold bg-primary text-primary-foreground hover:bg-primary-dark shadow-lg shadow-primary/20 active:scale-[0.98] mt-2"
           >
             {isLoading ? (
               <Loader2 className="size-5 animate-spin" />
@@ -984,8 +833,10 @@ const AuthSidebar = () => {
         showCloseButton={false}
       >
         {renderHeader()}
-        <div className="flex-1 overflow-y-auto p-8 lg:p-10">
-          {renderContent()}
+        <div className="flex-1 overflow-y-auto p-8 lg:p-10 flex flex-col">
+          <div className="my-auto w-full flex flex-col items-center">
+            <div className="w-full max-w-md">{renderContent()}</div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

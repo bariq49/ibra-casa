@@ -18,7 +18,7 @@ const TopHeader = () => {
       <Container>
         <div className="flex flex-col xl:flex-row items-center justify-between gap-y-2 lg:gap-y-0">
           <div className="xl:flex items-center gap-x-6 hidden">
-            <p className="flex items-center gap-x-2 text-foreground text-sm font-thin line-clamp-1">
+            <p className="flex items-center gap-x-2 text-foreground text-base font-normal line-clamp-1">
               <span>
                 <Headset className="size-5 text-foreground" />
               </span>
@@ -26,7 +26,7 @@ const TopHeader = () => {
               <span>{t("callUs")}</span>
               <Link
                 href="tel:(480)555-0103"
-                className="bg-warning py-px px-2 text-xs leading-4.5 rounded-[60px] text-foreground"
+                className="bg-warning py-1 px-2.5 text-sm leading-5 rounded-[60px] text-foreground font-medium"
               >
                 (480) 555-0103
               </Link>

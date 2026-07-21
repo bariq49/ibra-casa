@@ -6,6 +6,7 @@ export interface ITodaysOffer {
   products: Types.ObjectId[];
   endsAt: Date;
   isActive: boolean;
+  bgColor?: string;
 }
 
 export interface ITodaysOfferDocument extends ITodaysOffer, Document {}
@@ -36,6 +37,11 @@ const todaysOfferSchema = new mongoose.Schema<ITodaysOfferDocument>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    bgColor: {
+      type: String,
+      default: "#F4F3F5",
+      trim: true,
     },
   },
   { timestamps: true },
