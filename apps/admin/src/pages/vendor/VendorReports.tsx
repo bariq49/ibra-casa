@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -25,14 +25,18 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewGuard } from "@/hooks/usePreviewGuard";
-import {
-  previewReports,
-  previewProductsSummary,
-  previewProducts,
-} from "@/lib/preview/vendorPreviewData";
 import { formatCurrencyCompact, formatCurrencyWhole } from "@/lib/utils";
 
 type RangeKey = "ytd" | "6m" | "3m";
+
+type ReportRow = {
+  month: string;
+  orders: number;
+  grossSales: number;
+  refunds: number;
+  netSales: number;
+  payout: number;
+};
 
 const RANGE_LABEL: Record<RangeKey, string> = {
   ytd: "Year to date",
@@ -47,37 +51,18 @@ export default function VendorReports() {
   const { toast } = useToast();
   const { blockIfPreview } = usePreviewGuard();
 
-  const rows = useMemo(() => {
-    if (range === "3m") return previewReports.slice(-3);
-    if (range === "6m") return previewReports.slice(-6);
-    return previewReports;
-  }, [range]);
+  // Reports API not wired yet — empty until real data is available.
+  const rows: ReportRow[] = [];
 
-  const totals = useMemo(() => {
-    return rows.reduce(
-      (acc, r) => ({
-        orders: acc.orders + r.orders,
-        gross: acc.gross + r.grossSales,
-        refunds: acc.refunds + r.refunds,
-        net: acc.net + r.netSales,
-        payout: acc.payout + r.payout,
-      }),
-      { orders: 0, gross: 0, refunds: 0, net: 0, payout: 0 },
-    );
-  }, [rows]);
+  const totals = {
+    orders: 0,
+    gross: 0,
+    refunds: 0,
+    net: 0,
+    payout: 0,
+  };
 
-  const productSplit = useMemo(() => {
-    // Distribute the period payout proportionally across the demo catalog
-    // so the pie chart looks plausible without hitting the API.
-    const total = previewProducts.reduce((s, p) => s + p.price * (p.stock + 5), 0);
-    return previewProducts.slice(0, 6).map((p) => {
-      const weight = (p.price * (p.stock + 5)) / Math.max(1, total);
-      return {
-        name: p.name,
-        value: Math.round(totals.payout * weight),
-      };
-    });
-  }, [totals.payout]);
+  const productSplit: Array<{ name: string; value: number }> = [];
 
   function handleExport() {
     if (blockIfPreview("export reports")) return;
@@ -159,24 +144,30 @@ export default function VendorReports() {
         <div className="lg:col-span-2 bg-background rounded-2xl border border-border p-5">
           <h3 className="font-semibold text-grey-900 mb-4">Revenue vs Payout</h3>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={rows}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis dataKey="month" tickLine={false} axisLine={false} />
-                <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => formatCurrencyCompact(v)} />
-                <Tooltip formatter={(value) => formatCurrencyWhole(Number(value))} />
-                <Legend />
-                <Bar dataKey="grossSales" name="Gross sales" fill="#088178" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Line
-                  type="monotone"
-                  dataKey="payout"
-                  name="Net payout"
-                  stroke="#FFC107"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
+            {rows.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-sm text-grey-500">
+                No report data available.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={rows}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => formatCurrencyCompact(v)} />
+                  <Tooltip formatter={(value) => formatCurrencyWhole(Number(value))} />
+                  <Legend />
+                  <Bar dataKey="grossSales" name="Gross sales" fill="#088178" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                  <Line
+                    type="monotone"
+                    dataKey="payout"
+                    name="Net payout"
+                    stroke="#FFC107"
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -185,40 +176,48 @@ export default function VendorReports() {
             Revenue by Product
           </h3>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={productSplit}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={50}
-                  outerRadius={90}
-                  paddingAngle={2}
-                >
-                  {productSplit.map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => formatCurrencyWhole(Number(value))} />
-              </PieChart>
-            </ResponsiveContainer>
+            {productSplit.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-sm text-grey-500">
+                No product revenue data.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={productSplit}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={50}
+                    outerRadius={90}
+                    paddingAngle={2}
+                  >
+                    {productSplit.map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => formatCurrencyWhole(Number(value))} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
-          <ul className="mt-4 space-y-2 text-sm">
-            {productSplit.map((p, i) => (
-              <li key={p.name} className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-grey-700">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
-                  />
-                  <span className="truncate max-w-[140px]">{p.name}</span>
-                </span>
-                <span className="font-medium text-grey-900">
-                  {formatCurrencyWhole(p.value)}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {productSplit.length > 0 && (
+            <ul className="mt-4 space-y-2 text-sm">
+              {productSplit.map((p, i) => (
+                <li key={p.name} className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-grey-700">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
+                    />
+                    <span className="truncate max-w-[140px]">{p.name}</span>
+                  </span>
+                  <span className="font-medium text-grey-900">
+                    {formatCurrencyWhole(p.value)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 
@@ -236,33 +235,36 @@ export default function VendorReports() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((r) => (
-              <TableRow key={r.month}>
-                <TableCell className="font-medium text-grey-900">
-                  {r.month}
-                </TableCell>
-                <TableCell className="text-right">{r.orders}</TableCell>
-                <TableCell className="text-right text-primary-main font-medium">
-                  {formatCurrencyWhole(r.grossSales)}
-                </TableCell>
-                <TableCell className="text-right text-error-main">
-                  −{formatCurrencyWhole(r.refunds)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrencyWhole(r.netSales)}
-                </TableCell>
-                <TableCell className="text-right font-semibold">
-                  {formatCurrencyWhole(r.payout)}
+            {rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-10 text-grey-500">
+                  No monthly data yet.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              rows.map((r) => (
+                <TableRow key={r.month}>
+                  <TableCell className="font-medium text-grey-900">
+                    {r.month}
+                  </TableCell>
+                  <TableCell className="text-right">{r.orders}</TableCell>
+                  <TableCell className="text-right text-primary-main font-medium">
+                    {formatCurrencyWhole(r.grossSales)}
+                  </TableCell>
+                  <TableCell className="text-right text-error-main">
+                    −{formatCurrencyWhole(r.refunds)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {formatCurrencyWhole(r.netSales)}
+                  </TableCell>
+                  <TableCell className="text-right font-semibold">
+                    {formatCurrencyWhole(r.payout)}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
-        <p className="text-xs text-grey-400 mt-3">
-          Lifetime gross: {formatCurrencyWhole(previewProductsSummary.totalGrossRevenue)}{" "}
-          · Lifetime payout:{" "}
-          {formatCurrencyWhole(previewProductsSummary.totalPayout)}
-        </p>
       </div>
     </div>
   );

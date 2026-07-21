@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -24,8 +23,6 @@ import {
   DollarSign,
   TrendingUp,
   Trophy,
-  FlaskConical,
-  BarChart2,
   RefreshCw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,71 +76,20 @@ interface AdminVendorAnalytics {
 const FUNNEL_COLORS = ["#FFC107", "#54D62C", "#CB0233", "#94A3B8"];
 const TOP_N = 8;
 
-const DEMO_VENDORS = [
-  "Nimbus Apparel",
-  "Atlas Outdoor",
-  "Lumen Beauty",
-  "Hearth & Home",
-  "Tempo Audio",
-  "Kindred Goods",
-  "Pivot Toys",
-  "Wave Athletics",
-];
-
-const DEMO_DATA: AdminVendorAnalytics = {
+const EMPTY_ANALYTICS: AdminVendorAnalytics = {
   year: new Date().getFullYear(),
-  statusCounts: {
-    total: 124,
-    pending: 18,
-    approved: 92,
-    rejected: 8,
-    suspended: 6,
-  },
-  revenue: {
-    total: 482_350,
-    commission: 72_352,
-    vendorPayout: 409_998,
-  },
+  statusCounts: { total: 0, pending: 0, approved: 0, rejected: 0, suspended: 0 },
+  revenue: { total: 0, commission: 0, vendorPayout: 0 },
   approvalFunnel: {
-    applied: 124,
-    approved: 92,
-    rejected: 8,
-    suspended: 6,
-    pending: 18,
-    approvalRate: (92 / 124) * 100,
+    applied: 0,
+    approved: 0,
+    rejected: 0,
+    suspended: 0,
+    pending: 0,
+    approvalRate: 0,
   },
-  topVendors: DEMO_VENDORS.map((storeName, i) => {
-    const revenue = 96_000 - i * 8_400;
-    const commission = revenue * 0.15;
-    return {
-      _id: `demo-${i}`,
-      storeName,
-      logo: undefined,
-      status: i === 7 ? "pending" : "approved",
-      owner: {
-        name: `Owner ${i + 1}`,
-        email: `${storeName.toLowerCase().replace(/[^a-z]+/g, "")}@example.com`,
-      },
-      revenue,
-      commission,
-      payout: revenue - commission,
-      orders: 320 - i * 28,
-    };
-  }),
-  monthlyTrend: [
-    { name: "Jan", revenue: 22_000, commission: 3_300, orders: 180, signups: 4 },
-    { name: "Feb", revenue: 26_500, commission: 3_975, orders: 210, signups: 6 },
-    { name: "Mar", revenue: 31_200, commission: 4_680, orders: 246, signups: 5 },
-    { name: "Apr", revenue: 28_900, commission: 4_335, orders: 232, signups: 8 },
-    { name: "May", revenue: 35_400, commission: 5_310, orders: 268, signups: 7 },
-    { name: "Jun", revenue: 41_200, commission: 6_180, orders: 312, signups: 11 },
-    { name: "Jul", revenue: 38_500, commission: 5_775, orders: 290, signups: 9 },
-    { name: "Aug", revenue: 44_800, commission: 6_720, orders: 338, signups: 12 },
-    { name: "Sep", revenue: 48_700, commission: 7_305, orders: 360, signups: 10 },
-    { name: "Oct", revenue: 52_350, commission: 7_853, orders: 392, signups: 14 },
-    { name: "Nov", revenue: 56_200, commission: 8_430, orders: 420, signups: 16 },
-    { name: "Dec", revenue: 56_700, commission: 8_505, orders: 425, signups: 13 },
-  ],
+  topVendors: [],
+  monthlyTrend: [],
 };
 
 function StatCard({
@@ -179,20 +125,25 @@ export default function VendorAnalytics() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [error, setError] = useState(false);
 
   const fetchAnalytics = (y: number, silent = false) => {
     let active = true;
     if (silent) setRefreshing(true);
     else setLoading(true);
+    setError(false);
     adminApi
       .get(`${ADMIN_API_ENDPOINTS.VENDOR_ADMIN_ANALYTICS}?year=${y}&topN=${TOP_N}`)
-      .then((res) => active && setData(res.data))
+      .then((res) => {
+        if (active) {
+          setData(res.data);
+          setError(false);
+        }
+      })
       .catch(() => {
         if (active) {
-          // If the API errors, silently flip to demo so the page is never blank.
-          setIsDemoMode(true);
-          setData(DEMO_DATA);
+          setData(null);
+          setError(true);
         }
       })
       .finally(() => {
@@ -212,10 +163,7 @@ export default function VendorAnalytics() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [year]);
 
-  // Active source — falls back to demo if the API hasn't responded yet.
-  const display: AdminVendorAnalytics = isDemoMode
-    ? DEMO_DATA
-    : data ?? DEMO_DATA;
+  const display = data ?? EMPTY_ANALYTICS;
 
   const funnelData = [
     { name: "Pending", value: display.approvalFunnel.pending },
@@ -233,8 +181,7 @@ export default function VendorAnalytics() {
           <select
             value={year}
             onChange={(e) => setYear(parseInt(e.target.value))}
-            disabled={isDemoMode}
-            className="px-3 py-1.5 bg-grey-100 border-none rounded-full text-sm font-semibold text-grey-700 outline-hidden cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 bg-grey-100 border-none rounded-full text-sm font-semibold text-grey-700 outline-hidden cursor-pointer"
           >
             {yearOptions.map((y) => (
               <option key={y} value={y}>
@@ -247,7 +194,7 @@ export default function VendorAnalytics() {
             variant="outline"
             size="sm"
             onClick={() => fetchAnalytics(year, true)}
-            disabled={refreshing || isDemoMode}
+            disabled={refreshing}
             className="rounded-full h-9"
           >
             <RefreshCw
@@ -255,72 +202,14 @@ export default function VendorAnalytics() {
             />
             {refreshing ? "Refreshing…" : "Refresh"}
           </Button>
-
-          <AnimatePresence mode="wait">
-            {isDemoMode ? (
-              <motion.div
-                key="real-btn"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-              >
-                <Button
-                  size="sm"
-                  onClick={() => setIsDemoMode(false)}
-                  className="flex items-center gap-2 h-9 rounded-full px-4 bg-primary-main hover:bg-primary-dark text-white shadow-sm shadow-primary-main/20"
-                >
-                  <BarChart2 className="h-3.5 w-3.5" />
-                  Show Real Data
-                </Button>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="demo-btn"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsDemoMode(true)}
-                  className="flex items-center gap-2 h-9 rounded-full px-4 border-warning-main/30 bg-warning-lighter/50 text-warning-dark hover:bg-warning-lighter"
-                >
-                  <FlaskConical className="h-3.5 w-3.5" />
-                  Preview Demo Data
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
 
-      {/* Demo banner */}
-      <AnimatePresence>
-        {isDemoMode && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="flex items-center gap-3 bg-warning-lighter border border-warning-main/30 rounded-xl px-5 py-3 text-warning-dark">
-              <FlaskConical className="h-5 w-5 shrink-0" />
-              <p className="text-sm font-medium">
-                You are previewing{" "}
-                <span className="font-bold">demo / sample data</span>. Click{" "}
-                <button
-                  onClick={() => setIsDemoMode(false)}
-                  className="underline font-bold hover:text-warning-darker"
-                >
-                  Show Real Data
-                </button>{" "}
-                to return to live analytics from your platform.
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {error && !loading && (
+        <div className="rounded-xl border border-error-main/30 bg-error-lighter px-5 py-3 text-sm text-error-dark">
+          Could not load vendor analytics. Showing empty values.
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
@@ -401,12 +290,9 @@ export default function VendorAnalytics() {
         {/* Monthly trend */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between py-4 border-b border-border/50">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base font-bold text-grey-900">
-                Monthly trend
-              </CardTitle>
-              {isDemoMode && <DemoPill />}
-            </div>
+            <CardTitle className="text-base font-bold text-grey-900">
+              Monthly trend
+            </CardTitle>
             <p className="text-xs text-muted-foreground">
               Revenue, commission, and signups
             </p>
@@ -414,6 +300,10 @@ export default function VendorAnalytics() {
           <CardContent className="pt-4">
             {loading ? (
               <Skeleton className="h-72 w-full" />
+            ) : display.monthlyTrend.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-10">
+                No monthly trend data.
+              </p>
             ) : (
               <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
@@ -470,12 +360,9 @@ export default function VendorAnalytics() {
         {/* Approval funnel */}
         <Card>
           <CardHeader className="py-4 border-b border-border/50">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base font-bold text-grey-900">
-                Approval funnel
-              </CardTitle>
-              {isDemoMode && <DemoPill />}
-            </div>
+            <CardTitle className="text-base font-bold text-grey-900">
+              Approval funnel
+            </CardTitle>
             <p className="text-xs text-muted-foreground">
               Distribution of {display.approvalFunnel.applied} applications
             </p>
@@ -523,7 +410,6 @@ export default function VendorAnalytics() {
           <CardTitle className="text-base font-bold text-grey-900 flex items-center gap-2">
             <Trophy size={16} className="text-warning-main" />
             Top vendors by revenue
-            {isDemoMode && <DemoPill />}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
@@ -615,13 +501,5 @@ export default function VendorAnalytics() {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function DemoPill() {
-  return (
-    <span className="text-[10px] font-bold uppercase tracking-wider bg-warning-lighter text-warning-dark px-2 py-0.5 rounded-full">
-      Demo
-    </span>
   );
 }

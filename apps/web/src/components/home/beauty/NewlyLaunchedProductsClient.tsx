@@ -15,7 +15,6 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 
-/* ─── Animation variants ─── */
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.09 } },
@@ -30,7 +29,6 @@ const itemVariants: Variants = {
   },
 };
 
-/* ─── Main Component ─── */
 interface NewlyLaunchedProductsClientProps {
   products: ApiProduct[];
   productType?: any;
@@ -66,81 +64,83 @@ const NewlyLaunchedProductsClient = ({
   if (products.length === 0) return null;
 
   return (
-    <section className="py-10 md:py-14 lg:py-[70px] w-full relative">
-      <Container className="relative h-full">
-        {/* ── Background SVG matching TodaysTopOffer shape logic ── */}
-        <div className="absolute inset-0 z-0 hidden lg:block pointer-events-none overflow-hidden rounded-[32px]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 1728 833"
-            fill="none"
-            className="w-full h-full object-cover object-top-left"
-            preserveAspectRatio="xMinYMin slice"
-          >
-            <path
-              d="M1728 784.108C1728 810.618 1706.51 832.108 1680 832.108H48C21.4904 832.108 0 810.618 0 784.108V149.106C0 122.597 21.4903 101.106 48 101.106H365.5C405.547 101.106 440.281 78.362 457.49 45.086C469.472 21.9157 489.809 0 515.894 0H1680C1706.51 0 1728 21.4903 1728 48V784.108Z"
-              fill={bgColor}
-            />
-          </svg>
-        </div>
-
-        {/* ── Main content block ── */}
-        <div className="relative z-10 w-full min-h-[500px] rounded-[24px] overflow-hidden lg:overflow-visible pt-8 lg:pt-0 pb-10">
+    <section className="py-10 md:py-14 lg:py-[70px]">
+      <Container>
+        <div className="relative px-0 pt-8 md:pt-6 lg:pt-8 pb-12 min-h-[500px]">
+          {/* Mobile solid background */}
           <div
-            className="absolute inset-0 rounded-[24px] -z-10 lg:hidden pointer-events-none"
+            className="absolute inset-0 z-0 pointer-events-none md:hidden rounded-[24px]"
             style={{ backgroundColor: bgColor }}
           />
-          <div className="px-4 md:px-8 xl:px-12 w-full h-full relative z-10">
-            {/* ── Header: title left | arrows right ── */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-[24px] mb-[68px] flex-wrap relative">
-              {/* Title Block */}
+
+          {/* Desktop: solid fill + white top-left notch for the title */}
+          <div className="absolute inset-0 z-0 pointer-events-none hidden md:block overflow-hidden rounded-[48px]">
+            <div
+              className="absolute inset-0 rounded-[48px]"
+              style={{ backgroundColor: bgColor }}
+            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 516 150"
+              fill="none"
+              className="absolute top-0 left-0 w-[516px] h-[150px]"
+              preserveAspectRatio="xMinYMin meet"
+            >
+              <path
+                d="M515.894 0 H0 V149.106 C0 122.597 21.4903 101.106 48 101.106 H365.5 C405.547 101.106 440.281 78.362 457.49 45.086 C469.472 21.9157 489.809 0 515.894 0 Z"
+                fill="#FFFFFF"
+              />
+            </svg>
+          </div>
+
+          {/* Header sits in the white notch */}
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6 md:mb-14 lg:mb-16 w-full px-6 sm:px-10 lg:px-14">
+            <div className="relative max-w-max w-full flex flex-col items-start gap-1 md:-mt-8">
               <SectionHeader
-                title={productType?.title || "Newly Launched Products"}
+                title="Newly Launched Products"
                 description={
                   productType?.description ||
                   "Up to 69% discount for limited time 🔥"
                 }
                 align="left"
               />
-
-              {/* Right cluster: Carousel Arrows */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="flex items-center flex-wrap gap-[24px] shrink-0"
-              >
-                <div className="hidden sm:flex items-center gap-4">
-                  <button
-                    onClick={() => api?.scrollPrev()}
-                    disabled={!canScrollPrev}
-                    aria-label="Previous products"
-                    className={`size-12 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
-                      canScrollPrev
-                        ? "bg-white/70 hover:bg-white text-light-primary-text shadow-sm"
-                        : "bg-white/30 text-light-secondary-text cursor-not-allowed"
-                    }`}
-                  >
-                    <ChevronLeft className="size-5" />
-                  </button>
-                  <button
-                    onClick={() => api?.scrollNext()}
-                    disabled={!canScrollNext}
-                    aria-label="Next products"
-                    className={`size-12 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
-                      canScrollNext
-                        ? "bg-white hover:bg-white/90 text-light-primary-text shadow-sm"
-                        : "bg-white/30 text-light-secondary-text cursor-not-allowed"
-                    }`}
-                  >
-                    <ChevronRight className="size-5" />
-                  </button>
-                </div>
-              </motion.div>
             </div>
 
-            {/* ── Product carousel ── */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="hidden sm:flex items-center gap-4 shrink-0 md:-mt-8"
+            >
+              <button
+                onClick={() => api?.scrollPrev()}
+                disabled={!canScrollPrev}
+                aria-label="Previous products"
+                className={`size-12 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  canScrollPrev
+                    ? "bg-white/70 hover:bg-white text-light-primary-text shadow-sm"
+                    : "bg-white/30 text-light-secondary-text cursor-not-allowed"
+                }`}
+              >
+                <ChevronLeft className="size-5" />
+              </button>
+              <button
+                onClick={() => api?.scrollNext()}
+                disabled={!canScrollNext}
+                aria-label="Next products"
+                className={`size-12 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  canScrollNext
+                    ? "bg-white hover:bg-white/90 text-light-primary-text shadow-sm"
+                    : "bg-white/30 text-light-secondary-text cursor-not-allowed"
+                }`}
+              >
+                <ChevronRight className="size-5" />
+              </button>
+            </motion.div>
+          </div>
+
+          <div className="relative z-10 px-4 sm:px-6 lg:px-10 w-full">
             <div className="relative w-full overflow-hidden mb-10">
               <motion.div
                 variants={containerVariants}
@@ -174,7 +174,6 @@ const NewlyLaunchedProductsClient = ({
               </motion.div>
             </div>
 
-            {/* ── View All Bottom Right ── */}
             <div className="flex justify-end w-full">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}

@@ -97,7 +97,6 @@ export const productTypeSchema = z.object({
     .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid hex color format")
     .default("#ffffff"),
   productBasesBg: z.record(z.string(), z.string().optional()).optional(),
-  bannerPages: z.array(z.string()).optional(),
   productBases: z.array(z.string()).optional(),
 });
 

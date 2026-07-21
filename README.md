@@ -28,7 +28,6 @@ sellzy-ecommerce/
 │   ├── ui/                 # Shared React component primitives
 │   ├── eslint-config/      # Shared ESLint presets
 │   └── typescript-config/  # Shared tsconfig bases
-├── data/seed/      # Production-grade demo content snapshot (JSON)
 ├── documentation/  # Static one-page online documentation
 ├── _example.github/    # CI + Vercel deploy pipeline (rename → .github to activate)
 ├── README.md           # ← you are here
@@ -52,10 +51,7 @@ cp apps/api/.env.example   apps/api/.env
 cp apps/web/.env.example   apps/web/.env
 cp apps/admin/.env.example apps/admin/.env
 
-# 3. Seed the demo content into your MongoDB (idempotent, never touches user data)
-pnpm seed
-
-# 4. Run all three apps in parallel
+# 3. Run all three apps in parallel
 pnpm dev
 ```
 
@@ -91,12 +87,8 @@ Run from the repository root.
 | `pnpm build`                       | Production build for every app                                          |
 | `pnpm lint`                        | Lint every workspace                                                    |
 | `pnpm check-types`                 | TypeScript type-check every workspace                                   |
-| `pnpm seed`                        | Seed the demo content from `data/seed/*.json` into your MongoDB         |
-| `pnpm export-seed`                 | Re-export non-user-flow collections from MongoDB → `data/seed/*.json`   |
 | `pnpm format`                      | Prettier-format every file                                              |
 | `pnpm clean`                       | Remove all `node_modules/.cache`, `.turbo`, `.next`, and `dist` folders |
-
-The seed scripts deliberately **skip user-flow collections** (`users`, `orders`, `carts`, `addresses`, `reviews`, `notifications`, `vendors`, `abandonedcarts`, `customerreviews`). They're upsert-only — running them never deletes existing rows. See [sellzy-setup.md → Seeding](./sellzy-setup.md#5-seed-demo-content) for the full contract.
 
 ## 5. Key integrations
 
@@ -120,7 +112,6 @@ Each `.env.example` file has comments above every group telling you exactly whic
 - ✅ Multi-vendor: vendor onboarding, per-vendor product approval, payout-aware analytics
 - ✅ Stripe + COD checkout flows
 - ✅ Multi-language storefront (`next-intl`) — English, Spanish, French, German, Italian, Bengali ready
-- ✅ Idempotent demo seed system — buyers can reset their content without losing customers
 - ✅ Turborepo cache + parallel builds for fast CI
 
 ## 7. Deploy with GitHub Actions

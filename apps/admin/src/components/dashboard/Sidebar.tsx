@@ -11,8 +11,6 @@ import {
   ChevronRight,
   DollarSign,
   FileText,
-  Globe,
-  Grid3x3,
   ImageIcon,
   LayoutDashboard,
   List,
@@ -24,7 +22,6 @@ import {
   Palette,
   Plus,
   Settings,
-  Share2,
   ShoppingBag,
   ShoppingCart,
   Sliders,
@@ -32,14 +29,13 @@ import {
   BarChart3,
   Tag,
   Ticket,
+  Clock,
   User,
   UserCheck,
   Users,
   Smartphone,
   TrendingUp,
   Weight as WeightIcon,
-  Terminal,
-  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -387,12 +383,6 @@ function renderNavItems(open: boolean) {
           label="Badges"
           open={open}
         />
-        <NavItem
-          to="/dashboard/page-banners"
-          icon={<ImageIcon size={20} />}
-          label="Page Banners"
-          open={open}
-        />
       </div>
 
       <NavGroup label="Order & Sales" open={open} />
@@ -484,27 +474,9 @@ function renderNavItems(open: boolean) {
           open={open}
         />
         <NavItem
-          to="/dashboard/our-team"
-          icon={<Users size={20} />}
-          label="Our Team"
-          open={open}
-        />
-        <NavItem
-          to="/dashboard/customer-reviews"
-          icon={<Star size={20} />}
-          label="Trusted By Customers"
-          open={open}
-        />
-        <NavItem
           to="/dashboard/careers"
           icon={<Briefcase size={20} />}
           label="Careers Management"
-          open={open}
-        />
-        <NavItem
-          to="/dashboard/contact-settings"
-          icon={<Globe size={20} />}
-          label="Contact Settings"
           open={open}
         />
       </div>
@@ -585,15 +557,15 @@ function renderNavItems(open: boolean) {
           open={open}
         />
         <NavItem
-          to="/dashboard/ads-banners"
-          icon={<ImageIcon size={20} />}
-          label="Ads Banners"
-          open={open}
-        />
-        <NavItem
           to="/dashboard/promotions/coupon"
           icon={<Ticket size={20} />}
           label="Coupon"
+          open={open}
+        />
+        <NavItem
+          to="/dashboard/todays-offer"
+          icon={<Clock size={20} />}
+          label="Today's Offer"
           open={open}
         />
         <NavItem
@@ -624,36 +596,6 @@ function renderNavItems(open: boolean) {
           label="Settings"
           open={open}
         />
-        <NavItem
-          to="/dashboard/social-media"
-          icon={<Share2 size={20} />}
-          label="Social Media"
-          open={open}
-        />
-        <NavItem
-          to="/dashboard/website-config"
-          icon={<Globe size={20} />}
-          label="Website Config"
-          open={open}
-        />
-        <NavItem
-          to="/dashboard/website-icons"
-          icon={<ImageIcon size={20} />}
-          label="Website Icons"
-          open={open}
-        />
-        <NavItem
-          to="/dashboard/component-types"
-          icon={<Grid3x3 size={20} />}
-          label="Component Types"
-          open={open}
-        />
-        <NavItem
-          to="/dashboard/banner-pages"
-          icon={<Globe size={20} />}
-          label="Home Pages"
-          open={open}
-        />
       </div>
 
       <NavGroup label="API Config" open={open} />
@@ -662,12 +604,6 @@ function renderNavItems(open: boolean) {
           to="/dashboard/api-config/system-metrics"
           icon={<Sliders size={20} />}
           label="System Metrics"
-          open={open}
-        />
-        <NavItem
-          to="/dashboard/api-config/endpoint-test"
-          icon={<Terminal size={20} />}
-          label="Endpoint Test"
           open={open}
         />
       </div>

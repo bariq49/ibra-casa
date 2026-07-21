@@ -30,18 +30,15 @@ import SizesPage from "@/pages/dashboard/SizesPage";
 import ColorsPage from "@/pages/dashboard/ColorsPage";
 import WeightsPage from "@/pages/dashboard/WeightsPage";
 import BadgesPage from "@/pages/dashboard/BadgesPage";
-import PageBannersPage from "@/pages/dashboard/PageBannersPage";
+import TodaysOfferPage from "@/pages/dashboard/TodaysOfferPage";
 import OrdersPage from "@/pages/dashboard/Orders";
 import BannerTypesPage from "@/pages/dashboard/BannerTypesPage";
-import BannerPagesPage from "./pages/dashboard/BannerPagesPage";
 import AboutPageConfig from "./pages/dashboard/config/AboutPageConfig";
 import CareerPageConfig from "./pages/dashboard/config/CareerPageConfig";
 import MenusPage from "./pages/dashboard/MenusPage";
 import BannersPage from "./pages/dashboard/BannersPage";
-import AdsBannersPage from "./pages/dashboard/AdsBannersPage";
 import InvoicePage from "./pages/dashboard/InvoicePage";
 import ReviewsPage from "./pages/dashboard/ReviewsPage";
-import SocialMediaPage from "./pages/dashboard/SocialMediaPage";
 import SearchPage from "./pages/dashboard/SearchPage";
 import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import PurchasesPage from "./pages/dashboard/PurchasesPage";
@@ -50,9 +47,6 @@ import CreatePurchasePage from "./pages/dashboard/purchases/CreatePurchasePage";
 import ApprovedPurchasePage from "./pages/dashboard/purchases/ApprovedPurchasePage";
 import PurchasedItemsPage from "./pages/dashboard/purchases/PurchasedItemsPage";
 import SuppliersPage from "./pages/dashboard/purchases/SuppliersPage";
-import WebsiteConfigPage from "./pages/dashboard/WebsiteConfigPage";
-import ComponentTypesPage from "./pages/dashboard/ComponentTypesPage";
-import WebsiteIconsPage from "./pages/WebsiteIcons";
 import VendorsPage from "./pages/dashboard/VendorsPage";
 import VendorDetailPage from "./pages/dashboard/VendorDetailPage";
 import VendorProductsPage from "./pages/dashboard/VendorProductsPage";
@@ -70,11 +64,7 @@ import SubscriptionsPage from "@/pages/dashboard/SubscriptionsPage";
 import AddressesPage from "@/pages/dashboard/AddressesPage";
 import CouponPage from "./pages/dashboard/promotions/CouponPage";
 import SystemMetricsPage from "./pages/dashboard/api-config/SystemMetricsPage";
-import ApiCheckerPage from "./pages/dashboard/api-config/ApiCheckerPage";
 import CareersPage from "./pages/dashboard/careers/CareersPage";
-import ContactSettingsPage from "./pages/dashboard/config/ContactSettingsPage";
-import TeamMembersPage from "./pages/dashboard/config/TeamMembersPage";
-import CustomerReviewsPage from "./pages/dashboard/config/CustomerReviewsPage";
 
 // Vendor portal
 import VendorLayout from "@/components/layouts/VendorLayout";
@@ -187,15 +177,10 @@ export const router = createBrowserRouter(
         <Route path="invoices" element={<InvoicePage />} />
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="banner-types" element={<BannerTypesPage />} />
-        <Route path="banner-pages" element={<BannerPagesPage />} />
         <Route path="about-page" element={<AboutPageConfig />} />
         <Route path="career-page" element={<CareerPageConfig />} />
-        <Route path="our-team" element={<TeamMembersPage />} />
-        <Route path="customer-reviews" element={<CustomerReviewsPage />} />
         <Route path="careers" element={<CareersPage />} />
-        <Route path="contact-settings" element={<ContactSettingsPage />} />
         <Route path="banners" element={<BannersPage />} />
-        <Route path="ads-banners" element={<AdsBannersPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="brands" element={<BrandsPage />} />
@@ -205,7 +190,7 @@ export const router = createBrowserRouter(
         <Route path="colors" element={<ColorsPage />} />
         <Route path="weights" element={<WeightsPage />} />
         <Route path="badges" element={<BadgesPage />} />
-        <Route path="page-banners" element={<PageBannersPage />} />
+        <Route path="todays-offer" element={<TodaysOfferPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
         <Route path="purchases/dashboard" element={<PurchaseDashboardPage />} />
         <Route path="purchases" element={<PurchasesPage />} />
@@ -213,10 +198,6 @@ export const router = createBrowserRouter(
         <Route path="purchases/approved" element={<ApprovedPurchasePage />} />
         <Route path="purchases/purchased" element={<PurchasedItemsPage />} />
         <Route path="purchases/suppliers" element={<SuppliersPage />} />
-        <Route path="social-media" element={<SocialMediaPage />} />
-        <Route path="website-config" element={<WebsiteConfigPage />} />
-        <Route path="website-icons" element={<WebsiteIconsPage />} />
-        <Route path="component-types" element={<ComponentTypesPage />} />
         <Route path="vendors" element={<VendorsPage />} />
         <Route path="vendors/:id" element={<VendorDetailPage />} />
         <Route path="vendor-products" element={<VendorProductsPage />} />
@@ -238,7 +219,6 @@ export const router = createBrowserRouter(
           path="api-config/system-metrics"
           element={<SystemMetricsPage />}
         />
-        <Route path="api-config/endpoint-test" element={<ApiCheckerPage />} />
       </Route>
 
       {/* Vendor Portal Routes */}

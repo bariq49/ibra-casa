@@ -1,20 +1,65 @@
 [
   {
     "_id": "a70000000000000000000001",
-    "name": "featured",
-    "slug": "featured",
-    "type": "collection",
-    "title": "Featured Home Decor",
-    "description": "Handpicked metal wall art and aesthetic sculptures for modern homes.",
+    "name": "Top Selling Products",
+    "slug": "top-selling-products",
+    "title": "Top Selling Products",
+    "description": "Best-selling home d\u00e9cor customers love.",
     "banner": "",
     "bannerImages": [],
     "isActive": true,
     "displayOrder": 1,
     "bgColor": "#ffffff",
-    "bannerPages": [],
-    "productBases": ["a60000000000000000000001"],
-    "createdAt": "2026-07-14T00:00:00.000Z",
-    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "productBasesBg": {
+      "home-decor": "#F4F3F5"
+    },
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a70000000000000000000002",
+    "name": "Newly Lunch Products",
+    "slug": "newly-lunch-products",
+    "title": "Newly Launched Products",
+    "description": "Fresh arrivals for modern interiors.",
+    "banner": "",
+    "bannerImages": [],
+    "isActive": true,
+    "displayOrder": 2,
+    "bgColor": "#FFF8E7",
+    "productBasesBg": {
+      "home-decor": "#FFF8E7"
+    },
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a70000000000000000000003",
+    "name": "Most Loved Products",
+    "slug": "most-loved-products",
+    "title": "Limited Time Deals",
+    "description": "Customer favorites with limited-time savings.",
+    "banner": "",
+    "bannerImages": [],
+    "isActive": true,
+    "displayOrder": 3,
+    "bgColor": "#E8F5F0",
+    "productBasesBg": {
+      "home-decor": "#E8F5F0"
+    },
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
     "__v": 0
   }
 ]

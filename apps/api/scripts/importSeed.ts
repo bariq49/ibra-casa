@@ -45,6 +45,7 @@ const REPLACE_COLLECTIONS = [
   "blogcategories",
   "blogtags",
   "comments",
+  "todaysoffers",
 ];
 
 const OBJECT_ID_RE = /^[a-fA-F0-9]{24}$/;

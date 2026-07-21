@@ -13,14 +13,24 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewGuard } from "@/hooks/usePreviewGuard";
-import {
-  previewStaff,
-  type PreviewStaffMember,
-} from "@/lib/preview/vendorPreviewData";
 
-type RoleFilter = "all" | PreviewStaffMember["role"];
+type StaffRole = "manager" | "packer" | "support" | "accountant";
+type StaffStatus = "active" | "invited" | "disabled";
 
-const ROLE_LABEL: Record<PreviewStaffMember["role"], string> = {
+type StaffMember = {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: StaffRole;
+  status: StaffStatus;
+  joinedAt: string;
+  avatarColor?: string;
+};
+
+type RoleFilter = "all" | StaffRole;
+
+const ROLE_LABEL: Record<StaffRole, string> = {
   manager: "Manager",
   packer: "Packer",
   support: "Support",
@@ -28,7 +38,7 @@ const ROLE_LABEL: Record<PreviewStaffMember["role"], string> = {
 };
 
 const STATUS_PILLS: Record<
-  PreviewStaffMember["status"],
+  StaffStatus,
   { bg: string; text: string; label: string }
 > = {
   active: { bg: "bg-success-lighter", text: "text-success-dark", label: "Active" },
@@ -46,7 +56,8 @@ export default function VendorStaff() {
   const { toast } = useToast();
   const { blockIfPreview } = usePreviewGuard();
 
-  const staff = previewStaff;
+  // Staff management API not wired yet — show empty until real data exists.
+  const staff: StaffMember[] = [];
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -160,7 +171,7 @@ export default function VendorStaff() {
                     colSpan={6}
                     className="text-center py-10 text-grey-500"
                   >
-                    No staff matches your filters.
+                    No staff members yet.
                   </TableCell>
                 </TableRow>
               ) : (
@@ -178,7 +189,7 @@ export default function VendorStaff() {
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${s.avatarColor}`}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${s.avatarColor ?? "bg-muted text-grey-700"}`}
                           >
                             {initials}
                           </div>

@@ -99,7 +99,6 @@ type Banner = {
   startFrom: number;
   bannerType: string;
   discount?: string;
-  bannerPage: string;
   bgColor?: string;
   textColor?: string;
   weight: number;
@@ -109,14 +108,6 @@ type Banner = {
 // Define BannerType for fetching
 type BannerType = {
   _id: string;
-  title: string;
-  slug: string;
-};
-
-// Define BannerPage for fetching
-type BannerPage = {
-  _id: string;
-  name: string;
   title: string;
   slug: string;
 };
@@ -133,7 +124,6 @@ const bannerSchema = z.object({
   // Allow any string now as it comes from dynamic types
   bannerType: z.string().min(1, "Banner type is required"),
   discount: z.string().optional(),
-  bannerPage: z.string().min(1, "Banner page is required"),
   bgColor: z.string().optional(),
   textColor: z.string().optional(),
   weight: z.number().optional(),
@@ -153,7 +143,6 @@ export default function BannersPage() {
   // Data state
   const [banners, setBanners] = useState<Banner[]>([]);
   const [bannerTypes, setBannerTypes] = useState<BannerType[]>([]); // New state for types
-  const [bannerPages, setBannerPages] = useState<BannerPage[]>([]); // New state for pages
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -166,7 +155,6 @@ export default function BannersPage() {
   // Filter state
   const [searchTerm, setSearchTerm] = useState("");
   const [bannerType, setBannerType] = useState<string>("all");
-  const [bannerPage, setBannerPage] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -211,7 +199,6 @@ export default function BannersPage() {
       startFrom: 0,
       bannerType: "hero",
       discount: "",
-      bannerPage: "",
       weight: undefined,
       bgColor: "#05535c",
       textColor: "#ffffff",
@@ -230,7 +217,6 @@ export default function BannersPage() {
       startFrom: 0,
       bannerType: "hero",
       discount: "",
-      bannerPage: "",
       weight: undefined,
     },
   });
@@ -250,7 +236,6 @@ export default function BannersPage() {
         sortOrder,
         ...(searchTerm && { search: searchTerm }),
         ...(bannerType !== "all" && { bannerType }),
-        ...(bannerPage !== "all" && { bannerPage }),
       });
 
       const response = await axiosPrivate.get<BannerResponse>(
@@ -297,20 +282,6 @@ export default function BannersPage() {
     } catch (error) {}
   };
 
-  // Fetch banner pages
-  const fetchBannerPages = async () => {
-    try {
-      const response = await axiosPrivate.get<BannerPage[]>("/banner-pages");
-      setBannerPages(response.data);
-      // Set default banner page if not already set and pages are available
-      if (response.data.length > 0 && !formAdd.getValues("bannerPage")) {
-        formAdd.setValue("bannerPage", response.data[0].slug);
-      }
-    } catch (error) {
-      console.error("Failed to load banner pages", error);
-    }
-  };
-
   // Debounced search
   const debouncedSearchTerm = useMemo(() => {
     const handler = setTimeout(() => {
@@ -321,13 +292,12 @@ export default function BannersPage() {
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [searchTerm, bannerType, bannerPage, sortOrder, perPage]);
+  }, [searchTerm, bannerType, sortOrder, perPage]);
 
   // Clear filters
   const clearFilters = () => {
     setSearchTerm("");
     setBannerType("all");
-    setBannerPage("all");
     setSortOrder("desc");
     setCurrentPage(1);
     setPerPage(DEFAULT_PER_PAGE);
@@ -340,7 +310,6 @@ export default function BannersPage() {
   useEffect(() => {
     fetchBanners(1);
     fetchBannerTypes();
-    fetchBannerPages();
   }, []);
 
   useEffect(() => {
@@ -359,7 +328,6 @@ export default function BannersPage() {
       startFrom: banner.startFrom,
       bannerType: banner.bannerType,
       discount: banner.discount || "",
-      bannerPage: banner.bannerPage,
       weight: banner.weight,
     });
     setIsEditModalOpen(true);
@@ -376,7 +344,6 @@ export default function BannersPage() {
       startFrom: banner.startFrom,
       bannerType: banner.bannerType,
       discount: banner.discount || "",
-      bannerPage: banner.bannerPage,
       weight: banner.weight,
     });
     setIsAddModalOpen(true);
@@ -639,11 +606,6 @@ export default function BannersPage() {
             {banner.bannerType}
           </Badge>
         </TableCell>
-        <TableCell>
-          <Badge variant="outline" className="capitalize">
-            {banner.bannerPage}
-          </Badge>
-        </TableCell>
         <TableCell>{banner.startFrom}</TableCell>
         <TableCell>{new Date(banner.createdAt).toLocaleDateString()}</TableCell>
         {isAdmin && (
@@ -684,7 +646,7 @@ export default function BannersPage() {
   // Clear selection when page changes or filters change
   useEffect(() => {
     setSelectedBanners(new Set());
-  }, [currentPage, searchTerm, bannerType, bannerPage, sortOrder]);
+  }, [currentPage, searchTerm, bannerType, sortOrder]);
 
   // Skeleton loading component
   const SkeletonRow = () => (
@@ -877,12 +839,6 @@ export default function BannersPage() {
                     >
                       {bannerType === "all" ? "All Types" : bannerType}
                     </Badge>
-                    <Badge
-                      variant="outline"
-                      className="h-5 text-[10px] capitalize px-1.5"
-                    >
-                      {bannerPage === "all" ? "All Pages" : bannerPage}
-                    </Badge>
                   </>
                 )}
               </div>
@@ -923,9 +879,7 @@ export default function BannersPage() {
                   className={`mr-2 h-4 w-4 ${showFilters ? "text-primary" : ""}`}
                 />
                 Filters
-                {(bannerType !== "all" ||
-                  bannerPage !== "all" ||
-                  sortOrder !== "desc") && (
+                {(bannerType !== "all" || sortOrder !== "desc") && (
                   <span className="ml-2 flex h-2 w-2 rounded-full bg-primary" />
                 )}
               </Button>
@@ -937,7 +891,6 @@ export default function BannersPage() {
                 disabled={
                   !searchTerm &&
                   bannerType === "all" &&
-                  bannerPage === "all" &&
                   sortOrder === "desc"
                 }
               >
@@ -968,25 +921,6 @@ export default function BannersPage() {
                       {bannerTypes.map((type) => (
                         <SelectItem key={type.slug} value={type.slug}>
                           {type.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-muted-foreground ml-1">
-                    Banner Page
-                  </label>
-                  <Select value={bannerPage} onValueChange={setBannerPage}>
-                    <SelectTrigger className="h-10 bg-background">
-                      <SelectValue placeholder="Select page" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Pages</SelectItem>
-                      {bannerPages.map((page) => (
-                        <SelectItem key={page.slug} value={page.slug}>
-                          {page.title}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1045,17 +979,14 @@ export default function BannersPage() {
             Showing {banners.length} of {total} banners
             {searchTerm && ` for "${searchTerm}"`}
             {bannerType !== "all" && ` in ${bannerType}`}
-            {bannerPage !== "all" && ` on ${bannerPage}`}
           </span>
           {(searchTerm ||
             bannerType !== "all" ||
-            bannerPage !== "all" ||
             sortOrder !== "desc") && (
             <Badge variant="secondary" className="ml-2">
               {[
                 searchTerm && "Filtered",
                 bannerType !== "all" && "Type filtered",
-                bannerPage !== "all" && "Page filtered",
                 sortOrder === "asc" && "Sorted",
               ]
                 .filter(Boolean)
@@ -1089,7 +1020,6 @@ export default function BannersPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Page</TableHead>
                 <TableHead>Start From</TableHead>
                 <TableHead>Created</TableHead>
                 {isAdmin && (
@@ -1110,15 +1040,13 @@ export default function BannersPage() {
                 ) : banners.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={isAdmin ? 10 : 8}
+                      colSpan={isAdmin ? 9 : 7}
                       className="text-center py-8"
                     >
                       <div className="flex flex-col items-center gap-2 text-muted-foreground">
                         <Tag className="h-8 w-8" />
                         <span>No banners found</span>
-                        {(searchTerm ||
-                          bannerType !== "all" ||
-                          bannerPage !== "all") && (
+                        {(searchTerm || bannerType !== "all") && (
                           <Button
                             variant="link"
                             onClick={clearFilters}
@@ -1378,33 +1306,6 @@ export default function BannersPage() {
                         {bannerTypes.map((type) => (
                           <SelectItem key={type.slug} value={type.slug}>
                             {type.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formAdd.control}
-                name="bannerPage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Banner Page</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select banner page" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {bannerPages.map((page) => (
-                          <SelectItem key={page.slug} value={page.slug}>
-                            {page.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -1712,33 +1613,6 @@ export default function BannersPage() {
                         {bannerTypes.map((type) => (
                           <SelectItem key={type.slug} value={type.slug}>
                             {type.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formEdit.control}
-                name="bannerPage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Banner Page</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select banner page" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {bannerPages.map((page) => (
-                          <SelectItem key={page.slug} value={page.slug}>
-                            {page.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

@@ -10,7 +10,6 @@ export interface IBannerDocument extends Document {
   startFrom: number;
   image?: string;
   bannerType: string;
-  bannerPage: string;
   bgColor?: string;
   textColor?: string;
   weight: number;
@@ -55,10 +54,7 @@ const bannerSchema = new mongoose.Schema<IBannerDocument>(
     bannerType: {
       type: String,
       required: true,
-    },
-    bannerPage: {
-      type: String,
-      required: true,
+      default: "hero-banner",
     },
     bgColor: {
       type: String,

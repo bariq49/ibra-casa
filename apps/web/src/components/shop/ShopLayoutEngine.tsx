@@ -603,7 +603,7 @@ export default function ShopLayoutEngine({
           <div className="flex-1 min-w-0 flex flex-col gap-3 sm:gap-4 md:gap-6">
             {hasPromoBanners && (
               <div className="w-full relative z-10 xl:mt-0">
-                <Hero homeVersionSlug="home-1" compact={true} />
+                <Hero compact={true} />
               </div>
             )}
 

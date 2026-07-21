@@ -22,8 +22,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { adminApi, ADMIN_API_ENDPOINTS } from "@/lib/config";
 import { formatCurrency } from "@/lib/utils";
-import { usePreviewGuard } from "@/hooks/usePreviewGuard";
-import { previewOrders } from "@/lib/preview/vendorPreviewData";
 
 type VendorOrder = {
   _id: string;
@@ -60,19 +58,10 @@ const TOP_STATS = [
 export default function VendorOrders() {
   const [orders, setOrders] = useState<VendorOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isPreview } = usePreviewGuard();
 
   useEffect(() => {
     let active = true;
     setLoading(true);
-
-    if (isPreview) {
-      setOrders(previewOrders);
-      setLoading(false);
-      return () => {
-        active = false;
-      };
-    }
 
     adminApi
       .get(ADMIN_API_ENDPOINTS.VENDOR_ORDERS)
@@ -82,7 +71,7 @@ export default function VendorOrders() {
     return () => {
       active = false;
     };
-  }, [isPreview]);
+  }, []);
 
   const counts = useMemo(() => {
     const c = {

@@ -24,11 +24,9 @@ export type Blog = {
 
 export default async function LatestBlogs({
   locale,
-  /** Pre-fetched blogs passed from the page — avoids double-fetch waterfall */
   blogs: prefetchedBlogs,
 }: {
   locale: string;
-  productBase?: string;
   blogs?: Blog[];
 }) {
   setRequestLocale(locale);

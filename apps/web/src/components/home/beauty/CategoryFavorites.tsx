@@ -7,8 +7,8 @@ interface CategoryFavoritesProps {
 }
 
 /**
- * Server-compatible wrapper for the beauty Category Favorites section.
- * Categories are pre-fetched by the parent page server component and filtered for favorites.
+ * Server wrapper for Featured Categories (asymmetric image grid).
+ * Categories are pre-fetched by the parent and filtered for favorites.
  */
 export default function CategoryFavorites({ categories }: CategoryFavoritesProps) {
   if (!categories || categories.length === 0) return null;

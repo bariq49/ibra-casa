@@ -17,7 +17,6 @@ import { adminApi, ADMIN_API_ENDPOINTS } from "@/lib/config";
 import { usePreviewGuard } from "@/hooks/usePreviewGuard";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/utils";
-import { previewProducts } from "@/lib/preview/vendorPreviewData";
 
 type VendorProduct = {
   _id: string;
@@ -87,23 +86,12 @@ export default function VendorProducts({ tab }: { tab: Tab }) {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { blockIfPreview, isPreview } = usePreviewGuard();
+  const { blockIfPreview } = usePreviewGuard();
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     const status = statusToQuery(tab);
-
-    if (isPreview) {
-      const filtered = status
-        ? previewProducts.filter((p) => p.approvalStatus === status)
-        : previewProducts;
-      setProducts(filtered);
-      setLoading(false);
-      return () => {
-        active = false;
-      };
-    }
 
     adminApi
       .get(ADMIN_API_ENDPOINTS.VENDOR_PRODUCTS, {
@@ -120,7 +108,7 @@ export default function VendorProducts({ tab }: { tab: Tab }) {
     return () => {
       active = false;
     };
-  }, [tab, isPreview]);
+  }, [tab]);
 
   async function handleDelete(id: string) {
     if (blockIfPreview("delete products")) return;

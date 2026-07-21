@@ -8,6 +8,9 @@ import { Plus, Minus } from "lucide-react";
 const faqData = [
   {
     category: "SHOPPING",
+    title: "Shopping FAQs",
+    description:
+      "Answers about browsing, placing orders, accounts, and shopping on Ibra Casa.",
     questions: [
       {
         q: "What payment methods do you accept?",
@@ -15,7 +18,7 @@ const faqData = [
       },
       {
         q: "How can I track my order?",
-        a: "Once a vendor marks your order as shipped, you will receive an automatic email notification containing a tracking link. You can also monitor real-time shipping updates by logging into your Sellzy account and checking the 'My Orders' dashboard.",
+        a: "Once a vendor marks your order as shipped, you will receive an automatic email notification containing a tracking link. You can also monitor real-time shipping updates by logging into your Ibra Casa account and checking the 'My Orders' dashboard.",
       },
       {
         q: "How long will it take to receive my order?",
@@ -23,7 +26,7 @@ const faqData = [
       },
       {
         q: "Do you ship internationally?",
-        a: "Yes, because Sellzy is a global multi-vendor platform, many of our vendors offer international shipping. You can verify shipping availability and rates to your specific country directly on the product checkout page.",
+        a: "Yes, because Ibra Casa is a global multi-vendor platform, many of our vendors offer international shipping. You can verify shipping availability and rates to your specific country directly on the product checkout page.",
       },
       {
         q: "Can I cancel or modify my order?",
@@ -37,6 +40,9 @@ const faqData = [
   },
   {
     category: "PAYMENT",
+    title: "Payment FAQs",
+    description:
+      "Information about secure checkout, payment methods, and billing issues.",
     questions: [
       {
         q: "Is my payment information secure?",
@@ -50,10 +56,13 @@ const faqData = [
   },
   {
     category: "RETURNS",
+    title: "Returns & Refunds",
+    description:
+      "Details on return windows, refunds, and how vendor policies work.",
     questions: [
       {
         q: "What is your standard return policy?",
-        a: "Return policies are set individually by each vendor. However, Sellzy mandates a minimum 14-day return window for all items sold that arrive damaged or significantly not as described under our Buyer Protection Guarantee.",
+        a: "Return policies are set individually by each vendor. However, Ibra Casa mandates a minimum 14-day return window for all items sold that arrive damaged or significantly not as described under our Buyer Protection Guarantee.",
       },
       {
         q: "How long does it take to process a refund?",
@@ -63,6 +72,9 @@ const faqData = [
   },
   {
     category: "SHIPPING",
+    title: "Shipping FAQs",
+    description:
+      "Shipping costs, delivery options, and how orders get to your door.",
     questions: [
       {
         q: "How much is shipping?",
@@ -88,7 +100,7 @@ const FaqAccordionRow = ({
   onClick: () => void;
 }) => {
   return (
-    <div className="border-b border-border bg-white last:border-0">
+    <div className="border-b border-border last:border-0">
       <button
         onClick={onClick}
         className="w-full flex items-center justify-between py-6 text-left focus:outline-none group"
@@ -112,51 +124,66 @@ const FaqAccordionRow = ({
   );
 };
 
-const FaqAccordion = () => {
-  const [activeTab, setActiveTab] = useState(faqData[0].category);
-  const [openIndex, setOpenIndex] = useState<number | null>(0); // Default open first item
-
-  const activeData = faqData.find((d) => d.category === activeTab);
-
-  const handleTabChange = (category: string) => {
-    setActiveTab(category);
-    setOpenIndex(null);
-  };
+const FaqSection = ({
+  category,
+  title,
+  description,
+  questions,
+}: {
+  category: string;
+  title: string;
+  description: string;
+  questions: { q: string; a: string }[];
+}) => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-20 bg-white">
-      <Container>
-        <div className="max-w-4xl mx-auto flex flex-col items-center">
-          {/* Category Toggle Pills */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {faqData.map((tab) => (
-              <button
-                key={tab.category}
-                onClick={() => handleTabChange(tab.category)}
-                className={cn(
-                  "px-6 py-3 rounded-full font-medium font-dm-sans text-sm tracking-widest uppercase transition-all duration-300",
-                  activeTab === tab.category
-                    ? "bg-success/10 text-primary"
-                    : "bg-transparent text-foreground hover:bg-muted",
-                )}
-              >
-                {tab.category}
-              </button>
-            ))}
-          </div>
+    <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 xl:gap-20 items-start">
+      {/* Left: title + description (sticky within section) */}
+      <div className="w-full lg:w-[38%] lg:sticky lg:top-28 lg:self-start">
+        <p className="text-sm font-bold font-dm-sans tracking-[0.2em] uppercase text-warning mb-3">
+          {category}
+        </p>
+        <h2 className="text-2xl md:text-3xl font-bold font-urbanist text-light-primary-text leading-snug mb-3">
+          {title}
+          <span className="text-warning">.</span>
+        </h2>
+        <p className="text-sm md:text-base text-light-secondary-text font-dm-sans leading-relaxed max-w-sm">
+          {description}
+        </p>
+        <div className="mt-5 h-0.5 w-16 bg-warning rounded-full" />
+      </div>
 
-          {/* Accordion List */}
-          <div className="w-full">
-            {activeData?.questions.map((q, idx) => (
-              <FaqAccordionRow
-                key={idx}
-                question={`${idx + 1}. ${q.q}`}
-                answer={q.a}
-                isOpen={openIndex === idx}
-                onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-              />
-            ))}
-          </div>
+      {/* Right: accordion rows */}
+      <div className="w-full lg:w-[62%]">
+        {questions.map((q, idx) => (
+          <FaqAccordionRow
+            key={idx}
+            question={`${idx + 1}. ${q.q}`}
+            answer={q.a}
+            isOpen={openIndex === idx}
+            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const FaqAccordion = () => {
+  return (
+    <section className="py-16 md:py-20 bg-white">
+      <Container>
+        <div className="flex flex-col gap-20 md:gap-28">
+          {faqData.map((section) => (
+            <FaqSection
+              key={section.category}
+              category={section.category}
+              title={section.title}
+              description={section.description}
+              questions={section.questions}
+            />
+          ))}
         </div>
       </Container>
     </section>

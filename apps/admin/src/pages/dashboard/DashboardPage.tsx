@@ -3,7 +3,7 @@ import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import { useToast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
 import { getRoleDashboardMessage } from "@/lib/rolePermissions";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import DashboardSkeleton from "@/components/skeleton/DashboardSkeleton";
 import { SummaryWidget } from "@/components/dashboard/SummaryWidget";
 import { DashboardOrderStatus } from "@/components/dashboard/DashboardOrderStatus";
@@ -11,7 +11,7 @@ import { DashboardRevenueChart } from "@/components/dashboard/DashboardRevenueCh
 import { RecentOrdersList } from "@/components/dashboard/RecentOrdersList";
 import { LowStockProductsList } from "@/components/dashboard/LowStockProductsList";
 import { VendorManagementCard } from "@/components/dashboard/VendorManagementCard";
-import { FlaskConical, BarChart2, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, formatCurrencyWhole } from "@/lib/utils";
 
@@ -55,45 +55,16 @@ interface StatsData {
   brands: { name: string; value: number }[];
 }
 
-// ─── Demo data ────────────────────────────────────────────────────────────────
-const DEMO_STATS: StatsData = {
-  counts: {
-    users: 8642,
-    products: 3420,
-    categories: 48,
-    brands: 112,
-    orders: 12850,
-    totalRevenue: 984230,
-  },
-  orderStatus: {
-    pending: 280,
-    confirmed: 340,
-    delivering: 210,
-    delivered: 620,
-    completed: 450,
-    cancelled: 95,
-    packed: 180,
-    paid: 520,
-    address_confirmed: 155,
-  },
-  monthlyRevenue: [
-    { name: "Jan", sales: 4200, orders: 38 },
-    { name: "Feb", sales: 3800, orders: 31 },
-    { name: "Mar", sales: 5100, orders: 47 },
-    { name: "Apr", sales: 4700, orders: 43 },
-    { name: "May", sales: 6200, orders: 58 },
-    { name: "Jun", sales: 5900, orders: 54 },
-    { name: "Jul", sales: 7100, orders: 65 },
-    { name: "Aug", sales: 8400, orders: 78 },
-    { name: "Sep", sales: 7600, orders: 70 },
-    { name: "Oct", sales: 9200, orders: 85 },
-    { name: "Nov", sales: 11500, orders: 106 },
-    { name: "Dec", sales: 13800, orders: 128 },
-  ],
-  year: new Date().getFullYear(),
-  roles: [],
-  categories: [],
-  brands: [],
+const EMPTY_ORDER_STATUS: OrderStatus = {
+  pending: 0,
+  confirmed: 0,
+  delivering: 0,
+  delivered: 0,
+  completed: 0,
+  cancelled: 0,
+  packed: 0,
+  paid: 0,
+  address_confirmed: 0,
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -116,7 +87,6 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [yearLoading, setYearLoading] = useState(false);
 
@@ -141,11 +111,9 @@ export default function DashboardPage() {
         toast({
           variant: "destructive",
           title: "Could not load statistics",
-          description: "Using demo data as fallback. The API may be unavailable.",
+          description: "The API may be unavailable. Showing empty values.",
         });
-        // If API fails, silently switch to demo mode so page is never blank
-        setIsDemoMode(true);
-        setStats(DEMO_STATS);
+        setStats(null);
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -162,9 +130,7 @@ export default function DashboardPage() {
   // ── Year change (re-fetch with new year) ─────────────────────────────────
   const handleYearChange = async (year: number) => {
     setSelectedYear(year);
-    if (!isDemoMode) {
-      await fetchStats(year, true);
-    }
+    await fetchStats(year, true);
   };
 
   // ── Refresh ──────────────────────────────────────────────────────────────
@@ -173,20 +139,25 @@ export default function DashboardPage() {
     fetchStats(selectedYear, true);
   };
 
-  // ── Active display data (demo OR real) ───────────────────────────────────
-  const displayStats = isDemoMode ? DEMO_STATS : (stats ?? DEMO_STATS);
-
   // ─── Derived widget values ────────────────────────────────────────────────
-  const totalSales = formatCurrencyWhole(displayStats.counts.totalRevenue);
-  const totalOrders = displayStats.counts.orders.toLocaleString();
-  const totalCustomers = displayStats.counts.users.toLocaleString();
-  const totalProducts = displayStats.counts.products.toLocaleString();
-
-  // Use API values if available, otherwise use demo
-  const abandonedCarts = isDemoMode ? "128" : (displayStats.counts.abandonedCarts || 0).toLocaleString();
-  const shippingDelays = isDemoMode ? "42" : (displayStats.counts.shippingDelays || 0).toLocaleString();
-  const refundRequests = isDemoMode ? "15" : (displayStats.counts.refundRequests || 0).toLocaleString();
-  const paymentFailures = isDemoMode ? "8" : (displayStats.counts.paymentFailures || 0).toLocaleString();
+  const totalSales = stats
+    ? formatCurrencyWhole(stats.counts.totalRevenue)
+    : "—";
+  const totalOrders = stats ? stats.counts.orders.toLocaleString() : "—";
+  const totalCustomers = stats ? stats.counts.users.toLocaleString() : "—";
+  const totalProducts = stats ? stats.counts.products.toLocaleString() : "—";
+  const abandonedCarts = stats
+    ? (stats.counts.abandonedCarts || 0).toLocaleString()
+    : "—";
+  const shippingDelays = stats
+    ? (stats.counts.shippingDelays || 0).toLocaleString()
+    : "—";
+  const refundRequests = stats
+    ? (stats.counts.refundRequests || 0).toLocaleString()
+    : "—";
+  const paymentFailures = stats
+    ? (stats.counts.paymentFailures || 0).toLocaleString()
+    : "—";
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
@@ -213,83 +184,18 @@ export default function DashboardPage() {
 
             {/* Actions */}
             <div className="flex items-center gap-3 flex-wrap">
-              {/* Refresh */}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleRefresh}
-                disabled={refreshing || isDemoMode}
+                disabled={refreshing}
                 className="flex items-center gap-1.5 h-9 rounded-full px-4 border-border text-sm"
               >
                 <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} />
                 {refreshing ? "Refreshing..." : "Refresh"}
               </Button>
-
-              {/* Demo / Real toggle */}
-              <AnimatePresence mode="wait">
-                {isDemoMode ? (
-                  <motion.div
-                    key="real-btn"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                  >
-                    <Button
-                      size="sm"
-                      onClick={() => setIsDemoMode(false)}
-                      className="flex items-center gap-2 h-9 rounded-full px-4 bg-primary-main hover:bg-primary-dark text-white shadow-sm shadow-primary-main/20"
-                    >
-                      <BarChart2 className="h-3.5 w-3.5" />
-                      Show Real Data
-                    </Button>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="demo-btn"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsDemoMode(true)}
-                      className="flex items-center gap-2 h-9 rounded-full px-4 border-warning-main/30 bg-warning-lighter/50 text-warning-dark hover:bg-warning-lighter"
-                    >
-                      <FlaskConical className="h-3.5 w-3.5" />
-                      Preview Demo Data
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </motion.div>
-
-          {/* Demo mode notice banner */}
-          <AnimatePresence>
-            {isDemoMode && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="flex items-center gap-3 bg-warning-lighter border border-warning-main/30 rounded-xl px-5 py-3 text-warning-dark">
-                  <FlaskConical className="h-5 w-5 shrink-0" />
-                  <p className="text-sm font-medium">
-                    You are viewing <span className="font-bold">demo / sample data</span>. Click{" "}
-                    <button
-                      onClick={() => setIsDemoMode(false)}
-                      className="underline font-bold hover:text-warning-darker"
-                    >
-                      Show Real Data
-                    </button>{" "}
-                    to see live statistics from the database.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* ── 8-Widget Grid ──────────────────────────────────────────── */}
           <motion.div
@@ -300,7 +206,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Total Sales"
                 value={totalSales}
-                trend={isDemoMode ? 0.12 : 0}
+                trend={0}
                 bgColor="bg-[rgba(160,226,224,0.6)]"
               />
             </motion.div>
@@ -308,7 +214,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Total Orders"
                 value={totalOrders}
-                trend={isDemoMode ? -0.05 : 0}
+                trend={0}
                 bgColor="bg-[rgba(255,235,105,0.6)]"
               />
             </motion.div>
@@ -316,7 +222,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Total Customers"
                 value={totalCustomers}
-                trend={isDemoMode ? 0.08 : 0}
+                trend={0}
                 bgColor="bg-[rgba(255,192,145,0.6)]"
               />
             </motion.div>
@@ -324,7 +230,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Shipping Delays"
                 value={shippingDelays}
-                trend={isDemoMode ? -0.1 : 0}
+                trend={0}
                 bgColor="bg-[rgba(255,214,239,0.6)]"
               />
             </motion.div>
@@ -333,7 +239,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Refund Requests"
                 value={refundRequests}
-                trend={isDemoMode ? 0.05 : 0}
+                trend={0}
                 bgColor="bg-[rgba(146,189,245,0.6)]"
               />
             </motion.div>
@@ -341,7 +247,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Stock Products"
                 value={totalProducts}
-                trend={isDemoMode ? -0.07 : 0}
+                trend={0}
                 bgColor="bg-[rgba(250,184,81,0.6)]"
               />
             </motion.div>
@@ -349,7 +255,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Abandoned Carts"
                 value={abandonedCarts}
-                trend={isDemoMode ? 0.03 : 0}
+                trend={0}
                 bgColor="bg-[rgba(158,232,114,0.6)]"
               />
             </motion.div>
@@ -357,7 +263,7 @@ export default function DashboardPage() {
               <SummaryWidget
                 title="Payment Failures"
                 value={paymentFailures}
-                trend={isDemoMode ? -0.15 : 0}
+                trend={0}
                 bgColor="bg-[rgba(116,202,255,0.6)]"
               />
             </motion.div>
@@ -370,16 +276,14 @@ export default function DashboardPage() {
           >
             <motion.div variants={itemVariants} className="lg:col-span-1 h-full">
               <DashboardOrderStatus
-                data={displayStats.orderStatus}
+                data={stats?.orderStatus ?? EMPTY_ORDER_STATUS}
                 loading={false}
-                isDemoMode={isDemoMode}
               />
             </motion.div>
             <motion.div variants={itemVariants} className="lg:col-span-2 h-full">
               <DashboardRevenueChart
-                data={displayStats.monthlyRevenue}
+                data={stats?.monthlyRevenue ?? []}
                 loading={yearLoading}
-                isDemoMode={isDemoMode}
                 selectedYear={selectedYear}
                 availableYears={AVAILABLE_YEARS}
                 onYearChange={handleYearChange}

@@ -44,7 +44,7 @@ const FeaturedProductCard = ({
   return (
     <div className="bg-white flex flex-col items-center justify-between overflow-hidden p-6 relative rounded-4xl w-full h-full border border-gray-100 group shadow-sm hover:shadow-md transition-shadow">
       {/* Image Area (takes top portion behind text) */}
-      <div className="relative w-full rounded-3xl overflow-hidden flex items-center justify-center p-6 flex-1 min-h-62.5 sm:min-h-75 xl:min-h-0">
+      <div className="relative w-full rounded-3xl overflow-hidden flex items-center justify-center p-6 flex-1 min-h-6.5 sm:min-h-75 xl:min-h-0">
         <Link
           href={`/product/${product.slug}`}
           className="w-full h-full relative block"

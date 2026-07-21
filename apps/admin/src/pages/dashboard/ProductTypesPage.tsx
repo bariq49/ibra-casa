@@ -113,15 +113,8 @@ type ProductType = {
   displayOrder: number;
   bgColor?: string;
   productBasesBg?: Record<string, string>;
-  bannerPages?: string[];
   productBases?: string[];
   createdAt: string;
-};
-
-type BannerPage = {
-  _id: string;
-  name: string;
-  slug: string;
 };
 
 type ProductBase = {
@@ -141,7 +134,6 @@ type FormData = {
   displayOrder: number;
   bgColor: string;
   productBasesBg?: Record<string, string>;
-  bannerPages?: string[];
   productBases?: string[];
 };
 
@@ -170,9 +162,6 @@ export default function ProductTypesPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [availableBannerPages, setAvailableBannerPages] = useState<
-    BannerPage[]
-  >([]);
   const [availableProductBases, setAvailableProductBases] = useState<
     ProductBase[]
   >([]);
@@ -212,7 +201,6 @@ export default function ProductTypesPage() {
       displayOrder: 0,
       bgColor: "#ffffff",
       productBasesBg: {},
-      bannerPages: [],
       productBases: [],
     },
   });
@@ -226,21 +214,6 @@ export default function ProductTypesPage() {
       }
     } catch (error) {
       console.error("Failed to load product bases", error);
-    }
-  };
-
-  // Fetch active banner pages
-  const fetchBannerPages = async () => {
-    try {
-      const response = await axiosPrivate.get("/banner-pages");
-      // If the response is the expected array, set it
-      if (Array.isArray(response.data)) {
-        setAvailableBannerPages(response.data);
-      } else if (response.data && Array.isArray(response.data.bannerPages)) {
-        setAvailableBannerPages(response.data.bannerPages);
-      }
-    } catch (error) {
-      console.error("Failed to load banner pages", error);
     }
   };
 
@@ -335,7 +308,6 @@ export default function ProductTypesPage() {
 
   useEffect(() => {
     fetchProductTypes(1);
-    fetchBannerPages();
     fetchProductBases();
   }, []);
 
@@ -357,7 +329,6 @@ export default function ProductTypesPage() {
       displayOrder: productType.displayOrder,
       bgColor: productType.bgColor || "#ffffff",
       productBasesBg: productType.productBasesBg || {},
-      bannerPages: productType.bannerPages || [],
       productBases: productType.productBases || [],
     });
     setIsSidebarOpen(true);
@@ -377,7 +348,6 @@ export default function ProductTypesPage() {
       displayOrder: 0,
       bgColor: "#ffffff",
       productBasesBg: {},
-      bannerPages: [],
       productBases: [],
     });
     setIsSidebarOpen(true);
@@ -403,7 +373,6 @@ export default function ProductTypesPage() {
       displayOrder: productType.displayOrder,
       bgColor: productType.bgColor || "#ffffff",
       productBasesBg: productType.productBasesBg || {},
-      bannerPages: productType.bannerPages || [],
       productBases: productType.productBases || [],
     });
     setIsSidebarOpen(true);
@@ -510,12 +479,6 @@ export default function ProductTypesPage() {
         <div className="flex flex-row items-center gap-2">
           <Skeleton className="h-4 w-4 rounded-full" />
           <Skeleton className="h-3 w-16" />
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-1.5">
-          <Skeleton className="h-4 w-12 rounded-sm" />
-          <Skeleton className="h-4 w-12 rounded-sm" />
         </div>
       </TableCell>
       <TableCell>
@@ -874,9 +837,6 @@ export default function ProductTypesPage() {
                 <TableHead className="whitespace-nowrap">Status</TableHead>
                 <TableHead className="whitespace-nowrap">BG Color</TableHead>
                 <TableHead className="whitespace-nowrap min-w-[140px]">
-                  Pages
-                </TableHead>
-                <TableHead className="whitespace-nowrap min-w-[140px]">
                   Bases
                 </TableHead>
                 <TableHead className="whitespace-nowrap">Order</TableHead>
@@ -956,62 +916,6 @@ export default function ProductTypesPage() {
                         <span className="text-[10px] text-muted-foreground font-mono uppercase">
                           {productType.bgColor || "#ffffff"}
                         </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-[120px]">
-                      <div className="flex flex-wrap gap-1 items-center">
-                        {productType.bannerPages &&
-                        productType.bannerPages.length > 0 ? (
-                          <>
-                            <Badge
-                              variant="secondary"
-                              className="text-[10px] px-1 py-0 cursor-default"
-                            >
-                              {availableBannerPages.find(
-                                (p) => p._id === productType.bannerPages![0],
-                              )?.name || "Page"}
-                            </Badge>
-                            {productType.bannerPages.length > 1 && (
-                              <TooltipProvider>
-                                <Tooltip delayDuration={300}>
-                                  <TooltipTrigger asChild>
-                                    <Badge
-                                      variant="secondary"
-                                      className="text-[10px] px-1 py-0 cursor-help hover:bg-secondary/80"
-                                    >
-                                      +{productType.bannerPages.length - 1}{" "}
-                                      others
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top">
-                                    <div className="flex flex-col gap-1 max-h-40 overflow-y-auto">
-                                      {productType.bannerPages
-                                        .slice(1)
-                                        .map((pageId) => {
-                                          const page =
-                                            availableBannerPages.find(
-                                              (p) => p._id === pageId,
-                                            );
-                                          return (
-                                            <span
-                                              key={pageId}
-                                              className="text-xs font-medium"
-                                            >
-                                              {page ? page.name : "Page"}
-                                            </span>
-                                          );
-                                        })}
-                                    </div>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">
-                            None
-                          </span>
-                        )}
                       </div>
                     </TableCell>
                     <TableCell className="max-w-[120px]">
@@ -1453,81 +1357,6 @@ export default function ProductTypesPage() {
 
               <FormField
                 control={form.control}
-                name="bannerPages"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Display on Pages</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "w-full justify-between font-normal",
-                              !field.value?.length && "text-muted-foreground",
-                            )}
-                            disabled={formLoading}
-                          >
-                            {field.value?.length
-                              ? `${field.value.length} pages selected`
-                              : "Select pages"}
-                            <Plus className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-(--radix-popover-trigger-width) p-0"
-                        align="start"
-                      >
-                        <Command>
-                          <CommandInput placeholder="Search pages..." />
-                          <CommandEmpty>No page found.</CommandEmpty>
-                          <CommandGroup>
-                            <ScrollArea className="h-60">
-                              {availableBannerPages.map((page) => (
-                                <CommandItem
-                                  key={page._id}
-                                  onSelect={() => {
-                                    const currentValues = field.value || [];
-                                    const newValues = currentValues.includes(
-                                      page._id,
-                                    )
-                                      ? currentValues.filter(
-                                          (v) => v !== page._id,
-                                        )
-                                      : [...currentValues, page._id];
-                                    field.onChange(newValues);
-                                  }}
-                                >
-                                  <div
-                                    className={cn(
-                                      "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                      (field.value || []).includes(page._id)
-                                        ? "bg-primary text-primary-foreground"
-                                        : "opacity-50 [&_svg]:invisible",
-                                    )}
-                                  >
-                                    <Plus className={cn("h-4 w-4")} />
-                                  </div>
-                                  <span>{page.name}</span>
-                                </CommandItem>
-                              ))}
-                            </ScrollArea>
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormDescription>
-                      Select which pages this product type should be displayed
-                      on
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="productBases"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
@@ -1620,8 +1449,7 @@ export default function ProductTypesPage() {
                       </div>
                     )}
                     <FormDescription>
-                      Select which homepage sections (bases) this product type
-                      belongs to
+                      Select which product bases this product type belongs to
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

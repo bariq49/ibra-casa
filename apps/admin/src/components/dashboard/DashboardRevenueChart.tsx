@@ -20,37 +20,19 @@ interface MonthlyRevenuePoint {
 interface DashboardRevenueChartProps {
   data?: MonthlyRevenuePoint[];
   loading?: boolean;
-  isDemoMode?: boolean;
   selectedYear: number;
   availableYears: number[];
   onYearChange: (year: number) => void;
 }
 
-// Demo fallback data
-const DEMO_DATA: MonthlyRevenuePoint[] = [
-  { name: "Jan", sales: 4200, orders: 38 },
-  { name: "Feb", sales: 3800, orders: 31 },
-  { name: "Mar", sales: 5100, orders: 47 },
-  { name: "Apr", sales: 4700, orders: 43 },
-  { name: "May", sales: 6200, orders: 58 },
-  { name: "Jun", sales: 5900, orders: 54 },
-  { name: "Jul", sales: 7100, orders: 65 },
-  { name: "Aug", sales: 8400, orders: 78 },
-  { name: "Sep", sales: 7600, orders: 70 },
-  { name: "Oct", sales: 9200, orders: 85 },
-  { name: "Nov", sales: 11500, orders: 106 },
-  { name: "Dec", sales: 13800, orders: 128 },
-];
-
 export function DashboardRevenueChart({
   data,
   loading,
-  isDemoMode,
   selectedYear,
   availableYears,
   onYearChange,
 }: DashboardRevenueChartProps) {
-  const chartData = isDemoMode ? DEMO_DATA : (data ?? []);
+  const chartData = data ?? [];
 
   const totalRevenue = chartData.reduce((s, d) => s + d.sales, 0);
   const totalOrders = chartData.reduce((s, d) => s + d.orders, 0);
@@ -59,14 +41,7 @@ export function DashboardRevenueChart({
     <Card className="flex flex-col p-6 rounded-xl border border-grey-200 shadow-sm h-full w-full overflow-hidden">
       <div className="flex items-center justify-between mb-2">
         <div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-sans font-semibold text-lg text-grey-900">Revenue</h3>
-            {isDemoMode && (
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-warning-lighter text-warning-dark px-2 py-0.5 rounded-full">
-                Demo
-              </span>
-            )}
-          </div>
+          <h3 className="font-sans font-semibold text-lg text-grey-900">Revenue</h3>
           <p className="text-sm text-grey-500 font-medium">Monthly Earning Status</p>
         </div>
 
@@ -106,6 +81,10 @@ export function DashboardRevenueChart({
                 style={{ height: `${h}%` }}
               />
             ))}
+          </div>
+        ) : chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-sm text-grey-500">
+            No revenue data for this year.
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

@@ -9,7 +9,6 @@ import {
   CheckCircle,
   XCircle,
   Ticket,
-  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,23 +168,6 @@ export default function CouponPage() {
       });
     }
     setIsModalOpen(true);
-  };
-
-  const loadDummyData = () => {
-    const randomNum = Math.floor(Math.random() * 1000);
-    const now = new Date();
-    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    setFormData({
-      name: `Flash Sale ${randomNum}`,
-      code: `SALE${randomNum}`,
-      discountType: "percentage",
-      discountValue: Math.floor(Math.random() * 30) + 10,
-      minPurchaseAmount: 500,
-      startDate: now.toISOString().slice(0, 16),
-      endDate: nextWeek.toISOString().slice(0, 16),
-      usageLimit: 100,
-      isActive: true,
-    });
   };
 
   const handleSubmit = async () => {
@@ -420,12 +402,6 @@ export default function CouponPage() {
             <SheetTitle className="text-xl font-bold font-['DM_Sans',sans-serif] mt-0">
               {selectedCoupon ? "Edit Coupon" : "Create New Coupon"}
             </SheetTitle>
-            {!selectedCoupon && (
-              <Button onClick={loadDummyData} size="sm" variant="outline" className="h-8 gap-1.5 border-primary-main/20 text-primary-main hover:bg-primary-main/5 mt-0!">
-                <Wand2 className="h-3.5 w-3.5" />
-                Fill Dummy Data
-              </Button>
-            )}
           </SheetHeader>
           
           <div className="p-6 flex flex-col gap-5">

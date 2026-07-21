@@ -38,14 +38,6 @@ export const PRODUCT_ENDPOINTS = {
   REPLY_REVIEW: (productId: string, reviewId: string) => `/api/products/${productId}/review/${reviewId}/reply`,
 } as const;
 
-export const ADS_BANNER_ENDPOINTS = {
-  BASE: "/api/ads-banners",
-} as const;
-
-export const BANNER_PAGE_ENDPOINTS = {
-  BASE: "/api/banner-pages",
-} as const;
-
 export const CATEGORY_ENDPOINTS = {
   BASE: "/api/categories",
   TREE: "/api/categories/tree",
@@ -120,9 +112,7 @@ export const API_ENDPOINTS = {
   PRODUCT_TYPES: PRODUCT_TYPE_ENDPOINTS,
   PRODUCT_BASES: PRODUCT_BASE_ENDPOINTS,
   PRODUCTS: PRODUCT_ENDPOINTS,
-  BANNER_PAGES: BANNER_PAGE_ENDPOINTS,
   CATEGORIES: CATEGORY_ENDPOINTS,
-  ADS_BANNERS: ADS_BANNER_ENDPOINTS,
   BLOGS: BLOG_ENDPOINTS,
   BRANDS: BRAND_ENDPOINTS,
   COLORS: COLOR_ENDPOINTS,

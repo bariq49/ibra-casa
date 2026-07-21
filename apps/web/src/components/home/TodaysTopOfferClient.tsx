@@ -30,32 +30,41 @@ const itemVariants: Variants = {
 };
 
 /* ─── Countdown Timer ─── */
-const CountdownDisplay = () => {
-  const [time, setTime] = useState({ h: 0, m: 51, s: 4 });
+const CountdownDisplay = ({ endsAt }: { endsAt?: string }) => {
+  const [time, setTime] = useState({ h: 0, m: 0, s: 0 });
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
-    const target = new Date();
-    target.setHours(
-      target.getHours() + time.h,
-      target.getMinutes() + time.m,
-      target.getSeconds() + time.s,
-    );
+    const targetMs = endsAt
+      ? new Date(endsAt).getTime()
+      : Date.now() + 60 * 60 * 1000;
 
-    const tick = setInterval(() => {
-      const diff = target.getTime() - Date.now();
+    if (Number.isNaN(targetMs)) {
+      setExpired(true);
+      return;
+    }
+
+    const tick = () => {
+      const diff = targetMs - Date.now();
       if (diff <= 0) {
-        clearInterval(tick);
-        return;
+        setTime({ h: 0, m: 0, s: 0 });
+        setExpired(true);
+        return false;
       }
       const h = Math.floor(diff / 3_600_000);
       const m = Math.floor((diff % 3_600_000) / 60_000);
       const s = Math.floor((diff % 60_000) / 1_000);
       setTime({ h, m, s });
-    }, 1000);
+      setExpired(false);
+      return true;
+    };
 
-    return () => clearInterval(tick);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!tick()) return;
+    const id = setInterval(() => {
+      if (!tick()) clearInterval(id);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [endsAt]);
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -68,7 +77,9 @@ const CountdownDisplay = () => {
         className="font-bold text-light-primary-text text-[20px] leading-[30px] whitespace-nowrap"
         style={{ fontFamily: "'Urbanist', sans-serif" }}
       >
-        End in: {pad(time.h)} : {pad(time.m)} : {pad(time.s)}
+        {expired
+          ? "Offer ended"
+          : `End in: ${pad(time.h)} : ${pad(time.m)} : ${pad(time.s)}`}
       </span>
     </div>
   );
@@ -77,14 +88,16 @@ const CountdownDisplay = () => {
 /* ─── Main Component ─── */
 interface TodaysTopOfferClientProps {
   products: ApiProduct[];
-  productType?: any;
-  slug: string;
+  title?: string;
+  description?: string;
+  endsAt?: string;
 }
 
 const TodaysTopOfferClient = ({
   products,
-  productType,
-  slug,
+  title = "Today's Top Offer",
+  description = "Up to 69% discount for limited time 🔥",
+  endsAt,
 }: TodaysTopOfferClientProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
@@ -125,22 +138,15 @@ const TodaysTopOfferClient = ({
           </svg>
         </div>
 
-        {/* ── Main content block ── */}
         <div className="relative z-10 w-full min-h-[500px] rounded-[24px] bg-primary-lighter lg:bg-transparent overflow-hidden lg:overflow-visible pt-8 lg:pt-0 pb-10">
           <div className="px-4 md:px-8 xl:px-12 w-full h-full">
-            {/* ── Header: title left | timer + arrows right ── */}
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-[24px] mb-[68px] flex-wrap relative">
-              {/* Title Block */}
               <SectionHeader
-                title={productType?.title || "Today’s Top Offer"}
-                description={
-                  productType?.description ||
-                  "Up to 69% discount for limited time 🔥"
-                }
+                title={title}
+                description={description}
                 align="left"
               />
 
-              {/* Right cluster: countdown + arrows */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -148,7 +154,7 @@ const TodaysTopOfferClient = ({
                 transition={{ duration: 0.5 }}
                 className="flex items-center flex-wrap gap-[24px] shrink-0"
               >
-                <CountdownDisplay />
+                <CountdownDisplay endsAt={endsAt} />
 
                 <div className="hidden sm:flex items-center gap-4">
                   <button
@@ -179,7 +185,6 @@ const TodaysTopOfferClient = ({
               </motion.div>
             </div>
 
-            {/* ── Product carousel ── */}
             <div className="relative w-full overflow-hidden">
               <motion.div
                 variants={containerVariants}

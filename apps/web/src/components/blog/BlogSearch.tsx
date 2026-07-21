@@ -11,7 +11,7 @@ const BlogSearch = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      router.push(`/blog?search=${encodeURIComponent(searchTerm.trim())}`);
+      router.push(`/blogs?search=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 

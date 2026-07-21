@@ -6,8 +6,13 @@ import uploadService from "../config/uploadService.js";
 // @route   GET /api/banners
 // @access  Private
 const getBanners = asyncHandler(async (req, res) => {
-  const banners = await Banner.find({}).sort({ weight: 1 });
-  res.json(banners);
+  const filter: any = {};
+  if (req.query.bannerType && req.query.bannerType !== "all") {
+    filter.bannerType = req.query.bannerType;
+  }
+
+  const banners = await Banner.find(filter).sort({ weight: 1 });
+  res.json({ banners });
 });
 
 // @desc    Get all banners for admin with advanced filtering
@@ -46,11 +51,6 @@ const getBannersAdmin = asyncHandler(async (req, res) => {
   // Banner type filter
   if (bannerType && bannerType !== "all") {
     filter.bannerType = bannerType;
-  }
-
-  // Banner page filter
-  if (req.query.bannerPage && req.query.bannerPage !== "all") {
-    filter.bannerPage = req.query.bannerPage;
   }
 
   const skip = (page - 1) * perPage;
@@ -94,7 +94,6 @@ const createBanner = asyncHandler(async (req, res) => {
     startFrom,
     image,
     bannerType,
-    bannerPage,
     discount,
     bgColor,
     textColor,
@@ -130,8 +129,7 @@ const createBanner = asyncHandler(async (req, res) => {
     buttonHref,
     startFrom,
     image: imageUrl || undefined,
-    bannerType,
-    bannerPage,
+    bannerType: bannerType || "hero-banner",
     discount,
     bgColor,
     textColor,
@@ -179,7 +177,6 @@ const updateBanner = asyncHandler(async (req, res) => {
       buttonHref !== undefined ? buttonHref : banner.buttonHref;
     banner.startFrom = startFrom || banner.startFrom;
     banner.bannerType = bannerType || banner.bannerType;
-    banner.bannerPage = req.body.bannerPage || banner.bannerPage;
     banner.discount = discount !== undefined ? discount : banner.discount;
     banner.bgColor = bgColor !== undefined ? bgColor : banner.bgColor;
     banner.textColor = textColor !== undefined ? textColor : banner.textColor;

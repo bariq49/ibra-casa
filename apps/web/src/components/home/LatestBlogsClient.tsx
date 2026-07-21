@@ -37,7 +37,7 @@ export default function LatestBlogsClient({ blogs }: { blogs: Blog[] }) {
               >
                 {/* Image */}
                 <Link
-                  href={`/blog/${blog.slug}`}
+                  href={`/blogs/${blog.slug}`}
                   className="px-6 pt-6 block cursor-pointer"
                 >
                   <div className="relative h-[250px] w-full rounded-[16px] overflow-hidden">
@@ -101,7 +101,7 @@ export default function LatestBlogsClient({ blogs }: { blogs: Blog[] }) {
                   {/* Text */}
                   <div className="flex flex-col gap-3 w-full">
                     <Link
-                      href={`/blog/${blog.slug}`}
+                      href={`/blogs/${blog.slug}`}
                       className="cursor-pointer hover:text-primary transition-colors"
                     >
                       <h4 className="text-[18px] font-bold text-light-primary-text hover:text-primary transition-colors leading-[28px] line-clamp-2">
@@ -116,13 +116,13 @@ export default function LatestBlogsClient({ blogs }: { blogs: Blog[] }) {
 
                   {/* Button */}
                   <Link
-                    href={`/blog/${blog.slug}`}
+                    href={`/blogs/${blog.slug}`}
                     className="mt-auto bg-primary-light hover:bg-primary transition-colors duration-300 inline-flex items-center justify-between px-3 py-2 rounded-[59px] w-[167px] group/btn"
                   >
-                    <span className="font-['DM_Sans',sans-serif] font-semibold text-[16px] text-white leading-[26px] pl-3">
+                    <span className="font-['DM_Sans',sans-serif] font-semibold text-[16px] text-primary group-hover/btn:text-white leading-[26px] pl-3 transition-colors duration-300">
                       Read More
                     </span>
-                    <div className="bg-white flex items-center justify-center rounded-full size-[32px] shrink-0">
+                    <div className="bg-white group-hover/btn:bg-white/95 flex items-center justify-center rounded-full size-[32px] shrink-0">
                       <ArrowUpRight className="size-4 text-primary group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300" />
                     </div>
                   </Link>

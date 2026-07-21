@@ -20,7 +20,7 @@ const BlogCard = ({ post, view = "grid" }: BlogCardProps) => {
     return (
       <div className="flex border border-border rounded-2xl bg-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 w-full overflow-hidden items-center group">
         <div className="w-75 h-full relative min-h-55 shrink-0">
-          <Link href={`/blog/${post.slug}`} className="absolute inset-0">
+          <Link href={`/blogs/${post.slug}`} className="absolute inset-0">
             <Image
               src={post.image || "/placeholder-blog.jpg"}
               alt={post.title}
@@ -32,7 +32,7 @@ const BlogCard = ({ post, view = "grid" }: BlogCardProps) => {
         <div className="flex flex-col p-6 flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-xl font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-              <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+              <Link href={`/blogs/${post.slug}`}>{post.title}</Link>
             </h3>
             <div className="flex items-center gap-1 shrink-0 text-amber-400">
               <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -61,14 +61,14 @@ const BlogCard = ({ post, view = "grid" }: BlogCardProps) => {
           </div>
           <div className="flex items-center gap-4 mt-auto">
             <Link
-              href={`/blog/${post.slug}`}
+              href={`/blogs/${post.slug}`}
               className="flex-1 flex items-center justify-center gap-2 border border-border rounded-full py-2.5 font-medium text-foreground hover:border-primary hover:text-primary transition-colors text-sm"
             >
               <MessageSquare className="size-4" />
               Comment ({post.commentsCount || 0})
             </Link>
             <Link
-              href={`/blog/${post.slug}`}
+              href={`/blogs/${post.slug}`}
               className="flex-1 flex items-center justify-center gap-x-2 bg-primary text-white font-medium text-sm py-2.5 rounded-full hover:bg-primary/90 transition-colors"
             >
               Read Article
@@ -85,7 +85,7 @@ const BlogCard = ({ post, view = "grid" }: BlogCardProps) => {
       {/* Top Background Image */}
       <div className="relative w-full h-[350px] rounded-t-2xl overflow-visible shrink-0 pb-0 mb-0">
         <Link
-          href={`/blog/${post.slug}`}
+          href={`/blogs/${post.slug}`}
           className="absolute inset-0 rounded-t-2xl overflow-hidden block"
         >
           <Image
@@ -113,7 +113,7 @@ const BlogCard = ({ post, view = "grid" }: BlogCardProps) => {
       <div className="flex flex-col px-6 pt-10 pb-6 flex-1 relative z-0">
         <div className="flex justify-between items-start gap-4 mb-5">
           <h3 className="text-[17px] font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-            <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+            <Link href={`/blogs/${post.slug}`}>{post.title}</Link>
           </h3>
           <div className="flex items-center gap-[2px] shrink-0 text-[#FFB020]">
             <Star className="w-[14px] h-[14px] fill-current text-[#FFB020]" />
@@ -148,14 +148,14 @@ const BlogCard = ({ post, view = "grid" }: BlogCardProps) => {
 
         <div className="grid grid-cols-2 gap-3 mt-auto pt-2">
           <Link
-            href={`/blog/${post.slug}`}
+            href={`/blogs/${post.slug}`}
             className="flex items-center justify-center gap-2 border border-[#919EAB]/30 rounded-[8px] py-[10px] font-semibold text-[#212B36] hover:border-primary hover:text-primary transition-colors text-[14px]"
           >
             <MessageSquare className="size-4" strokeWidth={2} />
             Comments
           </Link>
           <Link
-            href={`/blog/${post.slug}`}
+            href={`/blogs/${post.slug}`}
             className="flex items-center justify-center gap-2 bg-primary text-white font-semibold text-[14px] py-[10px] rounded-[8px] hover:bg-primary/90 transition-colors shadow-[0_8px_16px_rgba(0,167,111,0.24)]"
           >
             <ArrowRight className="size-4" strokeWidth={2} />

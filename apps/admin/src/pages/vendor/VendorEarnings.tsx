@@ -21,8 +21,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { adminApi, ADMIN_API_ENDPOINTS } from "@/lib/config";
-import { usePreviewGuard } from "@/hooks/usePreviewGuard";
-import { previewOrders } from "@/lib/preview/vendorPreviewData";
 
 type VendorOrder = {
   _id: string;
@@ -68,29 +66,10 @@ const STATS = [
 export default function VendorEarnings() {
   const [orders, setOrders] = useState<VendorOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isPreview } = usePreviewGuard();
 
   useEffect(() => {
     let active = true;
     setLoading(true);
-
-    if (isPreview) {
-      setOrders(
-        previewOrders.map((o) => ({
-          _id: o._id,
-          createdAt: o.createdAt,
-          paymentStatus: o.paymentStatus,
-          paymentMethod: o.paymentMethod,
-          vendorSubtotal: o.vendorSubtotal,
-          platformCut: o.platformCut,
-          vendorPayout: o.vendorPayout,
-        })),
-      );
-      setLoading(false);
-      return () => {
-        active = false;
-      };
-    }
 
     adminApi
       .get(ADMIN_API_ENDPOINTS.VENDOR_ORDERS)
@@ -100,7 +79,7 @@ export default function VendorEarnings() {
     return () => {
       active = false;
     };
-  }, [isPreview]);
+  }, []);
 
   const stats = useMemo(() => {
     const income = orders.reduce((s, o) => s + o.vendorSubtotal, 0);

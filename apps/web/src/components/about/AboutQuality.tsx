@@ -23,27 +23,8 @@ const qualityFeatures = [
 
 const QualityPriority = () => {
   return (
-    <Container className="w-full relative mt-16 mb-20 overflow-hidden flex flex-col items-center">
-      {/* SVG Background (Desktop Only) */}
-      <div className="hidden lg:block absolute inset-0 z-0 overflow-hidden">
-        <svg
-          className="w-full h-full"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1728 450"
-          fill="none"
-        >
-          <path
-            d="M1728 402C1728 428.51 1706.51 450 1680 450H48C21.4904 450 0 428.51 0 402V48C0 21.4903 21.4903 0 48 0H464.229C490.65 0 511.137 22.4607 523.036 46.0506C540.075 79.8315 575.081 103 615.5 103H1112.5C1152.92 103 1187.92 79.8315 1204.96 46.0506C1216.86 22.4607 1237.35 0 1263.77 0H1680C1706.51 0 1728 21.4903 1728 48V402Z"
-            fill="#FFD6EF"
-          />
-        </svg>
-      </div>
-
-      {/* Solid Background (Mobile/Tablet Only) */}
-      <div className="absolute inset-0 z-0 bg-primary-lighter lg:hidden rounded-3xl mx-4" />
-
-      <div className="relative z-10 w-full pb-16 lg:pb-20 flex flex-col items-center max-w-6xl mx-auto">
+    <Container className="w-full mt-16 mb-20 flex flex-col items-center">
+      <div className="w-full pb-16 lg:pb-20 flex flex-col items-center container mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-10 lg:mb-16">
           <h2 className="text-3xl md:text-4xl font-urbanist font-bold text-light-primary-text mb-2 lg:mb-4">
             Quality is our priority

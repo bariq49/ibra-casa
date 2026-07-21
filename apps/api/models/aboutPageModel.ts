@@ -33,13 +33,13 @@ const aboutPageConfigSchema = new mongoose.Schema<IAboutPageConfigDocument>(
     },
     mission: {
       type: String,
-      required: [true, "Mission statement is required"],
       trim: true,
+      default: "",
     },
     vision: {
       type: String,
-      required: [true, "Vision statement is required"],
       trim: true,
+      default: "",
     },
     stats: [
       {
@@ -55,8 +55,8 @@ const aboutPageConfigSchema = new mongoose.Schema<IAboutPageConfigDocument>(
         },
       },
     ],
-    heroImage: { type: String },
-    heroImageSmall: { type: String },
+    heroImage: { type: String, default: "" },
+    heroImageSmall: { type: String, default: "" },
     features: [
       {
         title: { type: String, required: true },
@@ -69,7 +69,6 @@ const aboutPageConfigSchema = new mongoose.Schema<IAboutPageConfigDocument>(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,

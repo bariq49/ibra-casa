@@ -21,17 +21,11 @@ import {
 } from "@/components/ui/select";
 import {
   Settings,
-  Globe,
-  Share2,
-  ImageIcon,
   User,
   ChevronRight,
   CreditCard,
   Truck,
   Store,
-  Phone,
-  Layout,
-  Code2,
   Activity,
   Building2,
   Mail,
@@ -78,52 +72,16 @@ const defaultConfig: StoreConfig = {
 
 const configLinks = [
   {
-    title: "Website Config",
-    description: "Homepage blocks & branding",
-    href: "/dashboard/website-config",
-    icon: Globe,
-  },
-  {
-    title: "Social Media",
-    description: "Storefront social links",
-    href: "/dashboard/social-media",
-    icon: Share2,
-  },
-  {
-    title: "Website Icons",
-    description: "Favicon and app icons",
-    href: "/dashboard/website-icons",
-    icon: ImageIcon,
-  },
-  {
-    title: "Contact Settings",
-    description: "Contact page & map",
-    href: "/dashboard/contact-settings",
-    icon: Phone,
-  },
-  {
     title: "Vendor Config",
     description: "Commission & onboarding",
     href: "/dashboard/vendor-config",
     icon: Building2,
   },
   {
-    title: "Component Types",
-    description: "Page component schemas",
-    href: "/dashboard/component-types",
-    icon: Layout,
-  },
-  {
     title: "System Metrics",
     description: "API logs & monitoring",
     href: "/dashboard/api-config/system-metrics",
     icon: Activity,
-  },
-  {
-    title: "Endpoint Tester",
-    description: "Test API endpoints",
-    href: "/dashboard/api-config/endpoint-test",
-    icon: Code2,
   },
   {
     title: "My Profile",

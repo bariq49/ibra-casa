@@ -133,7 +133,7 @@ const TopSellingProductsClient = ({
                 title={productType?.title || "Top Selling Products"}
                 description={
                   productType?.description ||
-                  "Up to 69% discount for limited time 🔥"
+                  ""
                 }
                 align="center"
               />

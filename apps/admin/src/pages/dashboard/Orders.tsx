@@ -217,7 +217,6 @@ export default function OrdersPage({ isDashboard = true }: OrdersPageProps) {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
-  const [showDemoData, setShowDemoData] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
   const [isAddressConfirmed, setIsAddressConfirmed] = useState(false);
@@ -1368,23 +1367,12 @@ export default function OrdersPage({ isDashboard = true }: OrdersPageProps) {
             />
             {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
-
-          {isDashboard && (user?.role === "admin" || !user?.employee_role) && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowDemoData(!showDemoData)}
-              className={`flex items-center gap-1.5 rounded-full h-9 px-4 border-border ${showDemoData ? "bg-primary-50 text-primary-700 border-primary-200" : ""}`}
-            >
-              {showDemoData ? "Hide Demo Data" : "Load Demo Data"}
-            </Button>
-          )}
         </div>
       </motion.div>
 
       {/* Orders Dashboard Metrics (Admins typically see this) */}
       {isDashboard && (user?.role === "admin" || !user?.employee_role) && (
-        <OrdersDashboardStats orders={orders} showDemoData={showDemoData} />
+        <OrdersDashboardStats orders={orders} />
       )}
 
       {/* Filters */}

@@ -11,7 +11,6 @@ export interface IProductTypeDocument extends Document {
   displayOrder: number;
   bgColor?: string;
   productBasesBg?: Map<string, string>;
-  bannerPages?: mongoose.Types.ObjectId[];
   productBases?: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
@@ -64,12 +63,6 @@ const productTypeSchema = new mongoose.Schema<IProductTypeDocument>(
       of: String,
       default: {},
     },
-    bannerPages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "BannerPage",
-      },
-    ],
     productBases: [
       {
         type: mongoose.Schema.Types.ObjectId,

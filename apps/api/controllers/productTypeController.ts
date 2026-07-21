@@ -1,6 +1,5 @@
 import asyncHandler from "express-async-handler";
 import ProductType from "../models/productTypeModel.js";
-import BannerPage from "../models/bannerPageModel.js";
 import ProductBase from "../models/productBaseModel.js";
 import uploadService from "../config/uploadService.js";
 
@@ -8,21 +7,8 @@ import uploadService from "../config/uploadService.js";
 // @route   GET /api/product-types
 // @access  Public
 const getProductTypes = asyncHandler(async (req, res) => {
-  const { page, productBase } = req.query;
+  const { productBase } = req.query;
   const filter: any = { isActive: true };
-
-  if (page) {
-    const bannerPages = await BannerPage.find({
-      slug: { $in: [page as string, "all-pages"] },
-    });
-    if (bannerPages && bannerPages.length > 0) {
-      filter.bannerPages = { $in: bannerPages.map((p) => p._id) };
-    } else {
-      // If page slug provided but not found, only return those with no bannerPages or handle as empty
-      res.json([]);
-      return;
-    }
-  }
 
   // Filter by productBase slug if provided
   if (productBase) {
@@ -138,7 +124,6 @@ const createProductType = asyncHandler(async (req, res) => {
       displayOrder,
       bgColor,
       productBasesBg,
-      bannerPages,
       productBases,
     } = req.body;
 
@@ -196,7 +181,6 @@ const createProductType = asyncHandler(async (req, res) => {
       displayOrder: displayOrder || 0,
       bgColor: bgColor || "#ffffff",
       productBasesBg: productBasesBg || {},
-      bannerPages: bannerPages || [],
       productBases: productBases || [],
     });
 
@@ -227,7 +211,6 @@ const updateProductType = asyncHandler(async (req, res) => {
       displayOrder,
       bgColor,
       productBasesBg,
-      bannerPages,
       productBases,
     } = req.body;
 
@@ -276,8 +259,6 @@ const updateProductType = asyncHandler(async (req, res) => {
       if (productBasesBg !== undefined) {
         productType.productBasesBg = productBasesBg;
       }
-      productType.bannerPages =
-        bannerPages !== undefined ? bannerPages : productType.bannerPages;
       productType.productBases =
         productBases !== undefined ? productBases : productType.productBases;
 

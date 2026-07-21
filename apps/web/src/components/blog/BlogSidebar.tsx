@@ -55,7 +55,7 @@ const BlogSidebar = ({
           {categories.slice(0, 10).map((category) => (
             <li key={category._id}>
               <Link
-                href={`/blog?category=${category._id}`}
+                href={`/blogs?category=${category._id}`}
                 className="w-full flex items-center justify-between text-light-secondary-text hover:text-primary transition-colors group"
               >
                 <div className="flex items-center gap-x-3">
@@ -78,7 +78,7 @@ const BlogSidebar = ({
           {tags.slice(0, 10).map((tag) => (
             <Link
               key={tag._id}
-              href={`/blog?tag=${tag.slug || tag.name.toLowerCase()}`}
+              href={`/blogs?tag=${tag.slug || tag.name.toLowerCase()}`}
               className="px-4 py-2 bg-white border border-light-border rounded-full text-sm font-medium text-light-secondary-text hover:bg-primary hover:text-white hover:border-primary transition-colors"
             >
               {tag.name}
@@ -94,7 +94,7 @@ const BlogSidebar = ({
           {recentPosts.map((post) => (
             <div key={`recent-${post._id}`} className="flex gap-4 group">
               <Link
-                href={`/blog/${post.slug}`}
+                href={`/blogs/${post.slug}`}
                 className="shrink-0 relative size-[85px] rounded-xl overflow-hidden"
               >
                 <Image
@@ -106,7 +106,7 @@ const BlogSidebar = ({
               </Link>
               <div className="flex flex-col justify-center flex-1 py-1 min-w-0">
                 <h5 className="font-bold text-light-primary-text text-sm line-clamp-2 leading-tight mb-2 group-hover:text-primary transition-colors">
-                  <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                  <Link href={`/blogs/${post.slug}`}>{post.title}</Link>
                 </h5>
                 <div className="flex flex-col gap-1.5 text-xs text-light-secondary-text">
                   <span className="flex items-center gap-1">

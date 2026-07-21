@@ -1,38 +1,122 @@
 [
   {
     "_id": "a10000000000000000000001",
-    "name": "Home and Wall Decor",
-    "slug": "home-and-wall-decor",
+    "name": "Functional Decor",
+    "slug": "functional-decor",
     "parent": null,
     "path": "",
     "level": 0,
     "order": 0,
     "isActive": true,
     "isFavorite": true,
-    "description": "Metal wall art, sculptural décor, and statement pieces designed to elevate living rooms, hallways, and feature walls.",
+    "description": "Redefine rest with our organic collection.",
     "image": "",
     "icon": "",
-    "productBases": ["a60000000000000000000001"],
-    "createdAt": "2026-07-14T00:00:00.000Z",
-    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
     "__v": 0
   },
   {
     "_id": "a10000000000000000000002",
-    "name": "Aesthetic Products",
-    "slug": "aesthetic-products",
+    "name": "Furniture Accents",
+    "slug": "furniture-accents",
     "parent": null,
     "path": "",
     "level": 0,
     "order": 1,
     "isActive": true,
     "isFavorite": true,
-    "description": "Curated aesthetic home accents and sculptural metal décor for modern, minimalist, and artistic interiors.",
+    "description": "Statement pieces for modern living spaces.",
     "image": "",
     "icon": "",
-    "productBases": ["a60000000000000000000001"],
-    "createdAt": "2026-07-14T00:00:00.000Z",
-    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a10000000000000000000003",
+    "name": "Lighting Decor",
+    "slug": "lighting-decor",
+    "parent": null,
+    "path": "",
+    "level": 0,
+    "order": 2,
+    "isActive": true,
+    "isFavorite": true,
+    "description": "Warm ambient lighting for every room.",
+    "image": "",
+    "icon": "",
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a10000000000000000000004",
+    "name": "Decorative Accessories",
+    "slug": "decorative-accessories",
+    "parent": null,
+    "path": "",
+    "level": 0,
+    "order": 3,
+    "isActive": true,
+    "isFavorite": true,
+    "description": "Curated accents that complete the look.",
+    "image": "",
+    "icon": "",
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a10000000000000000000005",
+    "name": "Living Room",
+    "slug": "living-room",
+    "parent": null,
+    "path": "",
+    "level": 0,
+    "order": 4,
+    "isActive": true,
+    "isFavorite": false,
+    "description": "Comfort-first furniture for everyday living.",
+    "image": "",
+    "icon": "",
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
+    "__v": 0
+  },
+  {
+    "_id": "a10000000000000000000006",
+    "name": "Dining",
+    "slug": "dining",
+    "parent": null,
+    "path": "",
+    "level": 0,
+    "order": 5,
+    "isActive": true,
+    "isFavorite": false,
+    "description": "Tables and dining accents for gatherings.",
+    "image": "",
+    "icon": "",
+    "productBases": [
+      "a60000000000000000000001"
+    ],
+    "createdAt": "2026-07-21T00:00:00.000Z",
+    "updatedAt": "2026-07-21T00:00:00.000Z",
     "__v": 0
   }
 ]

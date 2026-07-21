@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import Container from "@/components/common/Container";
-import { bannerimageOne, bannerimageTwo } from "@/images";
 
 const AnimatedCounter = ({ value }: { value: string }) => {
   const ref = useRef<HTMLSpanElement>(null);
@@ -88,23 +87,14 @@ interface AboutHeroProps {
 }
 
 const AboutHero = ({ data }: AboutHeroProps) => {
-  // Use data from API or fallback to defaults
-  const title = data?.title || "Empowering Better Health at Home";
-  const mission =
-    data?.mission ||
-    "To make quality healthcare products accessible, affordable, and reliable for every household.";
-  const vision =
-    data?.vision ||
-    "To become a trusted name in home healthcare by simplifying the way people care for themselves.";
-  const displayStats =
-    data?.stats && data.stats.length > 0
-      ? data.stats
-      : [
-          { value: "12+", label: "Years of Trusted Service" },
-          { value: "1M", label: "Orders Delivered Safely" },
-          { value: "10K+", label: "Verified 5-Star Reviews" },
-          { value: "99%", label: "Customer Satisfaction Rate" },
-        ];
+  if (!data) return null;
+
+  const title = data.title;
+  const mission = data.mission;
+  const vision = data.vision;
+  const displayStats = data.stats?.length ? data.stats : [];
+  const heroImage = data.heroImage || "";
+  const heroImageSmall = data.heroImageSmall || "";
 
   return (
     <section className="pb-16 bg-background">
@@ -113,31 +103,37 @@ const AboutHero = ({ data }: AboutHeroProps) => {
           {/* Left Column: Text & Stats */}
           <div className="w-full lg:w-[60%] flex flex-col gap-10">
             {/* Title */}
-            <h1 className="text-4xl md:text-5xl font-bold text-light-primary-text leading-tight max-w-138">
-              {title}
-            </h1>
+            {title && (
+              <h1 className="text-4xl md:text-5xl font-bold text-light-primary-text leading-tight max-w-138">
+                {title}
+              </h1>
+            )}
 
             {/* Mission & Vision */}
             <div className="flex flex-col gap-6 max-w-161">
-              <div className="flex flex-col gap-3">
-                <h3 className="text-xl font-bold text-light-primary-text">
-                  Our Mission
-                </h3>
-                <p className="text-light-secondary-text leading-relaxed whitespace-pre-line">
-                  {mission}
-                </p>
-              </div>
-              <div className="flex flex-col gap-3">
-                <h3 className="text-xl font-bold text-light-primary-text">
-                  Our Vision
-                </h3>
-                <p className="text-light-secondary-text leading-relaxed whitespace-pre-line">
-                  {vision}
-                </p>
-              </div>
+              {mission && (
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-xl font-bold text-light-primary-text">
+                    Our Mission
+                  </h3>
+                  <p className="text-light-secondary-text leading-relaxed whitespace-pre-line">
+                    {mission}
+                  </p>
+                </div>
+              )}
+              {vision && (
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-xl font-bold text-light-primary-text">
+                    Our Vision
+                  </h3>
+                  <p className="text-light-secondary-text leading-relaxed whitespace-pre-line">
+                    {vision}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Statistics */}
+            {/* Statistics — empty when no stats from API */}
             {displayStats.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-3xl p-6 md:p-10 flex flex-wrap sm:flex-nowrap items-center justify-between gap-8 sm:gap-0 mt-4 w-full shadow-sm">
                 {displayStats.map((stat, index) => (
@@ -159,31 +155,35 @@ const AboutHero = ({ data }: AboutHeroProps) => {
             )}
           </div>
 
-          {/* Right Column: Images */}
-          <div className="w-full lg:w-[40%] flex justify-end mt-12 lg:mt-0">
-            <div className="relative w-full max-w-[526px] z-10">
-              {/* Large Image Wrapper */}
-              <div className="relative w-full aspect-3/4 rounded-[16px] overflow-hidden shrink-0 z-0">
-                <Image
-                  src={data?.heroImage || bannerimageTwo}
-                  alt="Hero Image"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
+          {/* Right Column: Images — only when provided, no fallbacks */}
+          {(heroImage || heroImageSmall) && (
+            <div className="w-full lg:w-[40%] flex justify-end mt-12 lg:mt-0">
+              <div className="relative w-full max-w-[526px] z-10">
+                {heroImage && (
+                  <div className="relative w-full aspect-3/4 rounded-[16px] overflow-hidden shrink-0 z-0">
+                    <Image
+                      src={heroImage}
+                      alt="Hero Image"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                )}
 
-              {/* Absolute Floating Smaller Image */}
-              <div className="hidden xl:block absolute top-[25%] -left-[140px] 2xl:-left-[180px] w-[255px] h-[340px] rounded-[16px] overflow-hidden shadow-2xl z-10 border-[6px] border-background">
-                <Image
-                  src={data?.heroImageSmall || bannerimageOne}
-                  alt="Hero Image Small"
-                  fill
-                  className="object-cover"
-                />
+                {heroImageSmall && (
+                  <div className="hidden xl:block absolute top-[25%] -left-[140px] 2xl:-left-[180px] w-[255px] h-[340px] rounded-[16px] overflow-hidden shadow-2xl z-10 border-[6px] border-background">
+                    <Image
+                      src={heroImageSmall}
+                      alt="Hero Image Small"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </Container>
     </section>

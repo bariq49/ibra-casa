@@ -13,9 +13,9 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "generate-slugs": "tsx scripts/generateProductSlugs.js",
-    "test": "jest",
     "seed": "tsx scripts/importSeed.ts",
-    "export-seed": "tsx scripts/exportSeed.ts"
+    "export-seed": "tsx scripts/exportSeed.ts",
+    "test": "jest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1005.0",

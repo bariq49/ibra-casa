@@ -14,7 +14,6 @@ export interface ProductType {
   displayOrder: number;
   bgColor?: string;
   productBasesBg?: Record<string, string>;
-  bannerPages?: string[];
   createdAt: string;
   updatedAt: string;
 }

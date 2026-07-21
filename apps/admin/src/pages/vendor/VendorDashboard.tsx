@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link } from "react-router";
 import {
-  FlaskConical,
-  BarChart2,
   RefreshCw,
   ArrowRight,
   Eye,
@@ -18,7 +16,6 @@ import { cn, formatCurrency, formatCurrencyWhole } from "@/lib/utils";
 import { adminApi, ADMIN_API_ENDPOINTS } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
-import { usePreviewGuard } from "@/hooks/usePreviewGuard";
 
 // Reuse the admin dashboard widgets so the visual language stays identical.
 import { SummaryWidget } from "@/components/dashboard/SummaryWidget";
@@ -79,58 +76,16 @@ interface VendorStats {
   lowStockProducts: LowStockProduct[];
 }
 
-// ─── Demo data ─────────────────────────────────────────────────────────────
-const DEMO_STATS: VendorStats = {
-  year: new Date().getFullYear(),
-  counts: {
-    products: 320,
-    pendingProducts: 14,
-    orders: 1840,
-    customers: 1124,
-    totalRevenue: 142850,
-    abandonedCarts: 36,
-    paymentFailures: 4,
-    refundRequests: 9,
-    shippingDelays: 7,
-  },
-  orderStatus: {
-    pending: 38,
-    confirmed: 56,
-    delivering: 41,
-    delivered: 128,
-    completed: 92,
-    cancelled: 11,
-    packed: 28,
-    paid: 96,
-    address_confirmed: 19,
-  },
-  monthlyRevenue: [
-    { name: "Jan", sales: 6200, orders: 38 },
-    { name: "Feb", sales: 5800, orders: 31 },
-    { name: "Mar", sales: 7100, orders: 47 },
-    { name: "Apr", sales: 6700, orders: 43 },
-    { name: "May", sales: 8200, orders: 58 },
-    { name: "Jun", sales: 7900, orders: 54 },
-    { name: "Jul", sales: 9100, orders: 65 },
-    { name: "Aug", sales: 10400, orders: 78 },
-    { name: "Sep", sales: 9600, orders: 70 },
-    { name: "Oct", sales: 12200, orders: 85 },
-    { name: "Nov", sales: 14500, orders: 106 },
-    { name: "Dec", sales: 16800, orders: 128 },
-  ],
-  recentOrders: Array.from({ length: 6 }).map((_, i) => ({
-    _id: `demo-${i}`,
-    customer: { name: `Customer ${i + 1}`, email: `c${i + 1}@example.com` },
-    total: 120 + i * 35,
-    status: ["pending", "confirmed", "delivering", "delivered", "completed", "cancelled"][i],
-    createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-  })),
-  lowStockProducts: Array.from({ length: 5 }).map((_, i) => ({
-    _id: `demo-product-${i}`,
-    name: `Sample Product ${i + 1}`,
-    stock: i,
-    price: 29.99 + i * 5,
-  })),
+const EMPTY_ORDER_STATUS: OrderStatusCounts = {
+  pending: 0,
+  confirmed: 0,
+  delivering: 0,
+  delivered: 0,
+  completed: 0,
+  cancelled: 0,
+  packed: 0,
+  paid: 0,
+  address_confirmed: 0,
 };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -171,13 +126,11 @@ export default function VendorDashboard() {
   const [stats, setStats] = useState<VendorStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [yearLoading, setYearLoading] = useState(false);
 
   const { toast } = useToast();
   const user = useAuthStore((s) => s.user);
-  const { isPreview, blockIfPreview } = usePreviewGuard();
 
   const fetchStats = useCallback(
     async (year: number, silent = false) => {
@@ -192,10 +145,9 @@ export default function VendorDashboard() {
         toast({
           variant: "destructive",
           title: "Could not load statistics",
-          description: "Showing demo data. The API may be unavailable.",
+          description: "The API may be unavailable. Showing empty values.",
         });
-        setIsDemoMode(true);
-        setStats(DEMO_STATS);
+        setStats(null);
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -206,35 +158,22 @@ export default function VendorDashboard() {
   );
 
   useEffect(() => {
-    if (isPreview) {
-      // Preview users never hit the real stats endpoint — show demo data immediately.
-      setIsDemoMode(true);
-      setStats(DEMO_STATS);
-      setLoading(false);
-      return;
-    }
     fetchStats(selectedYear);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPreview]);
+  }, []);
 
   const handleYearChange = async (year: number) => {
     setSelectedYear(year);
-    if (!isDemoMode) await fetchStats(year, true);
+    await fetchStats(year, true);
   };
 
   const handleRefresh = () => {
-    if (blockIfPreview("refresh real data")) return;
     setRefreshing(true);
     fetchStats(selectedYear, true);
   };
 
-  const handleShowRealData = () => {
-    if (blockIfPreview("view real data")) return;
-    setIsDemoMode(false);
-  };
-
-  // Active source — falls back to demo when there's no real data yet.
-  const display = isDemoMode ? DEMO_STATS : stats ?? DEMO_STATS;
+  const recentOrders = stats?.recentOrders ?? [];
+  const lowStockProducts = stats?.lowStockProducts ?? [];
 
   // ─── Render ─────────────────────────────────────────────────────────────
   return (
@@ -263,7 +202,7 @@ export default function VendorDashboard() {
             variant="outline"
             size="sm"
             onClick={handleRefresh}
-            disabled={refreshing || isDemoMode}
+            disabled={refreshing}
             className="flex items-center gap-1.5 h-9 rounded-full px-4 border-border text-sm"
           >
             <RefreshCw
@@ -271,87 +210,8 @@ export default function VendorDashboard() {
             />
             {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
-
-          <AnimatePresence mode="wait">
-            {isDemoMode ? (
-              <motion.div
-                key="real-btn"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-              >
-                <Button
-                  size="sm"
-                  onClick={handleShowRealData}
-                  className="flex items-center gap-2 h-9 rounded-full px-4 bg-primary-main hover:bg-primary-dark text-white shadow-sm shadow-primary-main/20"
-                >
-                  <BarChart2 className="h-3.5 w-3.5" />
-                  Show Real Data
-                </Button>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="demo-btn"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsDemoMode(true)}
-                  className="flex items-center gap-2 h-9 rounded-full px-4 border-warning-main/30 bg-warning-lighter/50 text-warning-dark hover:bg-warning-lighter"
-                >
-                  <FlaskConical className="h-3.5 w-3.5" />
-                  Preview Demo Data
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </motion.div>
-
-      {/* Demo banner */}
-      <AnimatePresence>
-        {isDemoMode && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="flex items-center gap-3 bg-warning-lighter border border-warning-main/30 rounded-xl px-5 py-3 text-warning-dark">
-              <FlaskConical className="h-5 w-5 shrink-0" />
-              {isPreview ? (
-                <p className="text-sm font-medium">
-                  As a preview user you are{" "}
-                  <span className="font-bold">unauthorized to view real data</span>.
-                  You are seeing sample data only. Click{" "}
-                  <button
-                    onClick={handleShowRealData}
-                    className="underline font-bold hover:text-warning-darker"
-                  >
-                    Show Real Data
-                  </button>{" "}
-                  for the same notice.
-                </p>
-              ) : (
-                <p className="text-sm font-medium">
-                  You are viewing{" "}
-                  <span className="font-bold">demo / sample data</span>. Click{" "}
-                  <button
-                    onClick={handleShowRealData}
-                    className="underline font-bold hover:text-warning-darker"
-                  >
-                    Show Real Data
-                  </button>{" "}
-                  to see live statistics from your store.
-                </p>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* 8-Widget Grid */}
       <motion.div
@@ -361,65 +221,56 @@ export default function VendorDashboard() {
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Total Sales"
-            value={loading ? "—" : formatCurrencyWhole(display.counts.totalRevenue)}
-            trend={isDemoMode ? 0.12 : undefined}
+            value={loading || !stats ? "—" : formatCurrencyWhole(stats.counts.totalRevenue)}
             bgColor="bg-[rgba(160,226,224,0.6)]"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Total Orders"
-            value={loading ? "—" : display.counts.orders.toLocaleString()}
-            trend={isDemoMode ? -0.05 : undefined}
+            value={loading || !stats ? "—" : stats.counts.orders.toLocaleString()}
             bgColor="bg-[rgba(255,235,105,0.6)]"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Total Customers"
-            value={loading ? "—" : display.counts.customers.toLocaleString()}
-            trend={isDemoMode ? 0.08 : undefined}
+            value={loading || !stats ? "—" : stats.counts.customers.toLocaleString()}
             bgColor="bg-[rgba(255,192,145,0.6)]"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Shipping Delays"
-            value={loading ? "—" : display.counts.shippingDelays.toLocaleString()}
-            trend={isDemoMode ? -0.1 : undefined}
+            value={loading || !stats ? "—" : stats.counts.shippingDelays.toLocaleString()}
             bgColor="bg-[rgba(255,214,239,0.6)]"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Refund Requests"
-            value={loading ? "—" : display.counts.refundRequests.toLocaleString()}
-            trend={isDemoMode ? 0.05 : undefined}
+            value={loading || !stats ? "—" : stats.counts.refundRequests.toLocaleString()}
             bgColor="bg-[rgba(146,189,245,0.6)]"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Stock Products"
-            value={loading ? "—" : display.counts.products.toLocaleString()}
-            trend={isDemoMode ? -0.07 : undefined}
+            value={loading || !stats ? "—" : stats.counts.products.toLocaleString()}
             bgColor="bg-[rgba(250,184,81,0.6)]"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Abandoned Carts"
-            value={loading ? "—" : display.counts.abandonedCarts.toLocaleString()}
-            trend={isDemoMode ? 0.03 : undefined}
+            value={loading || !stats ? "—" : stats.counts.abandonedCarts.toLocaleString()}
             bgColor="bg-[rgba(158,232,114,0.6)]"
-            dimmed={!isDemoMode}
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <SummaryWidget
             title="Payment Failures"
-            value={loading ? "—" : display.counts.paymentFailures.toLocaleString()}
-            trend={isDemoMode ? -0.15 : undefined}
+            value={loading || !stats ? "—" : stats.counts.paymentFailures.toLocaleString()}
             bgColor="bg-[rgba(116,202,255,0.6)]"
           />
         </motion.div>
@@ -432,16 +283,14 @@ export default function VendorDashboard() {
       >
         <motion.div variants={itemVariants} className="lg:col-span-1 h-full">
           <DashboardOrderStatus
-            data={display.orderStatus}
+            data={stats?.orderStatus ?? EMPTY_ORDER_STATUS}
             loading={loading}
-            isDemoMode={isDemoMode}
           />
         </motion.div>
         <motion.div variants={itemVariants} className="lg:col-span-2 h-full">
           <DashboardRevenueChart
-            data={display.monthlyRevenue}
+            data={stats?.monthlyRevenue ?? []}
             loading={yearLoading}
-            isDemoMode={isDemoMode}
             selectedYear={selectedYear}
             availableYears={AVAILABLE_YEARS}
             onYearChange={handleYearChange}
@@ -457,11 +306,6 @@ export default function VendorDashboard() {
               <CardTitle className="text-lg font-bold text-grey-900">
                 Recent Orders
               </CardTitle>
-              {isDemoMode && (
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-warning-lighter text-warning-dark px-2 py-0.5 rounded-full">
-                  Demo
-                </span>
-              )}
             </div>
             <Link to="/vendor/orders">
               <Button
@@ -496,7 +340,7 @@ export default function VendorDashboard() {
                       ))}
                     </tr>
                   ))
-                ) : display.recentOrders.length === 0 ? (
+                ) : recentOrders.length === 0 ? (
                   <tr>
                     <td
                       colSpan={6}
@@ -506,7 +350,7 @@ export default function VendorDashboard() {
                     </td>
                   </tr>
                 ) : (
-                  display.recentOrders.map((order, i) => (
+                  recentOrders.map((order, i) => (
                     <motion.tr
                       key={order._id}
                       initial={{ opacity: 0, y: 10 }}
@@ -566,12 +410,12 @@ export default function VendorDashboard() {
                     <Skeleton className="h-3 w-24" />
                   </div>
                 ))
-              ) : display.recentOrders.length === 0 ? (
+              ) : recentOrders.length === 0 ? (
                 <div className="px-4 py-8 text-center text-grey-500 text-sm">
                   No recent orders yet.
                 </div>
               ) : (
-                display.recentOrders.map((order) => (
+                recentOrders.map((order) => (
                   <div key={order._id} className="p-4">
                     <div className="flex justify-between items-start mb-2">
                       <div>
@@ -620,11 +464,6 @@ export default function VendorDashboard() {
               <CardTitle className="text-lg font-bold text-grey-900">
                 Stock Alerts
               </CardTitle>
-              {isDemoMode && (
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-warning-lighter text-warning-dark px-2 py-0.5 rounded-full">
-                  Demo
-                </span>
-              )}
             </div>
             <Link to="/vendor/products/stock">
               <Button
@@ -643,13 +482,13 @@ export default function VendorDashboard() {
                   <Skeleton key={i} className="h-12 w-full" />
                 ))}
               </div>
-            ) : display.lowStockProducts.length === 0 ? (
+            ) : lowStockProducts.length === 0 ? (
               <div className="p-8 text-center text-grey-500 text-sm">
                 No products yet.
               </div>
             ) : (
               <ul className="divide-y divide-border">
-                {display.lowStockProducts.map((p) => (
+                {lowStockProducts.map((p) => (
                   <li
                     key={p._id}
                     className="flex items-center gap-3 px-6 py-3 hover:bg-grey-50/50 transition-colors"

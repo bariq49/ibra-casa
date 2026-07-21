@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { MoveRight } from "lucide-react";
-import { usePathname } from "next/navigation";
 import Container from "../common/Container";
 import { Link } from "@/i18n/routing";
 import {
@@ -19,31 +18,17 @@ import { useBanners } from "@/hooks/useBanners";
 import type { HeroBanner } from "@/types/banner";
 
 interface HeroContentProps {
-  homeVersionSlug?: string;
   compact?: boolean;
   initialSlides?: HeroBanner[];
 }
 
 const HeroContent = ({
-  homeVersionSlug,
   compact = false,
   initialSlides = [],
 }: HeroContentProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const { getBannersByTypeAndPage, isLoading } = useBanners();
-  const pathname = usePathname();
-
-  // If homeVersionSlug provided, use it. Otherwise map pathname to bannerPage slug
-  // If pathname is "/" or empty (after stripping locale), it's home-1
-  // Otherwise use the slug from the path (e.g., /home-2 -> home-2)
-  // Remove locale prefix from pathname (e.g., /en/home-2 -> home-2)
-  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, "");
-  const homeVersion = homeVersionSlug
-    ? homeVersionSlug
-    : pathWithoutLocale === "/" || pathWithoutLocale === ""
-      ? "home-1"
-      : pathWithoutLocale.replace(/^\//, "");
+  const { getBannersByType, isLoading } = useBanners();
 
   useEffect(() => {
     if (!api) {
@@ -60,7 +45,7 @@ const HeroContent = ({
   const slides =
     initialSlides.length > 0
       ? initialSlides
-      : getBannersByTypeAndPage("hero-banner", homeVersion);
+      : getBannersByType("hero-banner");
 
   if (isLoading && initialSlides.length === 0) {
     return (
@@ -98,30 +83,21 @@ const HeroContent = ({
           style={{ backgroundColor: slides[current]?.bgColor || "#05535c" }}
         >
           <CarouselContent className="ml-0">
-            {slides.map((slide: any) => (
+            {slides.map((slide: HeroBanner) => (
               <CarouselItem
                 key={slide._id}
                 className={`pl-0 relative w-full ${compact ? "h-[300px] md:h-[470px]" : "h-[450px] md:h-[600px]"}`}
               >
-                {/* Background Image */}
                 <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000"
                   style={{ backgroundImage: `url(${slide.image})` }}
                 />
-                {/* Overlay for mobile readability */}
                 <div className="absolute inset-0 bg-black/20 md:bg-transparent" />
 
-                {/* Left Radial Glow (Figma requirement) */}
-                {homeVersion === "home-1" && (
-                  <div className="hidden md:block absolute left-[5%] top-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-success/30 blur-[100px] rounded-full pointer-events-none" />
-                )}
+                <div className="hidden md:block absolute left-[5%] top-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-success/30 blur-[100px] rounded-full pointer-events-none" />
 
                 <div className="relative h-full z-10 xl:pl-[120px] lg:pl-[60px] md:pl-[40px] px-6 sm:px-8 flex flex-col justify-center w-full max-w-full md:max-w-[450px] lg:max-w-[550px] xl:max-w-[800px]">
-                  <div
-                    className={
-                      "flex items-center gap-x-2 md:gap-x-3 mb-3 md:mb-4 animate-fadeInUp delay-300"
-                    }
-                  >
+                  <div className="flex items-center gap-x-2 md:gap-x-3 mb-3 md:mb-4 animate-fadeInUp delay-300">
                     <h6
                       className="font-semibold tracking-wide text-xs sm:text-sm md:text-base"
                       style={{ color: slide.textColor || "#ffffff" }}
@@ -148,7 +124,7 @@ const HeroContent = ({
                       color: slide.textColor
                         ? `${slide.textColor}E6`
                         : "#ffffffe6",
-                    }} // Apply 90% opacity (E6 in hex)
+                    }}
                   >
                     {slide.description}
                   </p>
@@ -159,10 +135,10 @@ const HeroContent = ({
                       className="inline-flex group items-center gap-x-4 bg-primary-light text-foreground font-bold py-3 pl-8 pr-3 rounded-full hover:bg-primary-dark hover:text-white transition-all duration-300 group/btn shadow-xl shadow-primary/20"
                     >
                       {slide.buttonTitle || "Shop Now"}
-                      <span className="size-10 bg-white text-primary-darker inline-flex items-center justify-center rounded-full transition-transform duration-300 shadow-inner">
+                      <span className="size-10 bg-foreground text-primary-light group-hover:bg-primary-light group-hover:text-foreground inline-flex items-center justify-center rounded-full transition-all duration-300 shadow-inner">
                         <MoveRight
                           size={20}
-                          className="text-primary-light -rotate-45 group-hover:rotate-0 transition-all duration-500 ease-in-out hoverEffect"
+                          className="text-primary-light group-hover:text-foreground -rotate-45 group-hover:rotate-0 transition-all duration-500 ease-in-out hoverEffect"
                         />
                       </span>
                     </Link>
@@ -172,11 +148,9 @@ const HeroContent = ({
             ))}
           </CarouselContent>
 
-          {/* Navigation Arrows */}
           <CarouselPrevious className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 size-12 bg-white/10 hover:bg-primary-light text-primary-foreground hover:text-primary rounded-full items-center justify-center border border-white/20 border-none hoverEffect" />
           <CarouselNext className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-20 size-12 bg-white/10 hover:bg-primary-light text-primary-foreground hover:text-primary rounded-full items-center justify-center border border-white/20 border-none hoverEffect" />
 
-          {/* Dots Background Shape - Visible md and up */}
           <div
             className="hidden md:block absolute left-1/2 -translate-x-1/2 bottom-0 z-10 w-[160px] h-[60px] bg-white transition-all duration-500"
             style={{
@@ -187,9 +161,8 @@ const HeroContent = ({
             <div className="absolute -right-[86px] top-0 z-10 bg-[url('/images/banner-right-shape.png')] bg-no-repeat w-[86px] h-full transition-colors duration-500"></div>
           </div>
 
-          {/* Dot Navigation */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-x-4 items-center justify-center">
-            {slides.map((s: any, index: number) => (
+            {slides.map((s, index) => (
               <button
                 key={s._id}
                 onClick={() => api?.scrollTo(index)}
@@ -217,16 +190,11 @@ const HeroContent = ({
 };
 
 interface HeroProps {
-  homeVersionSlug?: string;
   compact?: boolean;
   initialSlides?: HeroBanner[];
 }
 
-const Hero = ({
-  homeVersionSlug,
-  compact = false,
-  initialSlides = [],
-}: HeroProps) => {
+const Hero = ({ compact = false, initialSlides = [] }: HeroProps) => {
   return (
     <Suspense
       fallback={
@@ -241,11 +209,7 @@ const Hero = ({
         </section>
       }
     >
-      <HeroContent
-        homeVersionSlug={homeVersionSlug}
-        compact={compact}
-        initialSlides={initialSlides}
-      />
+      <HeroContent compact={compact} initialSlides={initialSlides} />
     </Suspense>
   );
 };

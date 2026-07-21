@@ -1,47 +1,48 @@
 import React from "react";
+import { setRequestLocale } from "next-intl/server";
+import TodaysTopOfferClient from "./TodaysTopOfferClient";
 import api from "@/lib/api";
 import { ApiProduct } from "@/hooks/useProducts";
-import { ProductType } from "@/hooks/useProductTypes";
-import { setRequestLocale } from "next-intl/server";
-import { PRODUCT_ENDPOINTS, PRODUCT_TYPE_ENDPOINTS } from "@/constants/endpoints";
-import TodaysTopOfferClient from "./TodaysTopOfferClient";
+
+interface TodaysOfferResponse {
+  title?: string;
+  description?: string;
+  endsAt?: string;
+  isActive?: boolean;
+  products?: ApiProduct[];
+}
 
 interface TodaysTopOfferProps {
-  slug?: string;
   locale: string;
 }
 
-/**
- * Server component — fetches "todays-top-offer" products and renders the
- * Today's Top Offer section for the beauty (Home-2) page.
- */
-const TodaysTopOffer = async ({
-  slug = "todays-top-offer",
-  locale,
-}: TodaysTopOfferProps) => {
+const TodaysTopOffer = async ({ locale }: TodaysTopOfferProps) => {
   setRequestLocale(locale);
-  let products: ApiProduct[] = [];
-  let productType: ProductType | null = null;
-  
+
   try {
-    const [productsRes, typeRes] = await Promise.all([
-      api.get<{ products: ApiProduct[]; total: number }>(
-        `${PRODUCT_ENDPOINTS.BASE}?productTypes=${slug}&productBase=beauty&limit=8`,
-      ),
-      api.get<ProductType[]>(`${PRODUCT_TYPE_ENDPOINTS.BASE}?slug=${slug}`),
-    ]);
-    products = productsRes.data.products;
-    
-    if (typeRes.data && typeRes.data.length > 0) {
-      productType = typeRes.data[0];
-    }
+    const { data } = await api.get<TodaysOfferResponse>("/api/todays-offer", {
+      next: { revalidate: 60 },
+    });
+
+    if (!data?.isActive) return null;
+
+    const products = data.products || [];
+    if (!products.length) return null;
+
+    return (
+      <TodaysTopOfferClient
+        products={products}
+        title={data.title || "Today's Top Offer"}
+        description={
+          data.description || "Up to 69% discount for limited time 🔥"
+        }
+        endsAt={data.endsAt}
+      />
+    );
   } catch (err) {
-    console.error("Error fetching Today's Top Offer products:", err);
+    console.error("Error fetching Today's Top Offer:", err);
+    return null;
   }
-
-  if (products.length === 0) return null;
-
-  return <TodaysTopOfferClient products={products} productType={productType} slug={slug} />;
 };
 
 export default TodaysTopOffer;

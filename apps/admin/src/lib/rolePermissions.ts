@@ -75,14 +75,6 @@ const menuPermissions: MenuItem[] = [
     allowedRoles: ["admin"],
   },
   {
-    path: "/dashboard/banner-pages",
-    allowedRoles: ["admin"],
-  },
-  {
-    path: "/dashboard/ads-banners",
-    allowedRoles: ["admin"],
-  },
-  {
     path: "/dashboard/products",
     allowedRoles: ["admin", "employee"],
     allowedEmployeeRoles: ["packer", "incharge"],
@@ -121,27 +113,11 @@ const menuPermissions: MenuItem[] = [
     allowedRoles: ["admin"],
   },
   {
-    path: "/dashboard/page-banners",
+    path: "/dashboard/todays-offer",
     allowedRoles: ["admin"],
   },
   {
     path: "/dashboard/reviews",
-    allowedRoles: ["admin"],
-  },
-  {
-    path: "/dashboard/social-media",
-    allowedRoles: ["admin"],
-  },
-  {
-    path: "/dashboard/website-config",
-    allowedRoles: ["admin"],
-  },
-  {
-    path: "/dashboard/website-icons",
-    allowedRoles: ["admin"],
-  },
-  {
-    path: "/dashboard/component-types",
     allowedRoles: ["admin"],
   },
   {
