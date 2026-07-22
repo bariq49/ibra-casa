@@ -48,7 +48,7 @@ export default function Footer() {
   return (
     <div className="text-primary-foreground/80">
       <SubscriptionTab />
-      <footer className="md:pb-15 pb-[100px] bg-primary-darker pt-40">
+      <footer className=" bg-primary-darker pt-40">
         <Container className="">
           <div className="pb-9 grid grid-cols-12 gap-6">
             <div className="md:col-span-12 col-span-12 xl:col-span-3 flex flex-col gap-y-6 animate__animated animate__fadeInUp">
@@ -110,8 +110,33 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          <div className="text-center text-white bg-[url('/images/bottom-border.png')] pt-[22px] bg-center pb-px bg-no-repeat animate__animated animate__fadeInUp">
-            {copyright}
+          <div className="relative mt-4 pt-12 pb-3 text-center animate__animated animate__fadeInUp">
+            {/* Smooth teal divider with centered arch over copyright */}
+            <svg
+              className="absolute top-0 left-0 w-full h-14 text-primary-lighter pointer-events-none"
+              viewBox="0 0 1400 56"
+              preserveAspectRatio="none"
+              fill="none"
+              aria-hidden
+            >
+              <path
+                d="M0 34
+                   H360
+                   C420 34 455 34 490 22
+                   C530 8 570 4 700 4
+                   C830 4 870 8 910 22
+                   C945 34 980 34 1040 34
+                   H1400"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+            <p className="relative z-10 text-white text-sm sm:text-base px-6 sm:px-10">
+              {copyright}
+            </p>
           </div>
         </Container>
       </footer>
