@@ -1,34 +1,32 @@
 "use client";
-import React, { useMemo, useState } from "react";
+
+import React from "react";
 import { motion, Variants } from "motion/react";
-import Container from "../common/Container";
 import { SectionHeader } from "../common/SectionHeader";
+import ProductCard from "../common/products/ProductCard";
 import { ProductType } from "@/hooks/useProductTypes";
 import { ApiProduct } from "@/hooks/useProducts";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
+import { Link } from "@/i18n/routing";
+import Container from "../common/Container";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import FeaturedProductCard from "../common/products/FeaturedProductCard";
-import TopSellingHorizontalCard from "../common/products/TopSellingHorizontalCard";
 
-function chunkArray<T>(array: T[], size: number): T[][] {
-  const chunks = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
-}
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.09 } },
+};
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeInOut" },
+    transition: { duration: 0.45, ease: "easeOut" },
   },
 };
 
@@ -41,77 +39,42 @@ interface TopSellingProductsClientProps {
 const TopSellingProductsClient = ({
   products,
   productType,
+  slug,
 }: TopSellingProductsClientProps) => {
-  const [api1, setApi1] = useState<CarouselApi>();
-  const [api2, setApi2] = useState<CarouselApi>();
-
-  const [canScrollPrev1, setCanScrollPrev1] = useState(false);
-  const [canScrollNext1, setCanScrollNext1] = useState(true);
-
-  const [canScrollPrev2, setCanScrollPrev2] = useState(false);
-  const [canScrollNext2, setCanScrollNext2] = useState(true);
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
+  const [canScrollNext, setCanScrollNext] = React.useState(true);
 
   React.useEffect(() => {
-    if (!api1) return;
-    setCanScrollPrev1(api1.canScrollPrev());
-    setCanScrollNext1(api1.canScrollNext());
-    api1.on("select", () => {
-      setCanScrollPrev1(api1.canScrollPrev());
-      setCanScrollNext1(api1.canScrollNext());
-    });
-    api1.on("reInit", () => {
-      setCanScrollPrev1(api1.canScrollPrev());
-      setCanScrollNext1(api1.canScrollNext());
-    });
-  }, [api1]);
-
-  React.useEffect(() => {
-    if (!api2) return;
-    setCanScrollPrev2(api2.canScrollPrev());
-    setCanScrollNext2(api2.canScrollNext());
-    api2.on("select", () => {
-      setCanScrollPrev2(api2.canScrollPrev());
-      setCanScrollNext2(api2.canScrollNext());
-    });
-    api2.on("reInit", () => {
-      setCanScrollPrev2(api2.canScrollPrev());
-      setCanScrollNext2(api2.canScrollNext());
-    });
-  }, [api2]);
+    if (!api) return;
+    const update = () => {
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    };
+    update();
+    api.on("select", update);
+    api.on("reInit", update);
+    return () => {
+      api.off("select", update);
+      api.off("reInit", update);
+    };
+  }, [api]);
 
   if (products.length === 0) {
     return null;
   }
 
-  // Split, sort and chunk products as requested
-  // Top Rated: Ascending order
-  const topRatedChunks = useMemo(() => {
-    const sorted = [...products].sort(
-      (a, b) => (a.price || 0) - (b.price || 0),
-    );
-    return chunkArray(sorted, 3);
-  }, [products]);
-
-  // Top Items: Descending order
-  const topItemsChunks = useMemo(() => {
-    const sorted = [...products].sort(
-      (a, b) => (b.price || 0) - (a.price || 0),
-    );
-    return chunkArray(sorted, 3);
-  }, [products]);
-
-  // Get banner block colors natively from productType or use defaults
   const bgColor = productType?.bgColor || "#F4F3F5";
 
   return (
     <section className="py-10 md:py-14 lg:py-[70px]">
       <Container>
         <div
-          className="relative px-0 pt-10 md:pt-0 pb-12 overflow-hidden min-h-[500px] rounded-xl"
-          style={{ backgroundColor: bgColor }}
+          className="relative px-0 pt-10 md:pt-0 pb-12 overflow-hidden min-h-[500px] rounded-2xl"
+          // style={{ backgroundColor: bgColor }}  
         >
-          {/* White cutout notch at the top center to create the curve over the yellow background */}
-          <div className="absolute top-0 left-0 right-0 z-0 pointer-events-none hidden md:flex justify-center w-full">
+          {/* White cutout notch at the top center */}
+          {/* <div className="absolute top-0 left-0 right-0 z-0 pointer-events-none hidden md:flex justify-center w-full">
             <svg
               viewBox="464 0 800 120"
               fill="none"
@@ -124,154 +87,97 @@ const TopSellingProductsClient = ({
                 fill="#FFFFFF"
               />
             </svg>
-          </div>
+          </div> */}
 
-          {/* Notch Content (Title and Description) */}
           <div className="flex justify-center mb-6 md:mb-10 overflow-visible relative z-10 w-full">
             <div className="relative px-6 sm:px-20 max-w-max w-full flex flex-col items-center">
               <SectionHeader
                 title={productType?.title || "Top Selling Products"}
-                description={
-                  productType?.description ||
-                  ""
-                }
+                description={productType?.description || ""}
                 align="center"
               />
             </div>
           </div>
 
-          <div className="px-4 sm:px-6 lg:px-10 relative z-10 w-full py-10">
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-[24px] xl:gap-[32px] w-full items-stretch">
-              {/* Column 1: Feature Product */}
-              <div className="h-full w-full">
-                <FeaturedProductCard product={products[0]} />
-              </div>
+          <div className="px-4 sm:px-6 lg:px-10 relative z-10 w-full">
+            <div className="hidden sm:flex justify-end items-center gap-4 mb-6">
+              <button
+                onClick={() => api?.scrollPrev()}
+                disabled={!canScrollPrev}
+                aria-label="Previous products"
+                className={`size-12 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  canScrollPrev
+                    ? "bg-white/70 hover:bg-white text-light-primary-text shadow-sm"
+                    : "bg-white/30 text-light-secondary-text cursor-not-allowed"
+                }`}
+              >
+                <ChevronLeft className="size-5" />
+              </button>
+              <button
+                onClick={() => api?.scrollNext()}
+                disabled={!canScrollNext}
+                aria-label="Next products"
+                className={`size-12 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  canScrollNext
+                    ? "bg-white hover:bg-white/90 text-light-primary-text shadow-sm"
+                    : "bg-white/30 text-light-secondary-text cursor-not-allowed"
+                }`}
+              >
+                <ChevronRight className="size-5" />
+              </button>
+            </div>
 
-              {/* Column 2: Top Rate */}
-              <div className="w-full flex justify-between flex-col h-full overflow-hidden">
-                <div className="flex justify-between items-center mb-[24px] border-b border-border pb-5">
-                  <h4 className="font-Urbanist font-bold text-light-primary-text text-[24px] leading-[36px]">
-                    Top Rate
-                  </h4>
-                  <div className="flex items-center gap-[8px]">
-                    <button
-                      onClick={() => api1?.scrollPrev()}
-                      disabled={!canScrollPrev1}
-                      className={`size-[32px] rounded-full border flex items-center justify-center transition-colors ${
-                        canScrollPrev1
-                          ? "border-[rgba(145,158,171,0.32)] text-light-primary-text hover:bg-gray-50 bg-white"
-                          : "border-gray-100 text-gray-300 cursor-not-allowed bg-white"
-                      }`}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="mb-10"
+            >
+              <Carousel
+                setApi={setApi}
+                opts={{ align: "start" }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-4 sm:-ml-6">
+                  {products.map((product) => (
+                    <CarouselItem
+                      key={product._id}
+                      className="pl-4 sm:pl-6 basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3 xl:basis-1/5"
                     >
-                      <ChevronLeft className="size-4" />
-                    </button>
-                    <button
-                      onClick={() => api1?.scrollNext()}
-                      disabled={!canScrollNext1}
-                      className={`size-[32px] rounded-full border flex items-center justify-center transition-colors ${
-                        canScrollNext1
-                          ? "border-[rgba(145,158,171,0.32)] text-light-primary-text hover:bg-gray-50 bg-white"
-                          : "border-gray-100 text-gray-300 cursor-not-allowed bg-white"
-                      }`}
-                    >
-                      <ChevronRight className="size-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <Carousel
-                  setApi={setApi1}
-                  opts={{ align: "start" }}
-                  className="w-full grow"
-                >
-                  <CarouselContent className="-ml-4 h-full">
-                    {topRatedChunks.map((chunk, index) => (
-                      <CarouselItem
-                        key={`tr-chunk-${index}`}
-                        className="pl-4 basis-full"
+                      <motion.div
+                        className="w-full flex h-full"
+                        variants={itemVariants}
                       >
-                        <motion.div
-                          className="h-full flex flex-col gap-[16px]"
-                          variants={itemVariants}
-                          initial="hidden"
-                          whileInView="visible"
-                          viewport={{ once: true }}
-                        >
-                          {chunk.map((product) => (
-                            <TopSellingHorizontalCard
-                              key={product._id}
-                              product={product}
-                            />
-                          ))}
-                        </motion.div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
-              </div>
+                        <div className="w-full h-full">
+                          <ProductCard product={product} />
+                        </div>
+                      </motion.div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+            </motion.div>
 
-              {/* Column 3: Top Items */}
-              <div className="w-full flex justify-between flex-col h-full overflow-hidden">
-                <div className="flex justify-between items-center mb-[24px] border-b border-border pb-5">
-                  <h4 className="font-Urbanist font-bold text-light-primary-text text-[24px] leading-[36px]">
-                    Top Items
-                  </h4>
-                  <div className="flex items-center gap-[8px]">
-                    <button
-                      onClick={() => api2?.scrollPrev()}
-                      disabled={!canScrollPrev2}
-                      className={`size-[32px] rounded-full border flex items-center justify-center transition-colors ${
-                        canScrollPrev2
-                          ? "border-[rgba(145,158,171,0.32)] text-light-primary-text hover:bg-gray-50 bg-white"
-                          : "border-gray-100 text-gray-300 cursor-not-allowed bg-white"
-                      }`}
-                    >
-                      <ChevronLeft className="size-4" />
-                    </button>
-                    <button
-                      onClick={() => api2?.scrollNext()}
-                      disabled={!canScrollNext2}
-                      className={`size-[32px] rounded-full border flex items-center justify-center transition-colors ${
-                        canScrollNext2
-                          ? "border-[rgba(145,158,171,0.32)] text-light-primary-text hover:bg-gray-50 bg-white"
-                          : "border-gray-100 text-gray-300 cursor-not-allowed bg-white"
-                      }`}
-                    >
-                      <ChevronRight className="size-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <Carousel
-                  setApi={setApi2}
-                  opts={{ align: "start" }}
-                  className="w-full grow"
+            <div className="flex justify-end w-full">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Link
+                  href={`/shop?type=${productType?.slug || slug}`}
+                  className="bg-white hover:bg-white/90 transition-colors duration-300 inline-flex items-center gap-[6px] py-[8px] pl-[20px] pr-[10px] rounded-[59px] group/btn shadow-sm"
                 >
-                  <CarouselContent className="-ml-4 h-full">
-                    {topItemsChunks.map((chunk, index) => (
-                      <CarouselItem
-                        key={`ti-chunk-${index}`}
-                        className="pl-4 basis-full"
-                      >
-                        <motion.div
-                          className="h-full flex flex-col gap-[16px]"
-                          variants={itemVariants}
-                          initial="hidden"
-                          whileInView="visible"
-                          viewport={{ once: true }}
-                        >
-                          {chunk.map((product) => (
-                            <TopSellingHorizontalCard
-                              key={product._id}
-                              product={product}
-                            />
-                          ))}
-                        </motion.div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
-              </div>
+                  <span className="font-['DM_Sans',sans-serif] font-semibold leading-[26px] text-primary text-[16px] whitespace-nowrap">
+                    View All Products
+                  </span>
+                  <div className="bg-primary flex items-center justify-center rounded-full size-[32px] ml-1">
+                    <ArrowUpRight className="size-4 text-white group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300" />
+                  </div>
+                </Link>
+              </motion.div>
             </div>
           </div>
         </div>

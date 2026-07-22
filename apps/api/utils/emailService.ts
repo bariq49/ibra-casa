@@ -326,6 +326,114 @@ const generateOrderEmailHTML = (userName: string, order: IOrder): string => {
   `;
 };
 
+const generateNewsletterEmailHTML = (
+  subject: string,
+  bodyHtml: string,
+  buttonText?: string,
+  buttonUrl?: string,
+): string => {
+  const hasButton = Boolean(buttonText?.trim() && buttonUrl?.trim());
+  const safeButtonText = (buttonText || "").trim();
+  const safeButtonUrl = (buttonUrl || "").trim();
+
+  const buttonSection = hasButton
+    ? `
+          <!-- CTA Button -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;" align="center">
+              <a href="${safeButtonUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: ${BRAND.dark}; color: ${BRAND.lime}; text-decoration: none; font-size: 16px; font-weight: 700; padding: 14px 32px; border-radius: 999px; letter-spacing: 0.3px;">
+                ${safeButtonText}
+              </a>
+            </td>
+          </tr>
+`
+    : "";
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject} - ${BRAND.name}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: ${BRAND.softBg}; line-height: 1.6;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: ${BRAND.softBg}; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: ${BRAND.white}; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(27, 31, 35, 0.08);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color: ${BRAND.lime}; padding: 40px 30px; text-align: center;">
+              <div style="background-color: ${BRAND.dark}; display: inline-block; padding: 14px 28px; border-radius: 999px; margin-bottom: 20px;">
+                <h1 style="margin: 0; color: ${BRAND.lime}; font-size: 26px; font-weight: 700; letter-spacing: 0.5px;">${BRAND.name}</h1>
+              </div>
+              <h2 style="margin: 0; color: ${BRAND.dark}; font-size: 24px; font-weight: 700;">Newsletter</h2>
+              <p style="margin: 10px 0 0 0; color: ${BRAND.muted}; font-size: 16px;">News, updates & exclusive offers</p>
+            </td>
+          </tr>
+
+          <!-- Subject badge -->
+          <tr>
+            <td style="padding: 30px 30px 10px 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: ${BRAND.softBg}; border-radius: 8px; border: 1px solid ${BRAND.border}; overflow: hidden;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <div style="font-size: 13px; color: ${BRAND.muted}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">This Issue</div>
+                    <div style="font-size: 18px; font-weight: 700; color: ${BRAND.dark};">${subject}</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 20px 30px 30px 30px;">
+              <div style="background-color: ${BRAND.softBg}; border: 1px solid ${BRAND.border}; border-radius: 8px; padding: 24px; color: ${BRAND.dark}; font-size: 15px; line-height: 1.7;">
+                <div style="color: ${BRAND.muted}; font-size: 15px; line-height: 1.7;">
+                  ${bodyHtml}
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          ${buttonSection}
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: ${BRAND.dark}; padding: 30px; text-align: center;">
+              <p style="margin: 0 0 15px 0; color: ${BRAND.lime}; font-size: 16px; font-weight: 700;">Thank you for being part of ${BRAND.name}!</p>
+              <p style="margin: 0 0 20px 0; color: #919EAB; font-size: 14px;">
+                You received this email because you subscribed to our newsletter.
+              </p>
+              <div style="margin: 0 0 15px 0;">
+                <a href="#" style="display: inline-block; margin: 0 10px; color: ${BRAND.lime}; text-decoration: none; font-size: 14px;">Facebook</a>
+                <span style="color: #495057;">|</span>
+                <a href="#" style="display: inline-block; margin: 0 10px; color: ${BRAND.lime}; text-decoration: none; font-size: 14px;">Instagram</a>
+                <span style="color: #495057;">|</span>
+                <a href="#" style="display: inline-block; margin: 0 10px; color: ${BRAND.lime}; text-decoration: none; font-size: 14px;">Twitter</a>
+              </div>
+              <p style="margin: 0; color: #919EAB; font-size: 12px;">
+                © ${new Date().getFullYear()} ${BRAND.name}. All rights reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+  `;
+};
+
 const generateOrderEmailContent = (
   userName: string,
   order: IOrder,
@@ -790,4 +898,5 @@ export {
   sendOrderConfirmationEmail,
   sendPasswordResetEmail,
   sendPasswordResetOtpEmail,
+  generateNewsletterEmailHTML,
 };

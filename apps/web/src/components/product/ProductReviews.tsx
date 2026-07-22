@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { FullProduct } from "@/hooks/useProductBySlug";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useHeaderStore } from "@/store/useHeaderStore";
 import {
   Select,
   SelectContent,
@@ -15,7 +14,7 @@ import {
 import api from "@/lib/api";
 import { API_ENDPOINTS } from "@/constants/endpoints";
 import { toast } from "sonner";
-import { ThumbsUp, ThumbsDown, MessageSquare, Star } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
 import Ratings from "../common/products/Ratings";
 import { Button } from "@/components/ui/button";
 
@@ -23,8 +22,7 @@ import { Button } from "@/components/ui/button";
 // import { formatDistanceToNow } from "date-fns";
 
 export default function ProductReviews({ product }: { product: FullProduct }) {
-  const { isAuthenticated, user } = useAuthStore();
-  const { onAuthOpen } = useHeaderStore();
+  const { user } = useAuthStore();
   const [showReviewForm, setShowReviewForm] = useState(true);
 
   // Form States
@@ -39,12 +37,16 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
   // Interaction States
   const [replyMode, setReplyMode] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [replyName, setReplyName] = useState("");
+  const [replyEmail, setReplyEmail] = useState("");
   const [isReplying, setIsReplying] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actorId, setActorId] = useState("");
+  const isLoggedIn = Boolean(user?._id);
 
-  // Local Reviews State for async updates without reload
+  // Only non-pending reviews are shown on the product page
   const [localReviews, setLocalReviews] = useState<any[]>(
-    product.reviews || [],
+    (product.reviews || []).filter((r) => r.isApproved !== false),
   );
 
   // Derive rating distribution
@@ -58,15 +60,11 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
   });
 
   const handleWriteReviewClick = () => {
-    if (!isAuthenticated) {
-      onAuthOpen("login");
-    } else {
-      setShowReviewForm(!showReviewForm);
-      if (!showReviewForm) {
-        setName(user?.name || "");
-        setEmail(user?.email || "");
-        setIsAnonymous(false);
-      }
+    setShowReviewForm(!showReviewForm);
+    if (!showReviewForm) {
+      setName(user?.name || "");
+      setEmail(user?.email || "");
+      setIsAnonymous(false);
     }
   };
 
@@ -84,16 +82,21 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rating || !comment.trim()) return;
+    if (!isAnonymous && (!name.trim() || !email.trim())) {
+      toast.error("Please provide your name and email");
+      return;
+    }
     const payloadData = isAnonymous
       ? { rating, comment, isAnonymous: true }
-      : { rating, comment, name, email };
+      : { rating, comment, name: name.trim(), email: email.trim() };
     setIsSubmitting(true);
     try {
       const res = await api.post(
         API_ENDPOINTS.PRODUCTS.REVIEW(product._id as string),
         payloadData,
       );
-      if (res.data?.review) {
+      // Never show pending reviews on the product page — wait for admin approval
+      if (res.data?.review && res.data.review.isApproved !== false) {
         setLocalReviews((prev) => [...prev, res.data.review]);
       }
       setShowReviewForm(false);
@@ -102,71 +105,122 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
       setName(user?.name || "");
       setEmail(user?.email || "");
       setIsAnonymous(false);
-      toast.success("Review submitted successfully");
+      toast.success(
+        res.data?.message ||
+          "Review submitted. It will appear after admin approval.",
+      );
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to submit review");
+      toast.error(
+        err?.data?.message ||
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to submit review",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const getActorId = () => {
+    if (user?._id) return String(user._id);
+    if (typeof window === "undefined") return "";
+    const key = "sellzy_guest_id";
+    let guestId = localStorage.getItem(key);
+    if (!guestId) {
+      guestId =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `guest-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(key, guestId);
+    }
+    return guestId;
+  };
+
+  useEffect(() => {
+    setActorId(getActorId());
+  }, [user?._id]);
+
+  const hasReacted = (list: any[] | undefined) =>
+    !!actorId &&
+    (list || []).some((id) => String(id) === actorId);
+
   const handleReviewLike = async (reviewId: string) => {
-    if (!isAuthenticated) return onAuthOpen("login");
     setActionLoading(`like-${reviewId}`);
     try {
       const res = await api.post(
         API_ENDPOINTS.PRODUCTS.LIKE_REVIEW(product._id as string, reviewId),
+        { guestId: getActorId() },
       );
       if (res.data?.review) {
         setLocalReviews((prev) =>
           prev.map((r) => (r._id === reviewId ? res.data.review : r)),
         );
       }
-    } catch {
-      toast.error("Failed to like the review");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to like the review");
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleReviewDislike = async (reviewId: string) => {
-    if (!isAuthenticated) return onAuthOpen("login");
     setActionLoading(`dislike-${reviewId}`);
     try {
       const res = await api.post(
         API_ENDPOINTS.PRODUCTS.DISLIKE_REVIEW(product._id as string, reviewId),
+        { guestId: getActorId() },
       );
       if (res.data?.review) {
         setLocalReviews((prev) =>
           prev.map((r) => (r._id === reviewId ? res.data.review : r)),
         );
       }
-    } catch {
-      toast.error("Failed to dislike the review");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to dislike the review");
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleSubmitReply = async (reviewId: string) => {
-    if (!isAuthenticated) return onAuthOpen("login");
     if (!replyText.trim()) return;
+    if (!isLoggedIn) {
+      if (!replyName.trim() || !replyEmail.trim()) {
+        toast.error("Please provide your name and email to reply");
+        return;
+      }
+    }
     setIsReplying(true);
     try {
+      const payload = isLoggedIn
+        ? { comment: replyText.trim() }
+        : {
+            comment: replyText.trim(),
+            name: replyName.trim(),
+            email: replyEmail.trim(),
+          };
       const res = await api.post(
         API_ENDPOINTS.PRODUCTS.REPLY_REVIEW(product._id as string, reviewId),
-        { comment: replyText },
+        payload,
       );
       if (res.data?.review) {
+        // API already strips pending replies for guests
         setLocalReviews((prev) =>
           prev.map((r) => (r._id === reviewId ? res.data.review : r)),
         );
       }
       setReplyMode(null);
       setReplyText("");
-      toast.success("Reply posted!");
-    } catch {
-      toast.error("Failed to post reply");
+      setReplyName("");
+      setReplyEmail("");
+      toast.success(
+        res.data?.message ||
+          (isLoggedIn
+            ? "Reply posted!"
+            : "Reply submitted. It will appear after admin approval."),
+      );
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to post reply");
     } finally {
       setIsReplying(false);
     }
@@ -372,9 +426,12 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
           {/* Review List */}
           <div className="space-y-8">
             {reviews.length > 0 ? (
-              reviews.map((review) => (
+              reviews.map((review, index) => (
                 <div
-                  key={review._id}
+                  key={
+                    review._id ||
+                    `${String(review.userId || "anon")}-${review.createdAt || index}`
+                  }
                   className="flex flex-col sm:flex-row gap-4 pb-8 border-b border-border last:border-0"
                 >
                   <div className="flex gap-4 w-full">
@@ -392,14 +449,12 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
                       </div>
                       <div className="flex items-center gap-x-2">
                         <Ratings rating={review.rating} totalReviews={1} />
-                        {review.isApproved && (
-                          <span className="text-sm font-semibold text-primary flex items-center gap-1">
-                            <span className="bg-primary/10 text-primary p-0.5 rounded-full size-4 flex items-center justify-center text-[10px]">
-                              ✓
-                            </span>
-                            Verified purchase
+                        <span className="text-sm font-semibold text-primary flex items-center gap-1">
+                          <span className="bg-primary/10 text-primary p-0.5 rounded-full size-4 flex items-center justify-center text-[10px]">
+                            ✓
                           </span>
-                        )}
+                          Verified
+                        </span>
                       </div>
                       <p className="text-muted-foreground text-[15px] pt-1">
                         {review.comment}
@@ -412,14 +467,14 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
                           disabled={actionLoading === `like-${review._id}`}
                           onClick={() => handleReviewLike(review._id)}
                           className={`flex items-center gap-1 transition-colors ${
-                            review.likes?.includes(user?._id as string)
+                            hasReacted(review.likes)
                               ? "text-primary"
                               : "hover:text-foreground"
                           } ${actionLoading === `like-${review._id}` ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                           <ThumbsUp
                             size={14}
-                            className={`${review.likes?.includes(user?._id as string) ? "fill-current" : ""} ${actionLoading === `like-${review._id}` ? "animate-pulse" : ""}`}
+                            className={`${hasReacted(review.likes) ? "fill-current" : ""} ${actionLoading === `like-${review._id}` ? "animate-pulse" : ""}`}
                           />{" "}
                           Thank({review.likes?.length || 0})
                         </button>
@@ -427,22 +482,19 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
                           disabled={actionLoading === `dislike-${review._id}`}
                           onClick={() => handleReviewDislike(review._id)}
                           className={`flex items-center gap-1 transition-colors ${
-                            (review as any).dislikes?.includes(
-                              user?._id as string,
-                            )
+                            hasReacted((review as any).dislikes)
                               ? "text-primary"
                               : "hover:text-foreground"
                           } ${actionLoading === `dislike-${review._id}` ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                           <ThumbsDown
                             size={14}
-                            className={`${(review as any).dislikes?.includes(user?._id as string) ? "fill-current" : ""} ${actionLoading === `dislike-${review._id}` ? "animate-pulse" : ""}`}
+                            className={`${hasReacted((review as any).dislikes) ? "fill-current" : ""} ${actionLoading === `dislike-${review._id}` ? "animate-pulse" : ""}`}
                           />{" "}
                           Dislike({(review as any).dislikes?.length || 0})
                         </button>
                         <button
                           onClick={() => {
-                            if (!isAuthenticated) return onAuthOpen("login");
                             setReplyMode(
                               replyMode === review._id ? null : review._id,
                             );
@@ -453,11 +505,22 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
                         </button>
                       </div>
 
-                      {/* Nested Replies */}
-                      {review.replies && review.replies.length > 0 && (
+                      {/* Nested Replies (approved only) */}
+                      {review.replies &&
+                        review.replies.filter(
+                          (r: any) => r.isApproved !== false,
+                        ).length > 0 && (
                         <div className="mt-4 pl-4 sm:pl-8 border-l-2 border-border space-y-4">
-                          {review.replies.map((reply: any, idx: number) => (
-                            <div key={idx} className="flex gap-3">
+                          {review.replies
+                            .filter((r: any) => r.isApproved !== false)
+                            .map((reply: any, idx: number) => (
+                            <div
+                              key={
+                                reply._id ||
+                                `${String(reply.userId || "reply")}-${reply.createdAt || idx}`
+                              }
+                              className="flex gap-3"
+                            >
                               <div className="size-8 shrink-0 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 uppercase overflow-hidden text-xs">
                                 {reply.userName?.[0] ||
                                   reply.userId?.[0] ||
@@ -466,7 +529,7 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
                               <div className="flex-1">
                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full">
                                   <p className="font-semibold text-sm text-foreground">
-                                    {reply.userName || "Admin/Support"}
+                                    {reply.userName || "Customer"}
                                   </p>
                                   <p className="text-[10px] text-muted-foreground">
                                     {new Date(reply.createdAt).toLocaleString()}
@@ -483,19 +546,44 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
 
                       {/* Reply Input */}
                       {replyMode === review._id && (
-                        <div className="mt-4 pl-4 sm:pl-8 animate-in fade-in slide-in-from-top-2">
+                        <div className="mt-4 pl-4 sm:pl-8 animate-in fade-in slide-in-from-top-2 space-y-3">
+                          {!isLoggedIn && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <input
+                                type="text"
+                                value={replyName}
+                                onChange={(e) => setReplyName(e.target.value)}
+                                placeholder="Name *"
+                                required
+                                className="w-full p-3 rounded-full border border-border outline-none focus:border-primary text-sm"
+                              />
+                              <input
+                                type="email"
+                                value={replyEmail}
+                                onChange={(e) => setReplyEmail(e.target.value)}
+                                placeholder="Email *"
+                                required
+                                className="w-full p-3 rounded-full border border-border outline-none focus:border-primary text-sm"
+                              />
+                            </div>
+                          )}
                           <textarea
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             placeholder={`Replying to ${review.userName || "this review"}...`}
                             className="w-full min-h-[80px] p-4 rounded-xl border border-border outline-none focus:border-primary resize-none text-sm bg-muted/30"
                           />
-                          <div className="flex justify-end gap-3 mt-2">
+                          <div className="flex justify-end gap-3">
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
-                              onClick={() => setReplyMode(null)}
+                              onClick={() => {
+                                setReplyMode(null);
+                                setReplyText("");
+                                setReplyName("");
+                                setReplyEmail("");
+                              }}
                               className="h-9 px-4 text-xs font-medium"
                             >
                               Cancel
@@ -505,7 +593,12 @@ export default function ProductReviews({ product }: { product: FullProduct }) {
                               onClick={() =>
                                 handleSubmitReply(review._id as string)
                               }
-                              disabled={isReplying || !replyText.trim()}
+                              disabled={
+                                isReplying ||
+                                !replyText.trim() ||
+                                (!isLoggedIn &&
+                                  (!replyName.trim() || !replyEmail.trim()))
+                              }
                               className="h-9 px-6 bg-primary text-white text-xs font-medium rounded-full"
                             >
                               {isReplying ? "Posting..." : "Post Reply"}

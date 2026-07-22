@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, Variants } from "motion/react";
-import Container from "../common/Container";
 import ProductCard from "../common/products/ProductCard";
 import { ApiProduct } from "@/hooks/useProducts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -13,6 +12,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import Container from "../common/Container";
 
 /* ─── Animation variants ─── */
 const containerVariants: Variants = {
@@ -31,7 +31,7 @@ const itemVariants: Variants = {
 
 /* ─── Countdown Timer ─── */
 const CountdownDisplay = ({ endsAt }: { endsAt?: string }) => {
-  const [time, setTime] = useState({ h: 0, m: 0, s: 0 });
+  const [time, setTime] = useState({ d: 0, h: 0, m: 0, s: 0 });
   const [expired, setExpired] = useState(false);
 
   useEffect(() => {
@@ -47,14 +47,15 @@ const CountdownDisplay = ({ endsAt }: { endsAt?: string }) => {
     const tick = () => {
       const diff = targetMs - Date.now();
       if (diff <= 0) {
-        setTime({ h: 0, m: 0, s: 0 });
+        setTime({ d: 0, h: 0, m: 0, s: 0 });
         setExpired(true);
         return false;
       }
-      const h = Math.floor(diff / 3_600_000);
+      const d = Math.floor(diff / 86_400_000);
+      const h = Math.floor((diff % 86_400_000) / 3_600_000);
       const m = Math.floor((diff % 3_600_000) / 60_000);
       const s = Math.floor((diff % 60_000) / 1_000);
-      setTime({ h, m, s });
+      setTime({ d, h, m, s });
       setExpired(false);
       return true;
     };
@@ -68,19 +69,62 @@ const CountdownDisplay = ({ endsAt }: { endsAt?: string }) => {
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
+  const parts = [
+    ...(time.d > 0 ? [{ value: String(time.d), unit: "d" }] : []),
+    { value: pad(time.h), unit: "h" },
+    { value: pad(time.m), unit: "m" },
+    { value: pad(time.s), unit: "s" },
+  ];
+
   return (
     <div
-      className="flex items-center justify-center h-[48px] px-[24px] py-[8px] rounded-[50px] bg-success-lighter shrink-0"
-      aria-label="Offer countdown timer"
-    >
-      <span
-        className="font-bold text-light-primary-text text-[20px] leading-[30px] whitespace-nowrap"
-        style={{ fontFamily: "'Urbanist', sans-serif" }}
-      >
-        {expired
+      className="flex items-center justify-center gap-2 h-[48px] px-[20px] sm:px-[24px] py-[8px] rounded-[50px] bg-success-lighter shrink-0"
+      aria-label={
+        expired
           ? "Offer ended"
-          : `End in: ${pad(time.h)} : ${pad(time.m)} : ${pad(time.s)}`}
-      </span>
+          : `Ends in ${parts.map((p) => `${p.value}${p.unit}`).join(" ")}`
+      }
+    >
+      {expired ? (
+        <span
+          className="font-bold text-light-primary-text text-[18px] sm:text-[20px] leading-[30px] whitespace-nowrap"
+          style={{ fontFamily: "'Urbanist', sans-serif" }}
+        >
+          Offer ended
+        </span>
+      ) : (
+        <>
+          <span
+            className="font-semibold text-light-primary-text text-[14px] sm:text-[16px] leading-[24px] whitespace-nowrap"
+            style={{ fontFamily: "'Urbanist', sans-serif" }}
+          >
+            Ends in
+          </span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {parts.map((part, index) => (
+              <React.Fragment key={part.unit}>
+                {index > 0 && (
+                  <span
+                    className="font-bold text-light-secondary-text text-[16px] sm:text-[18px] leading-none"
+                    aria-hidden
+                  >
+                    :
+                  </span>
+                )}
+                <span
+                  className="inline-flex items-baseline font-bold text-light-primary-text text-[18px] sm:text-[20px] leading-[30px] tabular-nums"
+                  style={{ fontFamily: "'Urbanist', sans-serif" }}
+                >
+                  {part.value}
+                  <span className="ml-0.5 text-[12px] sm:text-[13px] font-semibold text-light-secondary-text uppercase">
+                    {part.unit}
+                  </span>
+                </span>
+              </React.Fragment>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -123,9 +167,9 @@ const TodaysTopOfferClient = ({
   if (products.length === 0) return null;
 
   return (
-    <section className="py-10 md:py-14 lg:py-[70px] w-full relative">
+    <section className="py-10 md:py-14 lg:py-[70px] w-full relative px-6 sm:px-8 md:px-10 lg:px-12">
       <Container className="relative h-full">
-        <div className="absolute inset-0 z-0 hidden lg:block pointer-events-none overflow-hidden rounded-xl">
+        {/* <div className="absolute inset-0 z-0 hidden lg:block pointer-events-none overflow-hidden rounded-2xl">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1728 823"
@@ -134,21 +178,22 @@ const TodaysTopOfferClient = ({
             preserveAspectRatio="xMinYMin slice"
           >
             <path
-              d="M1728 811C1728 817.627 1722.627 823 1716 823H12C5.373 823 0 817.627 0 811V112C0 105.373 5.373 100 12 100H472.5C512.328 100 546.9 77.5038 564.205 44.5248C576.235 21.6001 596.482 0 622.371 0H1716C1722.627 0 1728 5.373 1728 12V811Z"
+              d="M1728 811C1728 817.627 1722.627 823 1716 823H12C5.373 823 0 817.627 0 811V124C0 110.745 10.745 100 24 100H472.5C512.328 100 546.9 77.5038 564.205 44.5248C576.235 21.6001 596.482 0 622.371 0H1716C1722.627 0 1728 5.373 1728 12V811Z"
               fill={bgColor}
             />
           </svg>
-        </div>
+        </div> */}
 
         {/* Mobile / tablet solid background — desktop uses the SVG shape above */}
-        <div
-          className="absolute inset-0 z-0 rounded-xl lg:hidden pointer-events-none"
+        {/* <div
+          className="absolute inset-0 z-0 rounded-2xl lg:hidden pointer-events-none"
           style={{ backgroundColor: bgColor }}
           aria-hidden
-        />
+        /> */}
 
         <div className="relative z-10 w-full min-h-[500px] overflow-hidden lg:overflow-visible pt-8 lg:pt-0 pb-10">
-          <div className="px-4 md:px-8 xl:px-12 w-full h-full">
+          {/* Light inset so cards fill the gray band (same rhythm as Top Selling) */}
+          <div className="">
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-[24px] mb-[68px] flex-wrap relative">
               <SectionHeader
                 title={title}

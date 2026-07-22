@@ -9,6 +9,10 @@ import {
   trackProductView,
   addProductReview,
   getAllReviews,
+  getPendingReviews,
+  getApprovedReviews,
+  getPendingReplies,
+  approveReply,
   likeProductReview,
   dislikeProductReview,
   replyProductReview,
@@ -24,6 +28,7 @@ import {
   admin,
   adminOrVendor,
   vendor,
+  optionalAuth,
 } from "../middleware/authMiddleware.js";
 import { preventReadOnlyActions } from "../middleware/readOnlyMiddleware.js";
 import upload, { handleMulterError } from "../middleware/uploadMiddleware.js";
@@ -280,6 +285,14 @@ router.post(
 // Get pending products (Admin only) - Must be before /:id
 router.route("/pending/all").get(protect, admin, getPendingProducts);
 
+// Product reviews list endpoints - Must be before /:id
+router.route("/reviews/pending").get(protect, admin, getPendingReviews);
+router.route("/reviews/approved").get(getApprovedReviews);
+router.route("/reviews/all").get(protect, admin, getAllReviews);
+router
+  .route("/reviews/replies/pending")
+  .get(protect, admin, getPendingReplies);
+
 // Get vendor products (Admin only - for approval) - Must be before /:id
 router.route("/vendor").get(protect, admin, getVendorProducts);
 
@@ -291,7 +304,7 @@ router.route("/bulk").post(protect, admin, bulkCreateProducts);
 
 router
   .route("/:id")
-  .get(getProductById)
+  .get(optionalAuth, getProductById)
   .put(protect, admin, preventReadOnlyActions, updateProduct)
   .delete(protect, admin, preventReadOnlyActions, deleteProduct);
 
@@ -341,16 +354,18 @@ router.route("/:id/rate").post(protect, rateProduct);
 // Track product view
 router.route("/:id/view").post(trackProductView);
 
-// Add product review
-router.route("/:id/review").post(protect, addProductReview);
+// Add product review (public — guests and logged-in users)
+router.route("/:id/review").post(optionalAuth, addProductReview);
 
-// Get all reviews (Admin only)
-router.route("/reviews/all").get(protect, admin, getAllReviews);
+// Like, dislike, or reply to a review (public — guests allowed)
+router.route("/:productId/review/:reviewId/like").post(optionalAuth, likeProductReview);
+router.route("/:productId/review/:reviewId/dislike").post(optionalAuth, dislikeProductReview);
+router.route("/:productId/review/:reviewId/reply").post(optionalAuth, replyProductReview);
 
-// Like, dislike, or reply to a review
-router.route("/:productId/review/:reviewId/like").post(protect, likeProductReview);
-router.route("/:productId/review/:reviewId/dislike").post(protect, dislikeProductReview);
-router.route("/:productId/review/:reviewId/reply").post(protect, replyProductReview);
+// Approve/Reject reply (Admin only) — before review approve route
+router
+  .route("/:productId/review/:reviewId/reply/:replyId")
+  .put(protect, admin, approveReply);
 
 // Approve/Reject review (Admin only)
 router.route("/:productId/review/:reviewId").put(protect, admin, approveReview);

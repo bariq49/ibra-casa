@@ -1,27 +1,34 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@/i18n/routing";
 import {
   ChevronDown,
   ChevronRight,
-  Headset,
   LayoutGrid,
   ArrowRight,
-  PhoneCall,
-  Copy,
+  Search,
+  X,
+  User,
+  ShoppingCart,
 } from "lucide-react";
-import { toast } from "sonner";
-import Container from "../Container";
-import { useTranslations } from "next-intl";
+import Logo from "../Logo";
+import SearchHeader from "./SearchHeader";
 import { useMenus } from "@/hooks/useMenus";
 import { useCategoryTree, CategoryTreeNode } from "@/hooks/useCategoryTree";
 import { NavItem } from "@/constants/data";
 import Image from "next/image";
+import { useHeaderStore } from "@/store/useHeaderStore";
+import { useCartStore } from "@/store/useCartStore";
 
 const MAX_VISIBLE_CATEGORIES = 12;
 
 interface BottomHeaderProps {
   isSticky?: boolean;
+  syncedAtTop?: boolean;
+  /** Shared hero-band gradient (not a solid fill) */
+  gradientStyle?: React.CSSProperties;
+  onDarkHero?: boolean;
   initialMenus?: NavItem[];
   initialCategoryTree?: CategoryTreeNode[];
 }
@@ -49,30 +56,33 @@ const CategoryImage = ({ category }: { category: CategoryTreeNode }) => {
 
 const BottomHeader = ({
   isSticky = false,
+  syncedAtTop = false,
+  gradientStyle,
+  onDarkHero = false,
   initialMenus,
   initialCategoryTree,
 }: BottomHeaderProps) => {
-  const [isSupportOpen, setIsSupportOpen] = useState(false);
-  const supportRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        supportRef.current &&
-        !supportRef.current.contains(event.target as Node)
-      ) {
-        setIsSupportOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   const { menus, isLoading: menusLoading } = useMenus(initialMenus);
   const { tree: categoryTree, isLoading: categoriesLoading } =
     useCategoryTree(initialCategoryTree);
+  const { onCartOpen, onAuthOpen } = useHeaderStore();
+  const cartItems = useCartStore((state) => state.cartItems);
+  const totalItems = cartItems.length ? cartItems.length : 0;
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsSearchOpen(false);
+    };
+    if (isSearchOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "";
+    };
+  }, [isSearchOpen]);
 
   /** Root-level categories capped at MAX_VISIBLE_CATEGORIES */
   const visibleCategories = categoryTree.slice(0, MAX_VISIBLE_CATEGORIES);
@@ -80,15 +90,29 @@ const BottomHeader = ({
 
   return (
     <div
-      className={`border-y border-border hidden xl:flex header-bottom bg-white z-40 transition-all duration-300 ${
+      className={`hidden xl:flex header-bottom max-w-full overflow-x-hidden transition-all duration-300 ${isSearchOpen ? "z-[220]" : "z-40"} ${
         isSticky
-          ? "fixed top-0 left-0 w-full shadow-md animate-fadeInDown"
-          : "relative"
+          ? "fixed top-0 left-0 w-full bg-white shadow-md animate-fadeInDown"
+          : syncedAtTop
+            ? "relative"
+            : "relative bg-white"
       }`}
+      style={
+        syncedAtTop && !isSticky && gradientStyle
+          ? gradientStyle
+          : undefined
+      }
     >
-      <Container className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-x-8">
-          {/* Category Menu */}
+      <div className="w-full px-6 sm:px-8 md:px-10 lg:px-12 pt-3">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full gap-4">
+          {/* Left: Logo */}
+          <div className="justify-self-start flex items-center min-w-0">
+            <Logo className={`w-24 ${onDarkHero ? "brightness-0 invert" : ""}`} />
+          </div>
+
+          {/* Center: Menus */}
+          <div className="justify-self-center flex items-center">
+          {false && (
           <div className="relative group">
             <button className="flex items-center gap-x-2 bg-primary-light hover:bg-primary text-foreground hover:text-primary-foreground px-6 py-4 rounded-lg font-semibold transition-colors duration-300">
               <LayoutGrid className="size-5" />
@@ -200,6 +224,8 @@ const BottomHeader = ({
             </ul>
           </div>
 
+          )}
+
           {/* Main Navigation */}
           <nav className="main-menu">
             <ul className="flex items-center">
@@ -225,7 +251,7 @@ const BottomHeader = ({
                   >
                     <Link
                       href={item.href}
-                      className="text-black hover:text-primary transition-colors flex items-center gap-1"
+                      className={`hover:text-primary transition-colors flex items-center gap-1 ${onDarkHero ? "text-white" : "text-black"}`}
                     >
                       {item.title}
                       {((item.subItems && item.subItems.length > 0) ||
@@ -343,76 +369,78 @@ const BottomHeader = ({
               )}
             </ul>
           </nav>
-        </div>
-
-        {/* Support Section */}
-        <div
-          className="relative z-50"
-          ref={supportRef}
-          onMouseEnter={() => setIsSupportOpen(true)}
-          onMouseLeave={() => setIsSupportOpen(false)}
-        >
-          <div
-            onClick={() => setIsSupportOpen(!isSupportOpen)}
-            className="flex items-center gap-x-4 py-2 cursor-pointer group select-none"
-          >
-            <div className="size-12 flex items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-warning/20 shadow-sm border border-transparent group-hover:border-warning/30">
-              <Headset className="size-6 text-primary" />
-            </div>
-            <div className="flex flex-col pr-2">
-              <span className="text-xs text-muted-foreground leading-tight group-hover:text-primary transition-colors">
-                24/7 Support
-              </span>
-              <span className="text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">
-                888-777-999
-              </span>
-            </div>
           </div>
 
-          {/* Dropdown Menu */}
-          <ul
-            className={`absolute right-0 top-full mt-2 w-[220px] bg-background shadow-dark-z-24 rounded-lg border border-border z-50 transition-all duration-300 overflow-hidden origin-top ${
-              isSupportOpen
-                ? "opacity-100 visible scale-y-100"
-                : "opacity-0 invisible scale-y-0"
-            }`}
-          >
-            <li className="border-b last:border-b-0 border-border/50">
-              <a
-                href="tel:888-777-999"
-                className="flex items-center gap-x-3 px-5 py-3.5 hover:bg-muted hover:text-primary transition-colors duration-300 w-full text-[15px] font-semibold text-foreground/90 group"
-                onClick={() => setIsSupportOpen(false)}
-              >
-                <div className="bg-primary/10 p-2 rounded-full group-hover:bg-primary/20 transition-colors">
-                  <PhoneCall className="size-4 text-primary" />
-                </div>
-                Make a Call
-              </a>
-            </li>
-            <li className="border-b last:border-b-0 border-border/50">
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText("888-777-999");
-                  toast.success("Phone number copied!", {
-                    description: (
-                      <span className="text-foreground/90 font-medium tracking-tight">
-                        888-777-999 has been copied to your clipboard.
-                      </span>
-                    ),
-                  });
-                  setIsSupportOpen(false);
-                }}
-                className="flex items-center gap-x-3 px-5 py-3.5 hover:bg-muted hover:text-primary transition-colors duration-300 w-full text-[15px] font-semibold text-left text-foreground/90 group"
-              >
-                <div className="bg-primary/10 p-2 rounded-full group-hover:bg-primary/20 transition-colors">
-                  <Copy className="size-4 text-primary" />
-                </div>
-                Copy Number
-              </button>
-            </li>
-          </ul>
+          {/* Right: Search / Account / Cart icons (no backgrounds) */}
+          <div className="justify-self-end flex items-center gap-x-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              className={`inline-flex items-center justify-center size-11 transition-colors ${onDarkHero ? "text-white hover:text-white/80" : "text-foreground hover:text-primary"}`}
+              aria-label="Search"
+            >
+              <Search className="size-6" strokeWidth={1.75} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onAuthOpen("login")}
+              className={`inline-flex items-center justify-center size-11 transition-colors ${onDarkHero ? "text-white hover:text-white/80" : "text-foreground hover:text-primary"}`}
+              aria-label="Account"
+            >
+              <User className="size-6" strokeWidth={1.75} />
+            </button>
+
+            <button
+              type="button"
+              onClick={onCartOpen}
+              className={`relative inline-flex items-center justify-center size-11 transition-colors ${onDarkHero ? "text-white hover:text-white/80" : "text-foreground hover:text-primary"}`}
+              aria-label="Cart"
+            >
+              <ShoppingCart className="size-6" strokeWidth={1.75} />
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full">
+                {totalItems}
+              </span>
+            </button>
+          </div>
         </div>
-      </Container>
+      </div>
+
+      {/* Full-width search overlay — portaled so TopHeader cannot cover it */}
+      {isSearchOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed inset-0 z-[300]">
+            <button
+              type="button"
+              aria-label="Close search"
+              className="absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+              onClick={() => setIsSearchOpen(false)}
+            />
+            <div className="relative z-10 w-full bg-white border-b border-border shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="w-full px-6 sm:px-8 md:px-10 lg:px-12 py-5 md:py-6">
+                <div className="flex items-start gap-3 w-full">
+                  <div className="flex-1 min-w-0">
+                    <SearchHeader
+                      id="bottom-header-search"
+                      className="w-full !max-w-none"
+                      autoFocus
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsSearchOpen(false)}
+                    className="inline-flex items-center justify-center size-11 shrink-0 rounded-full border border-border bg-muted/40 text-foreground hover:bg-muted transition-colors mt-0.5"
+                    aria-label="Close search"
+                  >
+                    <X className="size-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

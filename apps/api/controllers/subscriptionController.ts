@@ -1,5 +1,9 @@
 import asyncHandler from "express-async-handler";
 import Subscription from "../models/subscriptionModel.js";
+import {
+  sendEmail,
+  generateNewsletterEmailHTML,
+} from "../utils/emailService.js";
 
 // @desc    Subscribe to newsletter
 // @route   POST /api/subscriptions/subscribe
@@ -179,9 +183,9 @@ export const getSubscriptionStats = asyncHandler(async (req, res) => {
     status: "unsubscribed",
   });
 
-  // Get count by source
+  // Get count by source (must match subscriptionModel enum)
   const modalCount = await Subscription.countDocuments({
-    source: "modal",
+    source: "homepage_modal",
     status: "active",
   });
   const footerCount = await Subscription.countDocuments({
@@ -189,7 +193,11 @@ export const getSubscriptionStats = asyncHandler(async (req, res) => {
     status: "active",
   });
   const manualCount = await Subscription.countDocuments({
-    source: "manual",
+    source: "other",
+    status: "active",
+  });
+  const popupCount = await Subscription.countDocuments({
+    source: "popup",
     status: "active",
   });
 
@@ -206,10 +214,154 @@ export const getSubscriptionStats = asyncHandler(async (req, res) => {
     total,
     active,
     unsubscribed,
-    modal: modalCount,
+    modal: modalCount + popupCount,
     footer: footerCount,
     manual: manualCount,
     recentGrowth,
+  });
+});
+
+// @desc    Send newsletter to active subscribers (Admin only)
+// @route   POST /api/subscriptions/send-newsletter
+// @access  Private/Admin
+export const sendNewsletter = asyncHandler(async (req, res) => {
+  const { subject, message, html, buttonText, buttonUrl } = req.body;
+
+  if (!subject?.trim() || !message?.trim()) {
+    res.status(400);
+    throw new Error("Subject and message are required");
+  }
+
+  const trimmedButtonText = buttonText?.trim() || "";
+  const trimmedButtonUrl = buttonUrl?.trim() || "";
+
+  if (
+    (trimmedButtonText && !trimmedButtonUrl) ||
+    (!trimmedButtonText && trimmedButtonUrl)
+  ) {
+    res.status(400);
+    throw new Error("Both button text and button link are required together");
+  }
+
+  if (trimmedButtonUrl) {
+    try {
+      // eslint-disable-next-line no-new
+      new URL(trimmedButtonUrl);
+    } catch {
+      res.status(400);
+      throw new Error("Button link must be a valid URL");
+    }
+  }
+
+  const subscribers = await Subscription.find({
+    status: "active",
+    "preferences.newsletter": { $ne: false },
+  }).select("email");
+
+  if (!subscribers.length) {
+    res.status(400);
+    throw new Error("No active subscribers to send to");
+  }
+
+  const trimmedSubject = subject.trim();
+  const trimmedMessage = message.trim();
+  const bodyHtml = (html?.trim() || trimmedMessage.replace(/\n/g, "<br>"))
+    .replace(
+      /<img /gi,
+      '<img style="max-width:100%;height:auto;border-radius:8px;display:block;margin:16px 0;" ',
+    )
+    .replace(
+      /<p>/gi,
+      '<p style="margin:0 0 14px 0;color:#495057;font-size:15px;line-height:1.7;">',
+    )
+    .replace(
+      /<h1>/gi,
+      '<h1 style="margin:0 0 12px 0;color:#1B1F23;font-size:22px;font-weight:700;">',
+    )
+    .replace(
+      /<h2>/gi,
+      '<h2 style="margin:0 0 12px 0;color:#1B1F23;font-size:20px;font-weight:700;">',
+    )
+    .replace(
+      /<h3>/gi,
+      '<h3 style="margin:0 0 10px 0;color:#1B1F23;font-size:18px;font-weight:600;">',
+    )
+    .replace(
+      /<a /gi,
+      '<a style="color:#1B1F23;font-weight:600;text-decoration:underline;" ',
+    );
+
+  const newsletterHtml = generateNewsletterEmailHTML(
+    trimmedSubject,
+    bodyHtml,
+    trimmedButtonText,
+    trimmedButtonUrl,
+  );
+
+  const failed: string[] = [];
+  let sent = 0;
+
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < subscribers.length; i += BATCH_SIZE) {
+    const batch = subscribers.slice(i, i + BATCH_SIZE);
+    const results = await Promise.allSettled(
+      batch.map((subscriber) =>
+        sendEmail({
+          to: subscriber.email,
+          subject: trimmedSubject,
+          message: trimmedMessage,
+          html: newsletterHtml,
+        }),
+      ),
+    );
+
+    results.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        sent += 1;
+      } else {
+        failed.push(batch[index].email);
+      }
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `Newsletter sent to ${sent} of ${subscribers.length} subscribers`,
+    total: subscribers.length,
+    sent,
+    failed: failed.length,
+    failedEmails: failed,
+  });
+});
+
+// @desc    Unsubscribe a user by ID (Admin only)
+// @route   PATCH /api/subscriptions/:id/unsubscribe
+// @access  Private/Admin
+export const adminUnsubscribeSubscription = asyncHandler(async (req, res) => {
+  const subscription = await Subscription.findById(req.params.id);
+
+  if (!subscription) {
+    res.status(404);
+    throw new Error("Subscription not found");
+  }
+
+  if (subscription.status === "unsubscribed") {
+    res.status(200).json({
+      success: true,
+      message: "User is already unsubscribed",
+      subscription,
+    });
+    return;
+  }
+
+  subscription.status = "unsubscribed";
+  subscription.unsubscribedAt = new Date();
+  await subscription.save();
+
+  res.json({
+    success: true,
+    message: "User unsubscribed successfully",
+    subscription,
   });
 });
 

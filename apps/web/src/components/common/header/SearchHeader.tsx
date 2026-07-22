@@ -27,11 +27,13 @@ interface SearchResponseProduct {
 interface SearchHeaderProps {
   id?: string;
   className?: string;
+  autoFocus?: boolean;
 }
 
 const SearchHeader = ({
   id = "desktop-search",
   className,
+  autoFocus = false,
 }: SearchHeaderProps) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -133,9 +135,9 @@ const SearchHeader = ({
 
   return (
     <div
-      className={`relative search-input-container w-full ${className || "2xl:max-w-[800px] xl:max-w-[600px]"}`}
+      className={`relative search-input-container w-full min-w-0 max-w-full ${className || "2xl:max-w-[800px] xl:max-w-[600px]"}`}
     >
-      <div className="relative flex items-center px-6 py-3 rounded-[100px] ring-1 ring-muted-foreground/32 focus-within:ring-foreground transition-shadow duration-200 bg-white shadow-sm z-50">
+      <div className="relative flex items-center px-4 py-1.5 sm:px-5 sm:py-2 rounded-[100px] ring-1 ring-muted-foreground/32 focus-within:ring-foreground transition-shadow duration-200 bg-white shadow-sm z-50 h-10 sm:h-11">
         <div className="order-last ml-2">
           {searchTerm.length > 0 ? (
             <X
@@ -148,7 +150,7 @@ const SearchHeader = ({
         </div>
         <input
           type="text"
-          className="peer w-full bg-transparent text-base text-foreground placeholder-muted-foreground focus:placeholder-transparent outline-none"
+          className="peer w-full bg-transparent text-sm sm:text-base text-foreground placeholder-muted-foreground focus:placeholder-transparent outline-none"
           placeholder="Search for items..."
           id={id}
           value={searchTerm}
@@ -156,10 +158,11 @@ const SearchHeader = ({
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           autoComplete="off"
+          autoFocus={autoFocus}
         />
         <label
           htmlFor={id}
-          className="absolute left-[24px] top-1/2 -translate-y-1/2 text-xs leading-[18px] transition-all peer-placeholder-shown:text-muted-foreground peer-placeholder-shown:text-[16px] peer-placeholder-shown:top-1/2 peer-focus:text-[12px] peer-focus:top-0 peer-[:not(:placeholder-shown)]:text-[12px] peer-[:not(:placeholder-shown)]:top-0 bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:px-1 z-10"
+          className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-xs leading-[18px] transition-all peer-placeholder-shown:text-muted-foreground peer-placeholder-shown:text-sm sm:peer-placeholder-shown:text-base peer-placeholder-shown:top-1/2 peer-focus:text-[12px] peer-focus:top-0 peer-[:not(:placeholder-shown)]:text-[12px] peer-[:not(:placeholder-shown)]:top-0 bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:px-1 z-10"
         >
           Search for items...
         </label>
@@ -167,7 +170,7 @@ const SearchHeader = ({
 
       <div
         data-state={isSearchOpen ? "open" : "close"}
-        className={`absolute w-full top-[calc(100%-25px)] pt-[35px] left-0 border border-gray-300 shadow-[0px_24px_48px_rgba(145,158,171,0.16)] bg-white rounded-3xl z-40 transform transition-all duration-300 ease-[cubic-bezier(0.645,0.045,0.355,1)] ${isSearchOpen ? "translate-y-0 opacity-100 visible" : "-translate-y-4 opacity-0 invisible"}`}
+        className={`absolute w-full top-[calc(100%-25px)] pt-[35px] left-0 border border-gray-300 shadow-[0px_24px_48px_rgba(145,158,171,0.16)] bg-white rounded-3xl z-40 transform transition-all duration-300 ease-[cubic-bezier(0.645,0.045,0.355,1)] ${isSearchOpen ? "translate-y-0 opacity-100 visible pointer-events-auto" : "hidden opacity-0 invisible pointer-events-none"}`}
       >
         <div className="p-4 overflow-y-auto max-h-[450px]">
           {/* STATE 1: Empty Search Input -> Show Recent & Recommended */}

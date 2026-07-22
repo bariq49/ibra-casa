@@ -20,6 +20,7 @@ import { ProductType } from "@/hooks/useProductTypes";
 import { Category } from "@/hooks/useCategories";
 import type { Blog } from "@/components/home/LatestBlogs";
 import type { HeroBanner, BannersResponse } from "@/types/banner";
+import type { CustomerReview } from "@/components/about/AboutTestimonials";
 
 const REVALIDATE = 600;
 const HOME_PRODUCT_BASE = "home-decor";
@@ -107,6 +108,50 @@ export async function getHeroBanners(): Promise<HeroBanner[]> {
       { next: { revalidate: REVALIDATE } },
     );
     return res.data?.banners || [];
+  } catch {
+    return [];
+  }
+}
+
+type ApprovedReviewApi = {
+  reviewId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  isApproved: boolean;
+};
+
+/** Approved product reviews for home testimonials */
+export async function getApprovedTestimonials(): Promise<CustomerReview[]> {
+  try {
+    const res = await api.get<ApprovedReviewApi[]>(
+      PRODUCT_ENDPOINTS.APPROVED_REVIEWS,
+      { next: { revalidate: 60 } },
+    );
+    const reviews = Array.isArray(res.data) ? res.data : [];
+    return reviews.slice(0, 12).map((review, index) => {
+      const date = review.createdAt
+        ? new Date(review.createdAt).toLocaleString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })
+        : "";
+      return {
+        _id: String(review.reviewId || index),
+        name: review.userName || "Customer",
+        date,
+        rating: review.rating,
+        text: review.comment,
+        avatar: `https://i.pravatar.cc/150?u=${encodeURIComponent(
+          String(review.reviewId || review.userName || index),
+        )}`,
+        isVerified: true,
+      };
+    });
   } catch {
     return [];
   }

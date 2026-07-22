@@ -42,27 +42,47 @@ type Review = {
   productName: string;
 };
 
+type PendingReply = {
+  productId: string;
+  productName: string;
+  reviewId: string;
+  reviewComment: string;
+  replyId: string;
+  userId: string | null;
+  userName: string;
+  userEmail: string | null;
+  comment: string;
+  isApproved: boolean;
+  createdAt: string;
+};
+
 export default function ReviewsPage() {
   const axiosPrivate = useAxiosPrivate();
   const { toast } = useToast();
   const [pendingReviews, setPendingReviews] = useState<Review[]>([]);
   const [approvedReviews, setApprovedReviews] = useState<Review[]>([]);
+  const [pendingReplies, setPendingReplies] = useState<PendingReply[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [selectedReply, setSelectedReply] = useState<PendingReply | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDeleteReplyDialog, setShowDeleteReplyDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
 
   // Fetch all reviews
   const fetchAllReviews = async () => {
     try {
       setLoading(true);
-      const [pendingResponse, approvedResponse] = await Promise.all([
-        axiosPrivate.get("/products/reviews/pending"),
-        axiosPrivate.get("/products/reviews/approved"),
-      ]);
+      const [pendingResponse, approvedResponse, pendingRepliesResponse] =
+        await Promise.all([
+          axiosPrivate.get("/products/reviews/pending"),
+          axiosPrivate.get("/products/reviews/approved"),
+          axiosPrivate.get("/products/reviews/replies/pending"),
+        ]);
       setPendingReviews(pendingResponse.data || []);
       setApprovedReviews(approvedResponse.data || []);
+      setPendingReplies(pendingRepliesResponse.data || []);
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       toast({
@@ -131,6 +151,56 @@ export default function ReviewsPage() {
     }
   };
 
+  const handleApproveReply = async (reply: PendingReply) => {
+    try {
+      setActionLoading(reply.replyId);
+      await axiosPrivate.put(
+        `/products/${reply.productId}/review/${reply.reviewId}/reply/${reply.replyId}`,
+        { approve: true },
+      );
+      toast({
+        title: "Success",
+        description: "Reply approved successfully",
+      });
+      await fetchAllReviews();
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err.response?.data?.message || "Failed to approve reply",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteReply = async (reply: PendingReply) => {
+    try {
+      setActionLoading(reply.replyId);
+      await axiosPrivate.put(
+        `/products/${reply.productId}/review/${reply.reviewId}/reply/${reply.replyId}`,
+        { approve: false },
+      );
+      toast({
+        title: "Success",
+        description: "Reply rejected successfully",
+      });
+      await fetchAllReviews();
+      setShowDeleteReplyDialog(false);
+      setSelectedReply(null);
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err.response?.data?.message || "Failed to reject reply",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // Render star rating
   const renderStars = (rating: number) => {
     return (
@@ -172,9 +242,12 @@ export default function ReviewsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="pending">
-            Pending ({pendingReviews.length})
+            Pending Reviews ({pendingReviews.length})
+          </TabsTrigger>
+          <TabsTrigger value="pending-replies">
+            Pending Replies ({pendingReplies.length})
           </TabsTrigger>
           <TabsTrigger value="approved">
             Approved ({approvedReviews.length})
@@ -258,6 +331,100 @@ export default function ReviewsPage() {
                                   setShowDeleteDialog(true);
                                 }}
                                 disabled={actionLoading === review.reviewId}
+                              >
+                                <X className="mr-1 h-4 w-4" />
+                                Reject
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Pending Replies Tab */}
+        <TabsContent value="pending-replies">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Replies</CardTitle>
+              <CardDescription>
+                Approve or reject guest replies before they appear on the site
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <ReviewSkeleton />
+              ) : pendingReplies.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    No pending replies at the moment
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Product</TableHead>
+                        <TableHead>From</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Reply</TableHead>
+                        <TableHead>On review</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingReplies.map((reply) => (
+                        <TableRow key={reply.replyId}>
+                          <TableCell className="font-medium">
+                            {reply.productName}
+                          </TableCell>
+                          <TableCell>{reply.userName}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {reply.userEmail || "—"}
+                          </TableCell>
+                          <TableCell className="max-w-xs">
+                            <p className="line-clamp-2 text-sm">{reply.comment}</p>
+                          </TableCell>
+                          <TableCell className="max-w-xs">
+                            <p className="line-clamp-2 text-sm text-muted-foreground">
+                              {reply.reviewComment}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(reply.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => handleApproveReply(reply)}
+                                disabled={actionLoading === reply.replyId}
+                              >
+                                {actionLoading === reply.replyId ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <Check className="mr-1 h-4 w-4" />
+                                    Approve
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => {
+                                  setSelectedReply(reply);
+                                  setShowDeleteReplyDialog(true);
+                                }}
+                                disabled={actionLoading === reply.replyId}
                               >
                                 <X className="mr-1 h-4 w-4" />
                                 Reject
@@ -388,6 +555,46 @@ export default function ReviewsPage() {
               }}
             >
               Delete Review
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={showDeleteReplyDialog}
+        onOpenChange={setShowDeleteReplyDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Reply?</DialogTitle>
+            <DialogDescription>
+              This will permanently remove the pending reply.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedReply && (
+            <div className="my-4 p-4 bg-muted rounded-lg space-y-2">
+              <p className="font-semibold">{selectedReply.productName}</p>
+              <p className="text-sm text-muted-foreground">
+                {selectedReply.userName}
+                {selectedReply.userEmail ? ` (${selectedReply.userEmail})` : ""}
+              </p>
+              <p className="text-sm">{selectedReply.comment}</p>
+            </div>
+          )}
+          <DialogFooter className="flex justify-end gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteReplyDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-error-main hover:bg-error-dark text-white"
+              onClick={() => {
+                if (selectedReply) handleDeleteReply(selectedReply);
+              }}
+            >
+              Reject Reply
             </Button>
           </DialogFooter>
         </DialogContent>

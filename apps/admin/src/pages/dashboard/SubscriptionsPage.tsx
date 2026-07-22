@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import { useToast } from "@/hooks/use-toast";
+import ReactQuill from "react-quill-new";
+import "quill/dist/quill.snow.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -20,6 +23,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,6 +66,7 @@ import {
   CalendarDays,
   Globe,
   Monitor,
+  Send,
 } from "lucide-react";
 import { format } from "date-fns";
 import { DEFAULT_PER_PAGE } from "@/lib/pagination";
@@ -112,9 +124,129 @@ export default function SubscriptionsPage() {
   const [subscriptionToDelete, setSubscriptionToDelete] =
     useState<Subscription | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [unsubscribeDialogOpen, setUnsubscribeDialogOpen] = useState(false);
+  const [subscriptionToUnsubscribe, setSubscriptionToUnsubscribe] =
+    useState<Subscription | null>(null);
+  const [unsubscribing, setUnsubscribing] = useState(false);
+  const [newsletterDialogOpen, setNewsletterDialogOpen] = useState(false);
+  const [newsletterSubject, setNewsletterSubject] = useState("");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+  const [newsletterButtonText, setNewsletterButtonText] = useState("");
+  const [newsletterButtonUrl, setNewsletterButtonUrl] = useState("");
+  const [sendingNewsletter, setSendingNewsletter] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const newsletterQuillRef = useRef<any>(null);
 
   const axiosPrivate = useAxiosPrivate();
   const { toast } = useToast();
+
+  const newsletterImageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+    input.onchange = () => {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Url = reader.result as string;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const quill = (newsletterQuillRef.current as any)?.getEditor();
+          if (quill) {
+            const range = quill.getSelection();
+            const index = range ? range.index : 0;
+            quill.insertEmbed(index, "image", base64Url);
+            quill.setSelection(index + 1);
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    };
+  }, []);
+
+  const newsletterModules = useMemo(
+    () => ({
+      toolbar: {
+        container: [
+          [{ header: [1, 2, 3, false] }],
+          ["bold", "italic", "underline", "strike"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          [{ indent: "-1" }, { indent: "+1" }],
+          [{ color: [] }],
+          [{ align: [] }],
+          ["blockquote"],
+          ["link", "image"],
+          ["clean"],
+        ],
+        handlers: { image: newsletterImageHandler },
+      },
+      clipboard: { matchVisual: false },
+    }),
+    [newsletterImageHandler],
+  );
+
+  const newsletterFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "indent",
+    "color",
+    "align",
+    "blockquote",
+    "link",
+    "image",
+  ];
+
+  const stripHtml = (html: string) =>
+    html
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const processNewsletterImages = async (htmlContent: string): Promise<string> => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlContent;
+    const images = tempDiv.querySelectorAll("img");
+
+    if (images.length === 0) return htmlContent;
+
+    const base64Images: { element: HTMLImageElement; src: string }[] = [];
+    images.forEach((img) => {
+      const src = img.getAttribute("src") || "";
+      if (src.startsWith("data:image")) {
+        base64Images.push({ element: img, src });
+      }
+    });
+
+    if (base64Images.length === 0) return htmlContent;
+
+    toast({
+      title: "Uploading images",
+      description: `Uploading ${base64Images.length} image(s)...`,
+    });
+
+    for (let i = 0; i < base64Images.length; i++) {
+      try {
+        const { element, src } = base64Images[i];
+        const response = await axiosPrivate.post("/upload/test", {
+          image: src,
+          folder: "newsletters",
+          originalName: `newsletter-${Date.now()}-${i + 1}.jpg`,
+        });
+        element.src = response.data.result.url;
+      } catch (error) {
+        console.error("Error uploading newsletter image:", error);
+        throw new Error("Image upload failed");
+      }
+    }
+
+    return tempDiv.innerHTML;
+  };
 
   const totalPages = Math.ceil(total / perPage);
 
@@ -190,6 +322,42 @@ export default function SubscriptionsPage() {
     setDeleteDialogOpen(true);
   };
 
+  const handleUnsubscribeClick = (subscription: Subscription) => {
+    setSubscriptionToUnsubscribe(subscription);
+    setUnsubscribeDialogOpen(true);
+  };
+
+  const handleUnsubscribeConfirm = async () => {
+    if (!subscriptionToUnsubscribe) return;
+
+    try {
+      setUnsubscribing(true);
+      await axiosPrivate.patch(
+        `/subscriptions/${subscriptionToUnsubscribe._id}/unsubscribe`,
+      );
+
+      toast({
+        title: "Success",
+        description: "User unsubscribed successfully",
+      });
+
+      setUnsubscribeDialogOpen(false);
+      setSubscriptionToUnsubscribe(null);
+      setIsSheetOpen(false);
+      await Promise.all([fetchSubscriptions(), fetchStats()]);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          (error as { response?: { data?: { message?: string } } }).response
+            ?.data?.message || "Failed to unsubscribe user",
+        variant: "destructive",
+      });
+    } finally {
+      setUnsubscribing(false);
+    }
+  };
+
   const handleDeleteConfirm = async () => {
     if (!subscriptionToDelete) return;
 
@@ -215,6 +383,103 @@ export default function SubscriptionsPage() {
       });
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleOpenNewsletterDialog = () => {
+    setNewsletterSubject("");
+    setNewsletterMessage("");
+    setNewsletterButtonText("");
+    setNewsletterButtonUrl("");
+    setNewsletterDialogOpen(true);
+  };
+
+  const handleSendNewsletter = async () => {
+    const subject = newsletterSubject.trim();
+    const plainText = stripHtml(newsletterMessage);
+    const buttonText = newsletterButtonText.trim();
+    const buttonUrl = newsletterButtonUrl.trim();
+
+    if (!subject || !plainText) {
+      toast({
+        title: "Missing fields",
+        description: "Please enter both subject and message content",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if ((buttonText && !buttonUrl) || (!buttonText && buttonUrl)) {
+      toast({
+        title: "Incomplete button",
+        description: "Please provide both button text and button link",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (buttonUrl) {
+      try {
+        // eslint-disable-next-line no-new
+        new URL(buttonUrl);
+      } catch {
+        toast({
+          title: "Invalid link",
+          description: "Button link must be a valid URL (e.g. https://...)",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    if (stats.active < 1) {
+      toast({
+        title: "No subscribers",
+        description: "There are no active subscribers to send to",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setSendingNewsletter(true);
+      const html = await processNewsletterImages(newsletterMessage);
+
+      const response = await axiosPrivate.post(
+        "/subscriptions/send-newsletter",
+        {
+          subject,
+          message: plainText,
+          html,
+          buttonText: buttonText || undefined,
+          buttonUrl: buttonUrl || undefined,
+        },
+      );
+
+      toast({
+        title: "Newsletter sent",
+        description:
+          response.data?.message ||
+          `Sent to ${response.data?.sent ?? 0} subscribers`,
+      });
+
+      setNewsletterDialogOpen(false);
+      setNewsletterSubject("");
+      setNewsletterMessage("");
+      setNewsletterButtonText("");
+      setNewsletterButtonUrl("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error && error.message === "Image upload failed"
+            ? "Failed to upload embedded images."
+            : (error as { response?: { data?: { message?: string } } }).response
+                ?.data?.message || "Failed to send newsletter",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingNewsletter(false);
     }
   };
 
@@ -252,18 +517,28 @@ export default function SubscriptionsPage() {
             Manage newsletter subscriptions and email preferences
           </p>
         </div>
-        <Button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          variant="outline"
-          className="border-primary-main text-primary-main hover:bg-primary-main/10"
-        >
-          <RefreshCw
-            size={16}
-            className={`mr-2 ${refreshing ? "animate-spin" : ""}`}
-          />
-          Refresh
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={handleOpenNewsletterDialog}
+            disabled={stats.active < 1}
+            className="bg-primary-main hover:bg-primary-dark text-white"
+          >
+            <Send size={16} className="mr-2" />
+            Send Newsletter
+          </Button>
+          <Button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            variant="outline"
+            className="border-primary-main text-primary-main hover:bg-primary-main/10"
+          >
+            <RefreshCw
+              size={16}
+              className={`mr-2 ${refreshing ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
+        </div>
       </motion.div>
 
       {/* Stats Cards */}
@@ -528,6 +803,17 @@ export default function SubscriptionsPage() {
                         >
                           <Eye size={16} />
                         </Button>
+                        {subscription.status === "active" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleUnsubscribeClick(subscription)}
+                            title="Unsubscribe user"
+                            className="hover:bg-warning-lighter hover:text-warning-dark"
+                          >
+                            <UserX size={16} />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"
@@ -708,7 +994,20 @@ export default function SubscriptionsPage() {
                 )}
 
               {/* Actions */}
-              <div className="pt-4">
+              <div className="pt-4 space-y-2">
+                {selectedSubscription.status === "active" && (
+                  <Button
+                    variant="outline"
+                    className="w-full border-warning-main text-warning-dark hover:bg-warning-lighter"
+                    onClick={() => {
+                      setIsSheetOpen(false);
+                      handleUnsubscribeClick(selectedSubscription);
+                    }}
+                  >
+                    <UserX size={16} className="mr-2" />
+                    Unsubscribe User
+                  </Button>
+                )}
                 <Button
                   variant="destructive"
                   className="w-full"
@@ -725,6 +1024,160 @@ export default function SubscriptionsPage() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Send Newsletter Dialog */}
+      <Dialog
+        open={newsletterDialogOpen}
+        onOpenChange={(open) => {
+          if (!sendingNewsletter) setNewsletterDialogOpen(open);
+        }}
+      >
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Send Newsletter</DialogTitle>
+            <DialogDescription>
+              This will email{" "}
+              <span className="font-semibold text-foreground">
+                {stats.active}
+              </span>{" "}
+              active subscriber{stats.active === 1 ? "" : "s"}. Add text,
+              formatting, and images like a product description.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="newsletter-subject">Subject</Label>
+              <Input
+                id="newsletter-subject"
+                placeholder="e.g. This week’s exclusive offer"
+                value={newsletterSubject}
+                onChange={(e) => setNewsletterSubject(e.target.value)}
+                disabled={sendingNewsletter}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Message / Offer</Label>
+              <div className="rounded-md border border-input overflow-hidden [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-input [&_.ql-toolbar]:bg-muted/30 [&_.ql-toolbar]:rounded-t-md [&_.ql-container]:border-0 [&_.ql-container]:min-h-[260px] [&_.ql-editor]:min-h-[240px] [&_.ql-editor]:text-sm [&_.ql-editor]:leading-relaxed [&_.ql-editor_img]:max-w-full [&_.ql-editor_img]:rounded-md">
+                <ReactQuill
+                  ref={newsletterQuillRef}
+                  theme="snow"
+                  value={newsletterMessage}
+                  onChange={setNewsletterMessage}
+                  modules={newsletterModules}
+                  formats={newsletterFormats}
+                  readOnly={sendingNewsletter}
+                  placeholder="Write your newsletter or offer details. Use the image button to add photos..."
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="newsletter-button-text">
+                  Button text{" "}
+                  <span className="text-muted-foreground font-normal">
+                    (optional)
+                  </span>
+                </Label>
+                <Input
+                  id="newsletter-button-text"
+                  placeholder="e.g. Shop the offer"
+                  value={newsletterButtonText}
+                  onChange={(e) => setNewsletterButtonText(e.target.value)}
+                  disabled={sendingNewsletter}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newsletter-button-url">
+                  Button link{" "}
+                  <span className="text-muted-foreground font-normal">
+                    (optional)
+                  </span>
+                </Label>
+                <Input
+                  id="newsletter-button-url"
+                  type="url"
+                  placeholder="https://yoursite.com/offers"
+                  value={newsletterButtonUrl}
+                  onChange={(e) => setNewsletterButtonUrl(e.target.value)}
+                  disabled={sendingNewsletter}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setNewsletterDialogOpen(false)}
+              disabled={sendingNewsletter}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendNewsletter}
+              disabled={
+                sendingNewsletter ||
+                !newsletterSubject.trim() ||
+                !stripHtml(newsletterMessage)
+              }
+              className="bg-primary-main hover:bg-primary-dark text-white"
+            >
+              {sendingNewsletter ? (
+                <>
+                  <RefreshCw size={16} className="mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={16} className="mr-2" />
+                  Send to {stats.active} subscriber
+                  {stats.active === 1 ? "" : "s"}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unsubscribe Confirmation Dialog */}
+      <AlertDialog
+        open={unsubscribeDialogOpen}
+        onOpenChange={setUnsubscribeDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsubscribe User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unsubscribe{" "}
+              <span className="font-semibold text-foreground">
+                {subscriptionToUnsubscribe?.email}
+              </span>
+              ? They will no longer receive newsletter emails.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={unsubscribing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleUnsubscribeConfirm}
+              disabled={unsubscribing}
+              className="bg-warning-main hover:bg-warning-dark text-white"
+            >
+              {unsubscribing ? (
+                <>
+                  <RefreshCw size={16} className="mr-2 animate-spin" />
+                  Unsubscribing...
+                </>
+              ) : (
+                <>
+                  <UserX size={16} className="mr-2" />
+                  Unsubscribe
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

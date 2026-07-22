@@ -2,22 +2,25 @@ import mongoose, { Document, Model } from "mongoose";
 import { IProduct } from "../types/index.js";
 
 interface IReviewReply {
-  userId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId;
   userName: string;
+  userEmail?: string;
   comment: string;
+  isApproved: boolean;
   createdAt: Date;
 }
 
 interface IReview {
   _id?: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId;
   userName: string;
+  userEmail?: string;
   rating: number;
   comment: string;
   isApproved: boolean;
   createdAt?: Date;
-  likes: mongoose.Types.ObjectId[];
-  dislikes: mongoose.Types.ObjectId[];
+  likes: string[];
+  dislikes: string[];
   replies: IReviewReply[];
 }
 
@@ -145,11 +148,17 @@ const productSchema = new mongoose.Schema<IProductDocument>(
         userId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
-          required: true,
+          required: false,
         },
         userName: {
           type: String,
           required: true,
+        },
+        userEmail: {
+          type: String,
+          required: false,
+          lowercase: true,
+          trim: true,
         },
         rating: {
           type: Number,
@@ -163,18 +172,16 @@ const productSchema = new mongoose.Schema<IProductDocument>(
         },
         isApproved: {
           type: Boolean,
-          default: true,
+          default: false,
         },
         likes: [
           {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            type: String,
           },
         ],
         dislikes: [
           {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            type: String,
           },
         ],
         replies: [
@@ -182,15 +189,25 @@ const productSchema = new mongoose.Schema<IProductDocument>(
             userId: {
               type: mongoose.Schema.Types.ObjectId,
               ref: "User",
-              required: true,
+              required: false,
             },
             userName: {
               type: String,
               required: true,
             },
+            userEmail: {
+              type: String,
+              required: false,
+              lowercase: true,
+              trim: true,
+            },
             comment: {
               type: String,
               required: true,
+            },
+            isApproved: {
+              type: Boolean,
+              default: false,
             },
             createdAt: {
               type: Date,
@@ -222,7 +239,12 @@ const productSchema = new mongoose.Schema<IProductDocument>(
     ],
     image: {
       type: String,
-      required: true,
+      required: [
+        function (this: IProductDocument) {
+          return !(this.images && this.images.length > 0);
+        },
+        "Path `image` is required.",
+      ],
     },
     bg: {
       type: String,

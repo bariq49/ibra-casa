@@ -78,10 +78,10 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${publicSans.variable} ${urbanist.variable}`}
+      className={`${publicSans.variable} ${urbanist.variable} overflow-x-hidden`}
     >
       <head></head>
-      <body className="w-full overflow-x-hidden">
+      <body className="w-full max-w-full overflow-x-hidden">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <StoreSettingsProvider initialSettings={initialStoreSettings}>
             <UrlMessageHandler />

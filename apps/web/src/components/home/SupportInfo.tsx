@@ -60,7 +60,7 @@ const SupportInfo = () => {
     <section className="py-10 md:py-14 lg:py-[70px]">
       <Container>
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -69,7 +69,7 @@ const SupportInfo = () => {
           {SUPPORT_ITEMS.map((item, i) => (
             <motion.div
               key={i}
-              className="flex flex-col items-center justify-center gap-3 lg:gap-4 bg-white border border-gray-300 rounded-[16px] p-6 lg:p-4 xl:p-[24px] w-full"
+              className="flex flex-col items-center justify-center gap-3 lg:gap-4 bg-white border border-gray-300 rounded-2xl p-6 lg:p-4 xl:p-[24px] w-full"
               variants={itemVariants}
             >
               <span className="inline-flex shrink-0 items-center justify-center size-[52px] lg:size-[44px] xl:size-[56px] bg-warning-lighter rounded-full">

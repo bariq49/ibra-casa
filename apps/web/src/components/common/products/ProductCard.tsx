@@ -6,6 +6,7 @@ import { Heart, RefreshCw, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Ratings from "./Ratings";
 import AddToCartBtn from "./AddToCartBtn";
+import BuyNowBtn from "./BuyNowBtn";
 import WishlistBtn from "./WishlistBtn";
 import PriceFormatter from "./PriceFormatter";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -183,9 +184,9 @@ const ProductCard = ({
 
           <div className="flex gap-4 items-center mt-2">
             <WishlistBtn product={product} />
-
             <AddToCartBtn product={product} />
           </div>
+          <BuyNowBtn product={product} className="mt-3" />
         </div>
       </div>
     );
@@ -249,9 +250,12 @@ const ProductCard = ({
             </div>
           </div>
 
-          <div className="flex gap-4 items-end relative shrink-0 w-full mt-auto pt-3">
-            <WishlistBtn product={product} />
-            <AddToCartBtn product={product} variant="beauty" />
+          <div className="flex flex-col gap-3 relative shrink-0 w-full mt-auto pt-4">
+            <div className="flex gap-4 items-end w-full">
+              <WishlistBtn product={product} />
+              <AddToCartBtn product={product} variant="beauty" />
+            </div>
+            <BuyNowBtn product={product} variant="beauty" />
           </div>
         </div>
       </div>
@@ -364,9 +368,12 @@ const ProductCard = ({
             </div>
 
             {/* Actions Row using component APIs */}
-            <div className="flex items-center gap-3 w-full">
-              <WishlistBtn product={product} variant="grocery" />
-              <AddToCartBtn product={product} variant="grocery" />
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex items-center gap-3 w-full">
+                <WishlistBtn product={product} variant="grocery" />
+                <AddToCartBtn product={product} variant="grocery" />
+              </div>
+              <BuyNowBtn product={product} variant="grocery" />
             </div>
           </div>
         </div>
@@ -482,9 +489,12 @@ const ProductCard = ({
             </span>
           )}
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <WishlistBtn product={product} />
-          <AddToCartBtn product={product} />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-4">
+            <WishlistBtn product={product} />
+            <AddToCartBtn product={product} />
+          </div>
+          <BuyNowBtn product={product} />
         </div>
       </div>
     </div>

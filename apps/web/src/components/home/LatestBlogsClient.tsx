@@ -22,9 +22,14 @@ export default function LatestBlogsClient({ blogs }: { blogs: Blog[] }) {
             </h2>
             <Link
               href="/blogs"
-              className="font-['Urbanist',sans-serif] text-[24px] font-bold text-light-primary-text leading-[36px] hover:text-primary transition-colors"
+              className="bg-white hover:bg-white/90 transition-colors duration-300 inline-flex items-center gap-[6px] py-[8px] pl-[20px] pr-[10px] rounded-[59px] group/btn shadow-sm border border-light-divider"
             >
-              View All
+              <span className="font-['DM_Sans',sans-serif] font-semibold leading-[26px] text-primary text-[16px] whitespace-nowrap">
+                View All Blogs
+              </span>
+              <div className="bg-primary flex items-center justify-center rounded-full size-[32px] ml-1">
+                <ArrowUpRight className="size-4 text-white group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300" />
+              </div>
             </Link>
           </div>
 

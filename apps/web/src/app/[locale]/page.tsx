@@ -7,6 +7,7 @@ import TodaysTopOffer from "@/components/home/TodaysTopOffer";
 import MostLovedProducts from "@/components/home/beauty/MostLovedProducts";
 import NewlyLaunchedProductsBeauty from "@/components/home/beauty/NewlyLaunchedProducts";
 import CategoryFavorites from "@/components/home/beauty/CategoryFavorites";
+import AboutTestimonials from "@/components/about/AboutTestimonials";
 import {
   getHeroBanners,
   getHomeProductTypes,
@@ -15,6 +16,7 @@ import {
   getParentCategories,
   getLatestBlogs,
   getCategoriesByBase,
+  getApprovedTestimonials,
 } from "@/lib/homeDataFetcher";
 import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
@@ -75,6 +77,12 @@ const AsyncCategoryFavorites = async () => {
   );
 };
 
+/** Fetches approved reviews then renders testimonials */
+const DeferredTestimonials = async () => {
+  const reviews = await getApprovedTestimonials();
+  return <AboutTestimonials reviews={reviews} />;
+};
+
 export default async function Home({
   params,
 }: {
@@ -96,9 +104,9 @@ export default async function Home({
         <DeferredTopSelling locale={locale} productTypes={productTypes} />
       </Suspense>
 
-      <Suspense fallback={<SectionSkeleton height="h-[520px]" />}>
+      {/* <Suspense fallback={<SectionSkeleton height="h-[520px]" />}>
         <DeferredOurProducts locale={locale} />
-      </Suspense>
+      </Suspense> */}
       <Suspense fallback={<SectionSkeleton height="h-[500px]" />}>
         <AsyncCategoryFavorites />
       </Suspense>
@@ -106,15 +114,19 @@ export default async function Home({
         <TodaysTopOffer locale={locale} />
       </Suspense>
 
-      <Suspense fallback={<SectionSkeleton height="h-[520px]" />}>
+      {/* <Suspense fallback={<SectionSkeleton height="h-[520px]" />}>
         <NewlyLaunchedProductsBeauty locale={locale} />
-      </Suspense>
-      <Suspense fallback={<SectionSkeleton height="h-[500px]" />}>
+      </Suspense> */}
+      {/* <Suspense fallback={<SectionSkeleton height="h-[500px]" />}>
         <MostLovedProducts slug="most-loved-products" locale={locale} />
-      </Suspense>
+      </Suspense> */}
       
       <Suspense fallback={<SectionSkeleton height="h-[400px]" />}>
         <DeferredLatestBlogs locale={locale} />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton height="h-[500px]" />}>
+        <DeferredTestimonials />
       </Suspense>
     </main>
   );

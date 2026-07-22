@@ -33,7 +33,8 @@ const SingleProudctPage = async ({
 
   try {
     const response = await api.get<FullProduct>(PRODUCT_ENDPOINTS.BY_ID(slug), {
-      next: { revalidate: 600 },
+      cache: "no-store",
+      next: { revalidate: 0 },
     });
     product = response.data;
   } catch (err) {

@@ -36,7 +36,7 @@ const QualityPriority = () => {
   return (
     <section className="relative w-full mt-10">
       {/* Full width SVG background spanning behind the section */}
-      <div className="absolute top-0 left-0 w-full h-[450px] z-0 overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-[450px] z-0 overflow-hidden rounded-2xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1728 450"
@@ -45,8 +45,8 @@ const QualityPriority = () => {
           className="w-full h-full object-cover"
         >
           <path
-            d="M1728 402C1728 428.51 1706.51 450 1680 450H48C21.4904 450 0 428.51 0 402V48C0 21.4903 21.4903 0 48 0H464.229C490.65 0 511.137 22.4607 523.036 46.0506C540.075 79.8315 575.081 103 615.5 103H1112.5C1152.92 103 1187.92 79.8315 1204.96 46.0506C1216.86 22.4607 1237.35 0 1263.77 0H1680C1706.51 0 1728 21.4903 1728 48V402Z"
-            fill="#A0E2E0"
+            d="M1728 434C1728 442.837 1720.837 450 1712 450H16C7.163 450 0 442.837 0 434V16C0 7.163 7.163 0 16 0H464.229C490.65 0 511.137 22.4607 523.036 46.0506C540.075 79.8315 575.081 103 615.5 103H1112.5C1152.92 103 1187.92 79.8315 1204.96 46.0506C1216.86 22.4607 1237.35 0 1263.77 0H1712C1719.837 0 1728 7.163 1728 16V434Z"
+            fill="#F4F3F5"
           />
         </svg>
       </div>

@@ -25,6 +25,7 @@ import {
   ShoppingBag,
   ShoppingCart,
   Sliders,
+  Star,
   Store,
   BarChart3,
   Tag,
@@ -566,6 +567,12 @@ function renderNavItems(open: boolean) {
           to="/dashboard/todays-offer"
           icon={<Clock size={20} />}
           label="Today's Offer"
+          open={open}
+        />
+        <NavItem
+          to="/dashboard/reviews"
+          icon={<Star size={20} />}
+          label="Product Reviews"
           open={open}
         />
         <NavItem

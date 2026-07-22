@@ -33,6 +33,7 @@ export const PRODUCT_ENDPOINTS = {
   BASE: "/api/products",
   BY_ID: (id: string) => `/api/products/${id}`,
   REVIEW: (id: string) => `/api/products/${id}/review`,
+  APPROVED_REVIEWS: "/api/products/reviews/approved",
   LIKE_REVIEW: (productId: string, reviewId: string) => `/api/products/${productId}/review/${reviewId}/like`,
   DISLIKE_REVIEW: (productId: string, reviewId: string) => `/api/products/${productId}/review/${reviewId}/dislike`,
   REPLY_REVIEW: (productId: string, reviewId: string) => `/api/products/${productId}/review/${reviewId}/reply`,
@@ -98,6 +99,12 @@ export const CONTACT_ENDPOINTS = {
   BASE: "/api/contacts",
 } as const;
 
+export const SUBSCRIPTION_ENDPOINTS = {
+  BASE: "/api/subscriptions",
+  SUBSCRIBE: "/api/subscriptions/subscribe",
+  UNSUBSCRIBE: "/api/subscriptions/unsubscribe",
+} as const;
+
 export const CURRENCY_ENDPOINTS = {
   BASE: "/api/currencies",
 } as const;
@@ -123,6 +130,8 @@ export const API_ENDPOINTS = {
   NOTIFICATIONS: NOTIFICATION_ENDPOINTS,
   ORDERS: ORDER_ENDPOINTS,
   ADDRESSES: ADDRESS_ENDPOINTS,
+  CONTACTS: CONTACT_ENDPOINTS,
+  SUBSCRIPTIONS: SUBSCRIPTION_ENDPOINTS,
   CURRENCIES: CURRENCY_ENDPOINTS,
 } as const;
 

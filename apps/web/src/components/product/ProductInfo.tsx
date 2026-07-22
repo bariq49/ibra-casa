@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,
@@ -25,6 +26,7 @@ interface ProductInfoProps {
 }
 
 const ProductInfo = ({ product }: ProductInfoProps) => {
+  const router = useRouter();
   const [selectedColor, setSelectedColor] = useState<ProductVariantOption | null>(
     product.colors?.[0] || null,
   );
@@ -316,7 +318,31 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             </button>
           </div>
           <div className="flex sm:flex-row flex-col items-center gap-4 w-full flex-1">
-            <Button className="w-full sm:flex-1 h-12 rounded-[80px] bg-warning hover:bg-warning/90 text-foreground font-semibold text-[16px] shadow-color-warning border-none">
+            <Button
+              onClick={() => {
+                const req = useCartStore
+                  .getState()
+                  .addToCart(
+                    cartProduct,
+                    quantity,
+                    selectedColor,
+                    selectedSize,
+                  );
+                if (req) {
+                  toast.promise(req, {
+                    loading: `Preparing ${product.name}...`,
+                    success: () => {
+                      router.push("/cart");
+                      return `${product.name} ready for checkout`;
+                    },
+                    error: `Failed to buy ${product.name}`,
+                  });
+                } else {
+                  router.push("/cart");
+                }
+              }}
+              className="w-full sm:flex-1 h-12 rounded-[80px] bg-warning hover:bg-warning/90 text-foreground font-semibold text-[16px] shadow-color-warning border-none"
+            >
               Buy Now
             </Button>
             <Button

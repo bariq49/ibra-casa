@@ -337,7 +337,19 @@ const getProductById = asyncHandler(
     }
 
     if (product) {
-      res.json(product);
+      // Public product page: never expose pending reviews or pending replies
+      const productObj = product.toObject();
+      productObj.reviews = (productObj.reviews || [])
+        .filter(
+          (review: { isApproved?: boolean }) => review.isApproved !== false,
+        )
+        .map((review: any) => ({
+          ...review,
+          replies: (review.replies || []).filter(
+            (reply: { isApproved?: boolean }) => reply.isApproved !== false,
+          ),
+        }));
+      res.json(productObj);
     } else {
       res.status(404);
       throw new Error("Product not found");
@@ -731,9 +743,9 @@ const trackProductView = asyncHandler(
   },
 );
 
-// @desc    Add a product review
+// @desc    Add a product review (logged-in or guest)
 // @route   POST /api/products/:id/review
-// @access  Private
+// @access  Public
 const addProductReview = asyncHandler(
   async (req: any, res: Response): Promise<void> => {
     const { rating, comment } = req.body;
@@ -742,11 +754,6 @@ const addProductReview = asyncHandler(
     if (!product) {
       res.status(404);
       throw new Error("Product not found");
-    }
-
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized");
     }
 
     if (!rating || !comment) {
@@ -764,42 +771,97 @@ const addProductReview = asyncHandler(
       product.reviews = [] as any;
     }
 
-    // Check if user already reviewed this product
-    const alreadyReviewed = product.reviews.find(
-      (r) => r.userId.toString() === req.user._id.toString(),
-    );
+    const isAnonymous = Boolean(req.body.isAnonymous);
+    const guestEmail = String(req.body.email || "")
+      .trim()
+      .toLowerCase();
+    const guestName = String(req.body.name || "").trim();
+
+    // Guests (and non-anonymous) must provide name + email
+    if (!req.user && !isAnonymous) {
+      if (!guestName || !guestEmail) {
+        res.status(400);
+        throw new Error("Please provide your name and email");
+      }
+    }
+
+    if (!isAnonymous && guestEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+      res.status(400);
+      throw new Error("Please provide a valid email address");
+    }
+
+    // Prevent duplicate reviews: by userId when logged in, otherwise by email
+    const alreadyReviewed = product.reviews.find((r: any) => {
+      if (req.user && r.userId) {
+        return r.userId.toString() === req.user._id.toString();
+      }
+      if (!isAnonymous && guestEmail && r.userEmail) {
+        return String(r.userEmail).toLowerCase() === guestEmail;
+      }
+      return false;
+    });
 
     if (alreadyReviewed) {
       res.status(400);
       throw new Error("You have already reviewed this product");
     }
 
-    const review = {
-      userId: req.user._id,
-      userName: req.user.name,
+    const displayName = isAnonymous
+      ? "Anonymous"
+      : guestName || req.user?.name || "Customer";
+
+    const review: any = {
+      userName: displayName,
       rating: Number(rating),
       comment,
-      isApproved: true, // Auto-approved based on new requirements
+      isApproved: false, // Pending until admin verifies
       createdAt: new Date(),
       likes: [],
       dislikes: [],
       replies: [],
     };
 
+    if (req.user) {
+      review.userId = req.user._id;
+      if (!isAnonymous) {
+        review.userEmail = guestEmail || req.user.email;
+      }
+    } else if (!isAnonymous && guestEmail) {
+      review.userEmail = guestEmail;
+    }
+
     product.reviews.push(review as any);
-    await product.save();
+
+    // Backfill primary image from gallery if missing (legacy products)
+    if (!product.image && product.images?.length) {
+      product.image = product.images[0];
+    }
+
+    await product.save({ validateModifiedOnly: true });
+
+    // Return the persisted subdocument so the client gets a real `_id`
+    const savedReview = product.reviews[product.reviews.length - 1];
 
     res.status(201).json({
-      message: "Review submitted successfully.",
-      review,
+      message:
+        "Review submitted successfully. It will appear after admin approval.",
+      review: savedReview,
     });
   },
 );
 
-// @desc    Get pending reviews (Admin)
 // @desc    Like or Unlike a product review
 // @route   POST /api/products/:productId/review/:reviewId/like
-// @access  Private
+// @access  Public
+/** Strip pending replies before returning a review to the storefront */
+const sanitizeReviewForPublic = (review: any) => {
+  const obj = review.toObject ? review.toObject() : { ...review };
+  obj.replies = (obj.replies || []).filter(
+    (r: { isApproved?: boolean }) => r.isApproved !== false,
+  );
+  return obj;
+};
+
 const likeProductReview = asyncHandler(
   async (req: any, res: Response): Promise<void> => {
     const product = await Product.findById(req.params.productId as string);
@@ -815,33 +877,37 @@ const likeProductReview = asyncHandler(
       throw new Error("Review not found");
     }
 
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized");
+    const actorId = req.user?._id?.toString() || String(req.body.guestId || "").trim();
+    if (!actorId) {
+      res.status(400);
+      throw new Error("Missing guest id");
     }
 
-    const userId = req.user._id.toString();
-    const hasLiked = review.likes.some((id: any) => id.toString() === userId);
+    if (!review.likes) review.likes = [];
+    if (!review.dislikes) review.dislikes = [];
+
+    // Normalize legacy ObjectId likes to strings
+    review.likes = review.likes.map((id: any) => id.toString());
+    review.dislikes = review.dislikes.map((id: any) => id.toString());
+
+    const hasLiked = review.likes.includes(actorId);
 
     if (hasLiked) {
-      // Unlike
-      review.likes = review.likes.filter((id: any) => id.toString() !== userId);
+      review.likes = review.likes.filter((id: string) => id !== actorId);
     } else {
-      // Like (and safely remove from dislikes if they had disliked previously)
-      review.likes.push(req.user._id);
-      review.dislikes = (review.dislikes || []).filter(
-        (id: any) => id.toString() !== userId
-      );
+      review.likes.push(actorId);
+      review.dislikes = review.dislikes.filter((id: string) => id !== actorId);
     }
 
-    await product.save();
-    res.json({ message: hasLiked ? "Review unliked" : "Review liked", review });
-  }
+    await product.save({ validateModifiedOnly: true });
+    const publicReview = sanitizeReviewForPublic(review);
+    res.json({ message: hasLiked ? "Review unliked" : "Review liked", review: publicReview });
+  },
 );
 
 // @desc    Dislike or un-dislike a product review
 // @route   POST /api/products/:productId/review/:reviewId/dislike
-// @access  Private
+// @access  Public
 const dislikeProductReview = asyncHandler(
   async (req: any, res: Response): Promise<void> => {
     const product = await Product.findById(req.params.productId as string);
@@ -857,41 +923,38 @@ const dislikeProductReview = asyncHandler(
       throw new Error("Review not found");
     }
 
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized");
+    const actorId = req.user?._id?.toString() || String(req.body.guestId || "").trim();
+    if (!actorId) {
+      res.status(400);
+      throw new Error("Missing guest id");
     }
 
-    const userId = req.user._id.toString();
-    const hasDisliked = (review.dislikes || []).some(
-      (id: any) => id.toString() === userId
-    );
+    if (!review.likes) review.likes = [];
+    if (!review.dislikes) review.dislikes = [];
+
+    review.likes = review.likes.map((id: any) => id.toString());
+    review.dislikes = review.dislikes.map((id: any) => id.toString());
+
+    const hasDisliked = review.dislikes.includes(actorId);
 
     if (hasDisliked) {
-      // Un-dislike
-      review.dislikes = review.dislikes.filter(
-        (id: any) => id.toString() !== userId
-      );
+      review.dislikes = review.dislikes.filter((id: string) => id !== actorId);
     } else {
-      // Dislike (and safely remove from likes if they had liked previously)
-      if (!review.dislikes) review.dislikes = [];
-      review.dislikes.push(req.user._id);
-      review.likes = (review.likes || []).filter(
-        (id: any) => id.toString() !== userId
-      );
+      review.dislikes.push(actorId);
+      review.likes = review.likes.filter((id: string) => id !== actorId);
     }
 
-    await product.save();
+    await product.save({ validateModifiedOnly: true });
     res.json({
       message: hasDisliked ? "Review un-disliked" : "Review disliked",
-      review,
+      review: sanitizeReviewForPublic(review),
     });
-  }
+  },
 );
 
 // @desc    Reply to a product review
 // @route   POST /api/products/:productId/review/:reviewId/reply
-// @access  Private
+// @access  Public (guests must provide name + email; replies need admin approval)
 const replyProductReview = asyncHandler(
   async (req: any, res: Response): Promise<void> => {
     const { comment } = req.body;
@@ -908,29 +971,88 @@ const replyProductReview = asyncHandler(
       throw new Error("Review not found");
     }
 
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized");
-    }
-
-    if (!comment) {
+    if (!comment?.trim()) {
       res.status(400);
       throw new Error("Please provide a reply comment");
     }
 
-    const reply = {
-      userId: req.user._id,
-      userName: req.user.name,
-      comment,
+    const isLoggedIn = Boolean(req.user?._id);
+    const guestName = String(req.body.name || "").trim();
+    const guestEmail = String(req.body.email || "")
+      .trim()
+      .toLowerCase();
+
+    if (!isLoggedIn) {
+      if (!guestName || !guestEmail) {
+        res.status(400);
+        throw new Error("Please provide your name and email to reply");
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+        res.status(400);
+        throw new Error("Please provide a valid email address");
+      }
+    }
+
+    const reply: any = {
+      userName: isLoggedIn ? req.user.name : guestName,
+      userEmail: isLoggedIn ? req.user.email : guestEmail,
+      comment: comment.trim(),
+      // Guests always pending; logged-in replies are approved
+      isApproved: isLoggedIn,
       createdAt: new Date(),
     };
 
-    review.replies.push(reply);
-    await product.save();
+    if (isLoggedIn) {
+      reply.userId = req.user._id;
+    }
 
-    res.status(201).json({ message: "Reply added successfully", review });
-  }
+    review.replies.push(reply);
+    await product.save({ validateModifiedOnly: true });
+
+    const savedReply = review.replies[review.replies.length - 1];
+
+    res.status(201).json({
+      message: isLoggedIn
+        ? "Reply added successfully"
+        : "Reply submitted. It will appear after admin approval.",
+      review: sanitizeReviewForPublic(review),
+      reply: savedReply,
+    });
+  },
 );
+
+// Helper to flatten product reviews into admin/public list items
+const mapProductReviews = (
+  products: any[],
+  filter?: (review: any) => boolean,
+) => {
+  const mapped: any[] = [];
+  products.forEach((product) => {
+    product.reviews.forEach((review: any) => {
+      if (filter && !filter(review)) return;
+      mapped.push({
+        productId: product._id,
+        productName: product.name,
+        productImage: product.image,
+        reviewId: review._id,
+        userId: review.userId,
+        userName: review.userName,
+        userEmail: review.userEmail || null,
+        rating: review.rating,
+        comment: review.comment,
+        isApproved: review.isApproved,
+        likesCount: review.likes?.length || 0,
+        dislikesCount: review.dislikes?.length || 0,
+        repliesCount: review.replies?.length || 0,
+        createdAt: review.createdAt,
+      });
+    });
+  });
+  mapped.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+  return mapped;
+};
 
 // @desc    Get all reviews (Admin)
 // @route   GET /api/products/reviews/all
@@ -938,34 +1060,113 @@ const replyProductReview = asyncHandler(
 const getAllReviews = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const products = await Product.find({
-      "reviews.0": { $exists: true }
+      "reviews.0": { $exists: true },
     }).select("name reviews image");
 
-    const allReviews: any[] = [];
+    res.json(mapProductReviews(products));
+  },
+);
+
+// @desc    Get pending reviews (Admin)
+// @route   GET /api/products/reviews/pending
+// @access  Private/Admin
+const getPendingReviews = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const products = await Product.find({
+      reviews: { $elemMatch: { isApproved: false } },
+    }).select("name reviews image");
+
+    res.json(mapProductReviews(products, (review) => !review.isApproved));
+  },
+);
+
+// @desc    Get approved reviews (public + admin)
+// @route   GET /api/products/reviews/approved
+// @access  Public
+const getApprovedReviews = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const products = await Product.find({
+      reviews: { $elemMatch: { isApproved: true } },
+    }).select("name reviews image");
+
+    res.json(mapProductReviews(products, (review) => review.isApproved));
+  },
+);
+
+// @desc    Get pending review replies (Admin)
+// @route   GET /api/products/reviews/replies/pending
+// @access  Private/Admin
+const getPendingReplies = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const products = await Product.find({
+      "reviews.replies": { $elemMatch: { isApproved: false } },
+    }).select("name reviews image");
+
+    const pending: any[] = [];
     products.forEach((product) => {
-      product.reviews.forEach((review) => {
-        allReviews.push({
-          productId: product._id,
-          productName: product.name,
-          productImage: product.image,
-          reviewId: review._id,
-          userId: review.userId,
-          userName: review.userName,
-          rating: review.rating,
-          comment: review.comment,
-          isApproved: review.isApproved,
-          likesCount: (review as any).likes?.length || 0,
-          dislikesCount: (review as any).dislikes?.length || 0,
-          repliesCount: (review as any).replies?.length || 0,
-          createdAt: review.createdAt,
+      product.reviews.forEach((review: any) => {
+        (review.replies || []).forEach((reply: any) => {
+          if (reply.isApproved === false) {
+            pending.push({
+              productId: product._id,
+              productName: product.name,
+              reviewId: review._id,
+              reviewComment: review.comment,
+              replyId: reply._id,
+              userId: reply.userId || null,
+              userName: reply.userName,
+              userEmail: reply.userEmail || null,
+              comment: reply.comment,
+              isApproved: reply.isApproved,
+              createdAt: reply.createdAt,
+            });
+          }
         });
       });
     });
 
-    // Sort by newest first
-    allReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    pending.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    res.json(pending);
+  },
+);
 
-    res.json(allReviews);
+// @desc    Approve/Reject a review reply (Admin)
+// @route   PUT /api/products/:productId/review/:reviewId/reply/:replyId
+// @access  Private/Admin
+const approveReply = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { approve } = req.body;
+    const product = await Product.findById(req.params.productId as string);
+
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    const review = product.reviews.id(req.params.reviewId as string) as any;
+    if (!review) {
+      res.status(404);
+      throw new Error("Review not found");
+    }
+
+    const reply = review.replies.id(req.params.replyId as string) as any;
+    if (!reply) {
+      res.status(404);
+      throw new Error("Reply not found");
+    }
+
+    if (approve) {
+      reply.isApproved = true;
+      await product.save({ validateModifiedOnly: true });
+      res.json({ message: "Reply approved successfully", reply });
+    } else {
+      review.replies.pull(req.params.replyId as string);
+      await product.save({ validateModifiedOnly: true });
+      res.json({ message: "Reply rejected and removed" });
+    }
   },
 );
 
@@ -983,12 +1184,12 @@ const approveReview = asyncHandler(
       if (review) {
         if (approve) {
           review.isApproved = true;
-          await product.save();
+          await product.save({ validateModifiedOnly: true });
           res.json({ message: "Review approved successfully", review });
         } else {
           // Remove the review if rejected
           product.reviews.pull(req.params.reviewId as string);
-          await product.save();
+          await product.save({ validateModifiedOnly: true });
           res.json({ message: "Review rejected and removed" });
         }
       } else {
@@ -1358,6 +1559,10 @@ export {
   dislikeProductReview,
   replyProductReview,
   getAllReviews,
+  getPendingReviews,
+  getApprovedReviews,
+  getPendingReplies,
+  approveReply,
   approveReview,
   getPendingProducts,
   getVendorProducts,

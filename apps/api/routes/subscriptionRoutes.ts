@@ -4,6 +4,8 @@ import {
   unsubscribe,
   getSubscriptions,
   getSubscriptionStats,
+  sendNewsletter,
+  adminUnsubscribeSubscription,
   deleteSubscription,
 } from "../controllers/subscriptionController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
@@ -121,6 +123,62 @@ router.get("/", protect, admin, getSubscriptions);
  *         description: Unauthorized
  */
 router.get("/stats", protect, admin, getSubscriptionStats);
+
+/**
+ * @swagger
+ * /api/subscriptions/send-newsletter:
+ *   post:
+ *     summary: Send newsletter to all active subscribers (Admin only)
+ *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - subject
+ *               - message
+ *             properties:
+ *               subject:
+ *                 type: string
+ *               message:
+ *                 type: string
+ *               html:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Newsletter send completed
+ *       400:
+ *         description: Missing fields or no active subscribers
+ *       401:
+ *         description: Unauthorized
+ */
+router.post("/send-newsletter", protect, admin, sendNewsletter);
+
+/**
+ * @swagger
+ * /api/subscriptions/{id}/unsubscribe:
+ *   patch:
+ *     summary: Unsubscribe a user by ID (Admin only)
+ *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User unsubscribed
+ *       404:
+ *         description: Subscription not found
+ */
+router.patch("/:id/unsubscribe", protect, admin, adminUnsubscribeSubscription);
 
 /**
  * @swagger
