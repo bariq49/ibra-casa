@@ -93,6 +93,57 @@ export const getOrderById = asyncHandler(async (req: any, res: Response) => {
   }
 });
 
+// @desc    Track order by full ID or short display ID
+// @route   GET /api/orders/track/:ref
+// @access  Public — knowing the order ID is enough to view tracking status
+export const trackOrderByReference = asyncHandler(
+  async (req: any, res: Response) => {
+    const raw = String(req.params.ref || "")
+      .trim()
+      .replace(/^#/, "");
+    const ref = raw.toLowerCase();
+
+    if (!ref || !/^[0-9a-f]{4,24}$/i.test(ref)) {
+      res.status(404);
+      throw new Error("Order not found");
+    }
+
+    let order: any = null;
+
+    if (/^[0-9a-f]{24}$/i.test(ref)) {
+      order = await Order.findById(ref).populate("items.productId");
+    } else {
+      // Short display ID — match Mongo ObjectId suffix (case-insensitive)
+      const matches = await Order.aggregate([
+        {
+          $addFields: {
+            idStr: { $toLower: { $toString: "$_id" } },
+          },
+        },
+        {
+          $match: {
+            idStr: { $regex: `${ref}$` },
+          },
+        },
+        { $sort: { createdAt: -1 } },
+        { $limit: 1 },
+      ]);
+
+      if (matches[0]?._id) {
+        order = await Order.findById(matches[0]._id).populate(
+          "items.productId",
+        );
+      }
+    }
+
+    if (!order) {
+      res.status(404);
+      throw new Error("Order not found");
+    }
+
+    res.json(order);
+  },
+);
 export const createCODOrder = asyncHandler(async (req: any, res: Response) => {
   const { items, shippingAddress, guestEmail } = req.body;
   const isGuest = !req.user;
@@ -1089,7 +1140,9 @@ export const getAllOrdersAdmin = asyncHandler(
         { "shippingAddress.emailAddress": { $regex: searchTerm, $options: "i" } },
       ];
 
-      const cleanSearchTerm = searchTerm.replace(/^ORD-/i, "");
+      const cleanSearchTerm = searchTerm
+        .replace(/^#/, "")
+        .replace(/^ORD-/i, "");
       if (cleanSearchTerm.match(/^[0-9a-fA-F]{24}$/)) {
         filter.$or.push({ _id: cleanSearchTerm });
       } else if (cleanSearchTerm.match(/^[0-9a-fA-F]+$/i)) {
@@ -1097,7 +1150,7 @@ export const getAllOrdersAdmin = asyncHandler(
           $expr: {
             $regexMatch: {
               input: { $toString: "$_id" },
-              regex: cleanSearchTerm,
+              regex: `${cleanSearchTerm}$`,
               options: "i",
             },
           },
@@ -1189,7 +1242,7 @@ export const getAllOrdersAdmin = asyncHandler(
 
       return {
       _id: order._id,
-      orderId: `ORD-${order._id.toString().slice(-6).toUpperCase()}`,
+      orderId: order._id.toString().slice(-8).toUpperCase(),
       isGuest: isGuestOrder,
       guestEmail: isGuestOrder ? guestEmail : undefined,
       user: isGuestOrder

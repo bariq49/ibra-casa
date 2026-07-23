@@ -35,6 +35,7 @@ export interface IUserDocument extends Omit<IUser, "_id">, Document {
     quantity: number;
     colorId?: mongoose.Types.ObjectId;
     sizeId?: mongoose.Types.ObjectId;
+    weightId?: mongoose.Types.ObjectId;
   }[];
   orders: mongoose.Types.ObjectId[];
   password?: string;
@@ -169,6 +170,10 @@ const userSchema = new mongoose.Schema<IUserDocument>(
         sizeId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Size",
+        },
+        weightId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Weight",
         },
         quantity: {
           type: Number,

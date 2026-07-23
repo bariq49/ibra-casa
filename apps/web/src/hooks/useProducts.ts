@@ -21,8 +21,24 @@ export interface ApiProduct {
   };
   brand?: { name: string };
   category?: { name: string };
-  colors?: { name: string; value: string; slug: string }[];
-  sizes?: { name: string; value: string; slug: string }[];
+  colors?: {
+    name: string;
+    value: string;
+    slug: string;
+    priceModifier?: number;
+  }[];
+  sizes?: {
+    name: string;
+    value: string;
+    slug: string;
+    priceModifier?: number;
+  }[];
+  weights?: {
+    name: string;
+    value: string;
+    slug: string;
+    priceModifier?: number;
+  }[];
   bg?: string;
   // ... other fields as needed
 }

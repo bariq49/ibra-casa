@@ -5,6 +5,9 @@ const PRODUCT_POPULATE = [
   { path: "category", select: "name slug" },
   { path: "brand", select: "name slug" },
   { path: "productTypes", select: "title name slug" },
+  { path: "sizes", select: "name value slug priceModifier" },
+  { path: "colors", select: "name value slug priceModifier" },
+  { path: "weights", select: "name value slug priceModifier" },
 ];
 
 async function getOrCreateOffer() {

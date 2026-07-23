@@ -16,7 +16,7 @@ import api from "@/lib/api";
 import { useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
 import OrderProcessingModal, { OrderStep } from "./OrderProcessingModal";
-import { calculateProductPrice, calculateVariantPrice } from "@/lib/priceUtils";
+import { getCartLinePrices } from "@/lib/priceUtils";
 import {
   useCartTotalsFromStore,
 } from "@/hooks/useStorePricing";
@@ -58,6 +58,7 @@ const CheckoutClient = ({
   const isLoggedIn = serverIsLoggedIn || clientIsAuth;
   const activeCartItems = checkoutSnapshot || cartItems;
   const {
+    subtotalOriginal,
     subtotalDiscounted,
     totalDiscount,
     vatPercentage,
@@ -171,26 +172,7 @@ const CheckoutClient = ({
         .filter((item: CartItem) => item?.product)
         .map((item: CartItem) => {
           const product = item.product as any;
-          const basePrice =
-            Number(product.price) ||
-            Number(product.oldPrice) ||
-            Number(product.currentPrice) ||
-            0;
-          const discountPercentage =
-            Number(product.discountPercentage) ||
-            Number(product.discount) ||
-            0;
-          const hasModifiers =
-            item.size?.priceModifier != null ||
-            item.color?.priceModifier != null ||
-            (item as any).weight?.priceModifier != null;
-          const { discountedPrice } = hasModifiers
-            ? calculateVariantPrice(basePrice, discountPercentage, {
-                size: item.size,
-                color: item.color,
-                weight: (item as any).weight,
-              })
-            : calculateProductPrice(product);
+          const { discountedPrice } = getCartLinePrices(item);
 
           return {
             _id: product._id || product.id,
@@ -383,7 +365,7 @@ const CheckoutClient = ({
                   .map((item: CartItem, idx: number) => {
                     const product = item.product;
                     const { originalPrice, discountedPrice } =
-                      calculateProductPrice(product);
+                      getCartLinePrices(item);
 
                     return (
                       <div
@@ -446,21 +428,23 @@ const CheckoutClient = ({
                   <div className="flex justify-between items-center font-dm-sans text-[15px] text-light-secondary-text">
                     <span>Sub-Total</span>
                     <span className="text-foreground">
-                      <PriceFormatter amount={subtotalDiscounted} />
+                      <PriceFormatter
+                        amount={
+                          totalDiscount > 0
+                            ? subtotalOriginal
+                            : subtotalDiscounted
+                        }
+                      />
                     </span>
                   </div>
-                  <div className="flex justify-between items-center font-dm-sans text-[15px] text-light-secondary-text">
-                    <span>Discount</span>
-                    <span className="text-error">
-                      {totalDiscount > 0 ? (
-                        <>
-                          -<PriceFormatter amount={totalDiscount} />
-                        </>
-                      ) : (
-                        <PriceFormatter amount={0} />
-                      )}
-                    </span>
-                  </div>
+                  {totalDiscount > 0 && (
+                    <div className="flex justify-between items-center font-dm-sans text-[15px] text-light-secondary-text">
+                      <span>Discount</span>
+                      <span className="text-error">
+                        -<PriceFormatter amount={totalDiscount} />
+                      </span>
+                    </div>
+                  )}
                   {vatPercentage > 0 && (
                     <div className="flex justify-between items-center font-dm-sans text-[15px] text-light-secondary-text">
                       <span>Tax ({vatPercentage}%)</span>

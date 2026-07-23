@@ -359,7 +359,7 @@ export default function VendorDashboard() {
                       className="bg-white border-b border-border/50 hover:bg-grey-50/50 transition-colors last:border-0"
                     >
                       <td className="px-6 py-4 font-medium text-grey-900 whitespace-nowrap">
-                        #ORD-{order._id.slice(-6).toUpperCase()}
+                        #{order._id.slice(-8).toUpperCase()}
                       </td>
                       <td className="px-6 py-4 text-grey-700">
                         {order.customer?.name || "Guest Customer"}
@@ -420,7 +420,7 @@ export default function VendorDashboard() {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <h4 className="font-semibold text-grey-900 text-sm">
-                          #ORD-{order._id.slice(-6).toUpperCase()}
+                          #{order._id.slice(-8).toUpperCase()}
                         </h4>
                         <p className="text-grey-500 text-xs mt-0.5">
                           {order.customer?.name || "Guest Customer"}

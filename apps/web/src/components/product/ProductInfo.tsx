@@ -65,17 +65,32 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   const cartProduct = useMemo(
     () => ({
       id: product._id,
+      _id: product._id,
       title: product.name,
+      name: product.name,
       rating: product.numReviews || 0,
       stars: product.averageRating || 0,
-      currentPrice: variantPricing.discountedPrice,
-      oldPrice: variantPricing.originalPrice,
-      discount: variantPricing.discountPercentage,
+      // Catalog base only — cart applies selected size/color/weight modifiers once
+      basePrice: product.price,
+      price: product.price,
+      oldPrice: product.price,
+      discount: product.discountPercentage || 0,
+      discountPercentage: product.discountPercentage || 0,
       image: product.image,
       slug: product.slug,
+      stock: product.stock,
+    }),
+    [product],
+  );
+
+  const wishlistProduct = useMemo(
+    () => ({
+      ...cartProduct,
+      currentPrice: variantPricing.discountedPrice,
+      oldPrice: variantPricing.originalPrice,
       price: variantPricing.originalPrice,
     }),
-    [product, variantPricing],
+    [cartProduct, variantPricing],
   );
 
   const incrementQty = () => {
@@ -92,7 +107,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
       removeFromCompare(product._id);
       toast.info(`${product.name} removed from compare`);
     } else {
-      addToCompare(cartProduct);
+      addToCompare(wishlistProduct);
       toast.success(`${product.name} added to compare`);
     }
   };
@@ -138,7 +153,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             )}
           </div>
           <div className="shrink-0">
-            <WishlistBtn product={cartProduct} />
+            <WishlistBtn product={wishlistProduct} />
           </div>
         </div>
 

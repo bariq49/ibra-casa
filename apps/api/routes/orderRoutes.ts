@@ -2,6 +2,7 @@ import express from "express";
 import {
   getOrders,
   getOrderById,
+  trackOrderByReference,
   createOrderFromCart,
   createCODOrder,
   updateOrderStatus,
@@ -233,6 +234,9 @@ router.route("/").get(protect, getOrders).post(optionalAuth, createOrderFromCart
  *         description: Unauthorized
  */
 router.route("/cod").post(optionalAuth, createCODOrder);
+
+// Public / optional-auth order tracking (full or short ID) — must be before /:id
+router.route("/track/:ref").get(optionalAuth, trackOrderByReference);
 
 /**
  * @swagger

@@ -77,7 +77,8 @@ export default function OrderSingleView({
 
   const handleExportPDF = () => {
     const doc = new jsPDF();
-    const orderId = order?.orderId || order?._id?.substring(0, 8);
+    const orderId =
+      order?.orderId || order?._id?.slice(-8)?.toUpperCase() || "N/A";
 
     // Header
     doc.setFont("helvetica", "bold");
@@ -225,7 +226,7 @@ export default function OrderSingleView({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <span className="text-xl font-bold text-gray-900">
-                      #{order?.orderId || order?._id?.substring(0, 8)}
+                      #{order?.orderId || order?._id?.slice(-8).toUpperCase()}
                     </span>
                     <div className="flex gap-2">
                       <Badge

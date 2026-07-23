@@ -2459,7 +2459,9 @@ export default function OrdersPage({ isDashboard = true }: OrdersPageProps) {
                             />
                           </TableCell>
                           <TableCell className="text-sm font-medium text-gray-900 py-4">
-                            #{order.orderId || order._id?.substring(0, 8)}
+                            #
+                            {order.orderId ||
+                              order._id?.slice(-8).toUpperCase()}
                           </TableCell>
                           <TableCell className="py-4">
                             <div className="flex items-center gap-2">
@@ -2643,7 +2645,10 @@ export default function OrdersPage({ isDashboard = true }: OrdersPageProps) {
                           />
                           <div>
                             <p className="font-semibold text-lg">
-                              {order.orderId || "N/A"}
+                              #
+                              {order.orderId ||
+                                order._id?.slice(-8).toUpperCase() ||
+                                "N/A"}
                             </p>
                             <p className="text-sm text-grey-500">
                               {new Date(order.createdAt).toLocaleDateString()}

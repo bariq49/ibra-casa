@@ -31,7 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import PriceFormatter from "@/components/common/products/PriceFormatter";
-import { calculateProductPrice, calculateVariantPrice } from "@/lib/priceUtils";
+import { getCartLinePrices } from "@/lib/priceUtils";
 import {
   useCartTotalsFromStore,
   useStorePricingOptions,
@@ -47,6 +47,7 @@ const CartClient = () => {
   const [coupon, setCoupon] = useState("");
   const storePricing = useStorePricingOptions();
   const {
+    subtotalOriginal,
     subtotalDiscounted,
     totalDiscount,
     vatPercentage,
@@ -189,27 +190,8 @@ const CartClient = () => {
                   {cartItems
                     .filter((item) => item?.product)
                     .map((item, idx) => {
-                      const product = item.product as any;
-                      const basePrice =
-                        Number(product.price) ||
-                        Number(product.oldPrice) ||
-                        Number(product.currentPrice) ||
-                        0;
-                      const discountPercentage =
-                        Number(product.discountPercentage) ||
-                        Number(product.discount) ||
-                        0;
-                      const hasModifiers =
-                        item.size?.priceModifier != null ||
-                        item.color?.priceModifier != null ||
-                        (item as any).weight?.priceModifier != null;
-                      const { originalPrice, discountedPrice } = hasModifiers
-                        ? calculateVariantPrice(basePrice, discountPercentage, {
-                            size: item.size,
-                            color: item.color,
-                            weight: (item as any).weight,
-                          })
-                        : calculateProductPrice(item.product);
+                      const { originalPrice, discountedPrice } =
+                        getCartLinePrices(item);
                       const pStars =
                         (item.product as any).averageRating ||
                         item.product.stars ||
@@ -260,6 +242,20 @@ const CartClient = () => {
                                       ? item.product.category
                                       : "General")}
                                 </p>
+                                {(item.color || item.size || item.weight) && (
+                                  <p className="font-dm-sans text-[14px] leading-[22px] text-light-secondary-text">
+                                    {[
+                                      item.color?.name &&
+                                        `Color: ${item.color.name}`,
+                                      item.size?.name &&
+                                        `Size: ${item.size.name}`,
+                                      item.weight?.name &&
+                                        `Weight: ${item.weight.name}`,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" · ")}
+                                  </p>
+                                )}
                                 <p className="font-dm-sans text-[14px] leading-[22px] text-light-secondary-text">
                                   Available: {(item.product as any).stock || 0}
                                 </p>
@@ -416,21 +412,21 @@ const CartClient = () => {
                 <div className="flex justify-between items-center font-dm-sans text-[16px] text-light-secondary-text">
                   <span>Sub-Total</span>
                   <span className="text-light-primary-text font-medium">
-                    <PriceFormatter amount={subtotalDiscounted} />
+                    <PriceFormatter
+                      amount={
+                        totalDiscount > 0 ? subtotalOriginal : subtotalDiscounted
+                      }
+                    />
                   </span>
                 </div>
-                <div className="flex justify-between items-center font-dm-sans text-[16px] text-light-secondary-text">
-                  <span>Discount</span>
-                  <span className="text-error font-medium">
-                    {totalDiscount > 0 ? (
-                      <>
-                        -<PriceFormatter amount={totalDiscount} />
-                      </>
-                    ) : (
-                      <PriceFormatter amount={0} />
-                    )}
-                  </span>
-                </div>
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between items-center font-dm-sans text-[16px] text-light-secondary-text">
+                    <span>Discount</span>
+                    <span className="text-error font-medium">
+                      -<PriceFormatter amount={totalDiscount} />
+                    </span>
+                  </div>
+                )}
                 {vatPercentage > 0 && (
                   <div className="flex justify-between items-center font-dm-sans text-[16px] text-light-secondary-text">
                     <span>Tax ({vatPercentage}%)</span>

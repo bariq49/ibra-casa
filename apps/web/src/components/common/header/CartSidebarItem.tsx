@@ -9,7 +9,7 @@ import Link from "next/link";
 import PriceFormatter from "../products/PriceFormatter";
 import { toast } from "sonner";
 
-import { calculateProductPrice, calculateVariantPrice } from "@/lib/priceUtils";
+import { getCartLinePrices } from "@/lib/priceUtils";
 
 interface Props {
   item: CartItem;
@@ -28,27 +28,7 @@ const CartSidebarItem = ({ item, onCartClose }: Props) => {
   const pImage = item.product.image || (item.product as any).images?.[0] || "/images/placeholder.png";
   const pSlug = item.product.slug || item.product.id || "";
 
-  const product = item.product as any;
-  const basePrice =
-    Number(product.price) ||
-    Number(product.oldPrice) ||
-    Number(product.currentPrice) ||
-    0;
-  const discountPercentage =
-    Number(product.discountPercentage) || Number(product.discount) || 0;
-
-  const hasModifiers =
-    item.size?.priceModifier != null ||
-    item.color?.priceModifier != null ||
-    (item as any).weight?.priceModifier != null;
-
-  const { originalPrice, discountedPrice } = hasModifiers
-    ? calculateVariantPrice(basePrice, discountPercentage, {
-        size: item.size,
-        color: item.color,
-        weight: (item as any).weight,
-      })
-    : calculateProductPrice(product);
+  const { originalPrice, discountedPrice } = getCartLinePrices(item);
 
   return (
     <div

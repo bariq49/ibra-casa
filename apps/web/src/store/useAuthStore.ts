@@ -53,10 +53,16 @@ const syncUserData = async () => {
     if (cartRes.data?.success && cartRes.data.cart) {
       const formattedCart = cartRes.data.cart.map((item: any) => ({
         id: item._id || item.id || item.productId._id,
-        product: item.productId,
+        product: item.productId
+          ? {
+              ...item.productId,
+              basePrice: item.productId.basePrice ?? item.productId.price,
+            }
+          : item.productId,
         quantity: item.quantity,
         color: item.colorId,
         size: item.sizeId,
+        weight: item.weightId,
       }));
       useCartStore.getState().setCartItems(formattedCart);
     }

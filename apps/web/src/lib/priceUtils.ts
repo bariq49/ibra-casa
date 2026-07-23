@@ -9,6 +9,21 @@ export type VariantOption = {
   priceModifier?: number;
 };
 
+function isPopulatedVariant(value: unknown): value is VariantOption {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    ("name" in value || "priceModifier" in value || "slug" in value)
+  );
+}
+
+function firstPopulatedVariant(
+  values: unknown[] | undefined | null,
+): VariantOption | null {
+  if (!Array.isArray(values)) return null;
+  return values.find(isPopulatedVariant) ?? null;
+}
+
 /** Price for a product base + selected size/color/weight modifiers. */
 export function calculateVariantPrice(
   basePrice: number,
@@ -61,16 +76,15 @@ export function calculateProductPrice(product: any): PriceDetails {
   const discountPercentage =
     Number(product.discountPercentage) || Number(product.discount) || 0;
 
-  const hasVariantOptions =
-    (Array.isArray(product.sizes) && product.sizes.length > 0) ||
-    (Array.isArray(product.colors) && product.colors.length > 0) ||
-    (Array.isArray(product.weights) && product.weights.length > 0);
+  const defaultSize = firstPopulatedVariant(product.sizes);
+  const defaultColor = firstPopulatedVariant(product.colors);
+  const defaultWeight = firstPopulatedVariant(product.weights);
 
-  if (hasVariantOptions) {
+  if (defaultSize || defaultColor || defaultWeight) {
     return calculateVariantPrice(basePrice, discountPercentage, {
-      size: product.sizes?.[0] ?? null,
-      color: product.colors?.[0] ?? null,
-      weight: product.weights?.[0] ?? null,
+      size: defaultSize,
+      color: defaultColor,
+      weight: defaultWeight,
     });
   }
 
@@ -116,6 +130,76 @@ export type CartTotalsOptions = {
 };
 
 /**
+ * Resolve unit prices for a cart line.
+ * Catalog base (`basePrice` or `price`) + selected size/color/weight modifiers.
+ */
+export function getCartLinePrices(item: {
+  product?: any;
+  size?: VariantOption | null;
+  color?: VariantOption | null;
+  weight?: VariantOption | null;
+}): PriceDetails {
+  const product = item?.product;
+  if (!product) {
+    return {
+      originalPrice: 0,
+      discountedPrice: 0,
+      discountAmount: 0,
+      discountPercentage: 0,
+    };
+  }
+
+  const discountPercentage =
+    Number(product.discountPercentage) || Number(product.discount) || 0;
+
+  const hasLineModifiers =
+    item.size != null || item.color != null || item.weight != null;
+
+  if (hasLineModifiers) {
+    // Explicit catalog base from PDP add-to-cart
+    if (Number(product.basePrice) > 0) {
+      return calculateVariantPrice(
+        Number(product.basePrice),
+        discountPercentage,
+        {
+          size: item.size,
+          color: item.color,
+          weight: item.weight,
+        },
+      );
+    }
+
+    // Legacy slim snapshots baked the variant total into price/currentPrice
+    // (no catalog basePrice, but currentPrice is set and no full product arrays)
+    const isBakedLegacySnapshot =
+      product.currentPrice != null &&
+      !Array.isArray(product.sizes) &&
+      !Array.isArray(product.colors) &&
+      !Array.isArray(product.weights);
+
+    if (isBakedLegacySnapshot) {
+      return calculateProductPrice({
+        ...product,
+        sizes: undefined,
+        colors: undefined,
+        weights: undefined,
+      });
+    }
+
+    // Server-synced / catalog product: `price` is base — apply line modifiers
+    const catalogBase =
+      Number(product.price) || Number(product.oldPrice) || 0;
+    return calculateVariantPrice(catalogBase, discountPercentage, {
+      size: item.size,
+      color: item.color,
+      weight: item.weight,
+    });
+  }
+
+  return calculateProductPrice(product);
+}
+
+/**
  * Global utility to calculate cart totals (Subtotal, Discount, VAT, Shipping, Total)
  */
 export function calculateCartTotals(
@@ -128,29 +212,7 @@ export function calculateCartTotals(
 
   cartItems.forEach((item) => {
     if (item?.product) {
-      const product = item.product;
-      const basePrice =
-        Number(product.price) ||
-        Number(product.oldPrice) ||
-        Number(product.currentPrice) ||
-        0;
-      const discountPercentage =
-        Number(product.discountPercentage) || Number(product.discount) || 0;
-
-      // Prefer line variant modifiers when present; otherwise fall back to stored product pricing
-      const hasModifiers =
-        item.size?.priceModifier != null ||
-        item.color?.priceModifier != null ||
-        item.weight?.priceModifier != null;
-
-      const prices = hasModifiers
-        ? calculateVariantPrice(basePrice, discountPercentage, {
-            size: item.size,
-            color: item.color,
-            weight: item.weight,
-          })
-        : calculateProductPrice(product);
-
+      const prices = getCartLinePrices(item);
       const qty = Number(item.quantity) || 1;
       subtotalOriginal += prices.originalPrice * qty;
       subtotalDiscounted += prices.discountedPrice * qty;

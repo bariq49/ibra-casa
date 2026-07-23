@@ -15,7 +15,8 @@ const populateCart = async (user: IUserDocument) => {
       }
     },
     { path: "cart.colorId", model: "Color" },
-    { path: "cart.sizeId", model: "Size" }
+    { path: "cart.sizeId", model: "Size" },
+    { path: "cart.weightId", model: "Weight" },
   ]);
 };
 
@@ -70,7 +71,7 @@ export const getCart = asyncHandler(async (req: any, res: Response) => {
 // @route   POST /api/cart
 // @access  Private
 export const addItemToCart = asyncHandler(async (req: any, res: Response) => {
-  const { productId, quantity = 1, colorId, sizeId } = req.body;
+  const { productId, quantity = 1, colorId, sizeId, weightId } = req.body;
 
   if (!req.user) {
     res.status(401);
@@ -103,9 +104,16 @@ export const addItemToCart = asyncHandler(async (req: any, res: Response) => {
   // Check if identical item (same product & exact variant) already exists in cart
   const existingItemIndex = user.cart.findIndex((item) => {
     const matchProduct = item.productId.toString() === productId;
-    const matchColor = colorId ? item.colorId?.toString() === colorId : !item.colorId;
-    const matchSize = sizeId ? item.sizeId?.toString() === sizeId : !item.sizeId;
-    return matchProduct && matchColor && matchSize;
+    const matchColor = colorId
+      ? item.colorId?.toString() === colorId
+      : !item.colorId;
+    const matchSize = sizeId
+      ? item.sizeId?.toString() === sizeId
+      : !item.sizeId;
+    const matchWeight = weightId
+      ? (item as any).weightId?.toString() === weightId
+      : !(item as any).weightId;
+    return matchProduct && matchColor && matchSize && matchWeight;
   });
 
   if (existingItemIndex > -1) {
@@ -134,6 +142,7 @@ export const addItemToCart = asyncHandler(async (req: any, res: Response) => {
     };
     if (colorId) newItem.colorId = colorId;
     if (sizeId) newItem.sizeId = sizeId;
+    if (weightId) newItem.weightId = weightId;
 
     user.cart.push(newItem);
   }
