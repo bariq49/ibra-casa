@@ -328,6 +328,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                     quantity,
                     selectedColor,
                     selectedSize,
+                    selectedWeight,
                   );
                 if (req) {
                   toast.promise(req, {
@@ -355,6 +356,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                     quantity,
                     selectedColor,
                     selectedSize,
+                    selectedWeight,
                   );
                 if (req) {
                   toast.promise(req, {

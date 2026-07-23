@@ -89,12 +89,24 @@ export default async function OrderSuccessPage({
       0,
     ) ||
     0;
-  const displayTax = order.tax || 0;
-  // If order was created before shipping was tracked on the root order document, try to deduce it:
+  const displayTax = Number(order.tax) || 0;
   const displayShipping =
     order.shipping !== undefined
       ? order.shipping
       : Math.max(0, order.total - computedSubtotal - displayTax);
+
+  // Prefer rate saved on the order; fall back to tax ÷ subtotal for older orders
+  const rawTaxRate =
+    typeof order.taxRate === "number" && order.taxRate > 0
+      ? order.taxRate
+      : computedSubtotal > 0 && displayTax > 0
+        ? displayTax / computedSubtotal
+        : 0;
+  const vatPercentage = Math.round(rawTaxRate * 10000) / 100; // e.g. 2 or 2.5
+  const vatLabel =
+    vatPercentage % 1 === 0
+      ? String(vatPercentage)
+      : vatPercentage.toFixed(2).replace(/\.?0+$/, "");
 
   return (
     <div className="min-h-screen pb-16">
@@ -264,7 +276,7 @@ export default async function OrderSuccessPage({
                 </div>
                 <button
                   type="button"
-                  className="h-[52px] mt-2 px-10 bg-sellzy-teal hover:bg-primary-dark text-white font-dm-sans font-bold text-[16px] rounded-[80px] shadow-sm transition-all w-fit"
+                  className="h-[52px] mt-2 px-10 bg-primary-light hover:brightness-95 text-foreground font-dm-sans font-bold text-[16px] rounded-[80px] shadow-sm transition-all w-fit"
                 >
                   Send Now
                 </button>
@@ -324,14 +336,14 @@ export default async function OrderSuccessPage({
                     <PriceFormatter amount={computedSubtotal} />
                   </span>
                 </div>
-                <div className="flex justify-between items-center font-dm-sans text-[15px] text-light-secondary-text">
-                  <span>
-                    VAT ( {process.env.NEXT_PUBLIC_VAT_PERCENTAGE || 0}% )
-                  </span>
-                  <span className="text-light-primary-text font-medium">
-                    <PriceFormatter amount={displayTax} />
-                  </span>
-                </div>
+                {displayTax > 0 && (
+                  <div className="flex justify-between items-center font-dm-sans text-[15px] text-light-secondary-text">
+                    <span>VAT ({vatLabel}%)</span>
+                    <span className="text-light-primary-text font-medium">
+                      <PriceFormatter amount={displayTax} />
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center font-dm-sans text-[15px] text-light-secondary-text">
                   <span>Shipment</span>
                   <span className="text-light-primary-text font-medium">
@@ -349,7 +361,7 @@ export default async function OrderSuccessPage({
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 mt-4">
+              {/* <div className="flex flex-col gap-3 mt-4">
                 <Link href={`/user/orders/${order._id}`} className="w-full">
                   <button className="w-full h-[52px] bg-primary hover:bg-primary-dark text-white font-dm-sans font-bold text-[16px] rounded-[80px] transition-all flex items-center justify-center gap-2">
                     Track Order
@@ -360,14 +372,14 @@ export default async function OrderSuccessPage({
                     View All Orders <ArrowRight className="w-5 h-5" />
                   </button>
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
       </Container>
 
       {/* Features Banner representing Free Shipping, 24x7 Support, etc. extracted from Figma Layout */}
-      <QualityPriority />
+      {/* <QualityPriority /> */}
     </div>
   );
 }

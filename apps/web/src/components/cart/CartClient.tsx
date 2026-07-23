@@ -31,7 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import PriceFormatter from "@/components/common/products/PriceFormatter";
-import { calculateProductPrice } from "@/lib/priceUtils";
+import { calculateProductPrice, calculateVariantPrice } from "@/lib/priceUtils";
 import {
   useCartTotalsFromStore,
   useStorePricingOptions,
@@ -189,8 +189,27 @@ const CartClient = () => {
                   {cartItems
                     .filter((item) => item?.product)
                     .map((item, idx) => {
-                      const { originalPrice, discountedPrice } =
-                        calculateProductPrice(item.product);
+                      const product = item.product as any;
+                      const basePrice =
+                        Number(product.price) ||
+                        Number(product.oldPrice) ||
+                        Number(product.currentPrice) ||
+                        0;
+                      const discountPercentage =
+                        Number(product.discountPercentage) ||
+                        Number(product.discount) ||
+                        0;
+                      const hasModifiers =
+                        item.size?.priceModifier != null ||
+                        item.color?.priceModifier != null ||
+                        (item as any).weight?.priceModifier != null;
+                      const { originalPrice, discountedPrice } = hasModifiers
+                        ? calculateVariantPrice(basePrice, discountPercentage, {
+                            size: item.size,
+                            color: item.color,
+                            weight: (item as any).weight,
+                          })
+                        : calculateProductPrice(item.product);
                       const pStars =
                         (item.product as any).averageRating ||
                         item.product.stars ||

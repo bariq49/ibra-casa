@@ -43,6 +43,9 @@ export function calculateVariantPrice(
 /**
  * Global utility to calculate product prices accurately from various fallback models.
  * Ensures identical price structures across Product Cards, Cart, Checkout, and Success.
+ *
+ * When size/color/weight options are present, uses the same default selection as the
+ * product detail page (first of each) so listing cards match the PDP starting price.
  */
 export function calculateProductPrice(product: any): PriceDetails {
   if (!product) {
@@ -54,27 +57,42 @@ export function calculateProductPrice(product: any): PriceDetails {
     };
   }
 
-  // 1. Detect base original price
-  const pOldPrice = product.price || product.oldPrice || 0;
+  const basePrice = Number(product.price) || Number(product.oldPrice) || 0;
+  const discountPercentage =
+    Number(product.discountPercentage) || Number(product.discount) || 0;
 
-  // 2. Detect discount percentage
-  const pDiscountPercentage = product.discountPercentage || product.discount || 0;
+  const hasVariantOptions =
+    (Array.isArray(product.sizes) && product.sizes.length > 0) ||
+    (Array.isArray(product.colors) && product.colors.length > 0) ||
+    (Array.isArray(product.weights) && product.weights.length > 0);
 
-  // 3. Determine definitive discounted price
-  let pCurrentPrice = product.currentPrice;
-  if (pCurrentPrice === undefined || pCurrentPrice === null) {
-    pCurrentPrice = parseFloat((pOldPrice * (1 - pDiscountPercentage / 100)).toFixed(2));
+  if (hasVariantOptions) {
+    return calculateVariantPrice(basePrice, discountPercentage, {
+      size: product.sizes?.[0] ?? null,
+      color: product.colors?.[0] ?? null,
+      weight: product.weights?.[0] ?? null,
+    });
   }
 
-  // If product just has a currentPrice and no oldPrice, make oldPrice match currentPrice to prevent negative discounts
-  const definitiveOriginalPrice = pOldPrice < pCurrentPrice ? pCurrentPrice : pOldPrice;
-  const definitiveDiscountAmount = parseFloat((definitiveOriginalPrice - pCurrentPrice).toFixed(2));
+  // Slim product objects (e.g. cart lines) without variant arrays
+  let pCurrentPrice = product.currentPrice;
+  if (pCurrentPrice === undefined || pCurrentPrice === null) {
+    pCurrentPrice = parseFloat(
+      (basePrice * (1 - discountPercentage / 100)).toFixed(2),
+    );
+  }
+
+  const definitiveOriginalPrice =
+    basePrice < pCurrentPrice ? pCurrentPrice : basePrice;
+  const definitiveDiscountAmount = parseFloat(
+    (definitiveOriginalPrice - pCurrentPrice).toFixed(2),
+  );
 
   return {
     originalPrice: definitiveOriginalPrice,
     discountedPrice: pCurrentPrice,
     discountAmount: definitiveDiscountAmount > 0 ? definitiveDiscountAmount : 0,
-    discountPercentage: pDiscountPercentage,
+    discountPercentage,
   };
 }
 

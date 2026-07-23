@@ -20,15 +20,15 @@ const TopHeader = () => {
       <div className={`${PAGE_X} py-0.5`}>
         <div className="flex flex-col xl:flex-row items-center justify-between gap-y-0 min-h-0">
           <div className="xl:flex items-center gap-x-6 hidden">
-            <p className="flex items-center gap-x-2 text-foreground text-xs font-normal leading-none line-clamp-1">
+            <p className="flex items-center gap-x-2 text-foreground text-sm font-normal leading-none line-clamp-1">
               <span>
-                <Headset className="size-3.5 text-foreground" />
+                <Headset className="size-4 text-foreground" />
               </span>
               {t("needSupport")}
               <span>{t("callUs")}</span>
               <Link
                 href="tel:(480)555-0103"
-                className="bg-warning py-0.5 px-2 text-[11px] leading-none rounded-[60px] text-foreground font-medium"
+                className="bg-warning py-0.5 px-2.5 text-sm leading-none rounded-[60px] text-foreground font-medium"
               >
                 (480) 555-0103
               </Link>

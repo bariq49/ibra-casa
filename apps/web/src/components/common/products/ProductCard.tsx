@@ -39,8 +39,27 @@ export interface Product {
   available?: number;
   description?: string;
   brand?: string | { name: string; slug?: string; _id?: string };
-  colors?: { name: string; value: string; slug: string; _id?: string }[];
-  sizes?: { name: string; value: string; slug: string; _id?: string }[];
+  colors?: {
+    name: string;
+    value: string;
+    slug: string;
+    _id?: string;
+    priceModifier?: number;
+  }[];
+  sizes?: {
+    name: string;
+    value: string;
+    slug: string;
+    _id?: string;
+    priceModifier?: number;
+  }[];
+  weights?: {
+    name: string;
+    value: string;
+    slug: string;
+    _id?: string;
+    priceModifier?: number;
+  }[];
 }
 
 export interface ProductCardProps {

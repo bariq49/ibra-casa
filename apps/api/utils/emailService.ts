@@ -32,6 +32,12 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
+/** Short display order ID (last 8 chars), matches storefront success / tracking pages. */
+const formatOrderDisplayId = (orderId: string | { toString(): string }): string => {
+  const id = String(orderId);
+  return id.substring(Math.max(0, id.length - 8)).toUpperCase();
+};
+
 const brandFrom = () =>
   `"${BRAND.name}" <${
     process.env.SENDER_EMAIL_ADDRESS || "noor.jsdivs@gmail.com"
@@ -41,10 +47,11 @@ const brandFrom = () =>
 const generateOrderEmailHTML = (userName: string, order: IOrder): string => {
   const isDelivered = order.status === "delivered";
   const emailTitle = isDelivered ? "Order Delivered" : "Order Confirmation";
+  const displayOrderId = formatOrderDisplayId(order._id);
   const emailMessage =
     order.status === "delivered"
-      ? `Great news! Your order #${order._id} has been delivered.`
-      : `Thank you for your order! Your order #${order._id} has been confirmed.`;
+      ? `Great news! Your order #${displayOrderId} has been delivered.`
+      : `Thank you for your order! Your order #${displayOrderId} has been confirmed.`;
 
   const subtotal = order.items.reduce((acc, item) => {
     return acc + item.price * item.quantity;
@@ -124,9 +131,7 @@ const generateOrderEmailHTML = (userName: string, order: IOrder): string => {
                       <tr>
                         <td>
                           <div style="font-size: 13px; color: ${BRAND.muted}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Order Number</div>
-                          <div style="font-size: 18px; font-weight: 700; color: ${BRAND.dark};">#${
-                            order._id
-                          }</div>
+                          <div style="font-size: 18px; font-weight: 700; color: ${BRAND.dark};">#${displayOrderId}</div>
                         </td>
                         <td align="right">
                           <div style="font-size: 13px; color: ${BRAND.muted}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Status</div>
@@ -440,9 +445,10 @@ const generateOrderEmailContent = (
 ): { subject: string; message: string } => {
   const isDelivered = order.status === "delivered";
   const emailTitle = isDelivered ? "Order Delivered" : "Order Confirmation";
+  const displayOrderId = formatOrderDisplayId(order._id);
   const emailMessage = isDelivered
-    ? `Great news! Your order #${order._id} has been delivered! We hope you love your purchase.`
-    : `Thank you for your order! Your order #${order._id} has been confirmed and is now being prepared for shipment. We'll keep you updated every step of the way.`;
+    ? `Great news! Your order #${displayOrderId} has been delivered! We hope you love your purchase.`
+    : `Thank you for your order! Your order #${displayOrderId} has been confirmed and is now being prepared for shipment. We'll keep you updated every step of the way.`;
 
   const subtotal = order.items.reduce((acc, item) => {
     return acc + item.price * item.quantity;
@@ -463,14 +469,14 @@ const generateOrderEmailContent = (
     .join("\n");
 
   return {
-    subject: `${emailTitle} #${order._id} - ${BRAND.name}`,
+    subject: `${emailTitle} #${displayOrderId} - ${BRAND.name}`,
     message: `
 Hi ${userName},
 
 ${emailMessage}
 
 Order Details:
-- Order Number: #${order._id}
+- Order Number: #${displayOrderId}
 - Status: ${order.status}
 
 Items Ordered:

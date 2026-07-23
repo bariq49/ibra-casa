@@ -8,6 +8,7 @@ export interface IOrderDocument
   items: IOrderItem[];
   subtotal: number;
   tax: number;
+  taxRate?: number;
   shipping: number;
   paymentStatus: "pending" | "paid" | "failed" | "refunded" | "cod_collected";
   paymentMethod: "stripe" | "cod";
@@ -121,6 +122,10 @@ const orderSchema = new mongoose.Schema<IOrderDocument>(
       default: 0,
     },
     tax: {
+      type: Number,
+      default: 0,
+    },
+    taxRate: {
       type: Number,
       default: 0,
     },

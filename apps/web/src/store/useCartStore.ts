@@ -11,6 +11,7 @@ export interface CartItem {
   quantity: number;
   color?: any;
   size?: any;
+  weight?: any;
 }
 
 interface CartStore {
@@ -20,6 +21,7 @@ interface CartStore {
     quantity?: number,
     color?: any,
     size?: any,
+    weight?: any,
   ) => Promise<any> | null;
   removeFromCart: (cartItemId: string | number) => Promise<any> | null;
   updateQuantity: (
@@ -41,9 +43,9 @@ export const useCartStore = create<CartStore>()(
 
       setCartItems: (items) => set({ cartItems: items }),
 
-      addToCart: (product, quantity = 1, color, size) => {
+      addToCart: (product, quantity = 1, color, size, weight) => {
         const pId = (product as any)._id || product.id;
-        const pseudoId = `${pId}-${color?._id || "default"}-${size?._id || "default"}`;
+        const pseudoId = `${pId}-${color?._id || "default"}-${size?._id || "default"}-${weight?._id || "default"}`;
 
         set((state) => {
           const existingItem = state.cartItems.find(
@@ -51,7 +53,8 @@ export const useCartStore = create<CartStore>()(
               item.id === pseudoId ||
               (item.product._id === pId &&
                 item.color?._id === color?._id &&
-                item.size?._id === size?._id),
+                item.size?._id === size?._id &&
+                item.weight?._id === weight?._id),
           );
           if (existingItem) {
             return {
@@ -65,7 +68,7 @@ export const useCartStore = create<CartStore>()(
           return {
             cartItems: [
               ...state.cartItems,
-              { id: pseudoId, product, quantity, color, size },
+              { id: pseudoId, product, quantity, color, size, weight },
             ],
           };
         });
@@ -78,6 +81,7 @@ export const useCartStore = create<CartStore>()(
           quantity,
           ...(color && { colorId: color._id }),
           ...(size && { sizeId: size._id }),
+          ...(weight && { weightId: weight._id }),
         });
 
         req.catch((error) => {

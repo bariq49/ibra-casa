@@ -16,7 +16,7 @@ import api from "@/lib/api";
 import { useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
 import OrderProcessingModal, { OrderStep } from "./OrderProcessingModal";
-import { calculateProductPrice } from "@/lib/priceUtils";
+import { calculateProductPrice, calculateVariantPrice } from "@/lib/priceUtils";
 import {
   useCartTotalsFromStore,
 } from "@/hooks/useStorePricing";
@@ -170,8 +170,27 @@ const CheckoutClient = ({
       const itemsPayload = cartItems
         .filter((item: CartItem) => item?.product)
         .map((item: CartItem) => {
-          const product = item.product;
-          const { discountedPrice } = calculateProductPrice(product);
+          const product = item.product as any;
+          const basePrice =
+            Number(product.price) ||
+            Number(product.oldPrice) ||
+            Number(product.currentPrice) ||
+            0;
+          const discountPercentage =
+            Number(product.discountPercentage) ||
+            Number(product.discount) ||
+            0;
+          const hasModifiers =
+            item.size?.priceModifier != null ||
+            item.color?.priceModifier != null ||
+            (item as any).weight?.priceModifier != null;
+          const { discountedPrice } = hasModifiers
+            ? calculateVariantPrice(basePrice, discountPercentage, {
+                size: item.size,
+                color: item.color,
+                weight: (item as any).weight,
+              })
+            : calculateProductPrice(product);
 
           return {
             _id: product._id || product.id,
