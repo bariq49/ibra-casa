@@ -108,7 +108,8 @@ export function OrderTrackingClient({
   const isLoggedIn = serverIsLoggedIn;
 
   const trackOrder = useCallback(async () => {
-    const trimmedId = orderId.trim();
+    // UI shows short IDs like "#76BD64" — strip # so it isn't treated as a URL fragment
+    const trimmedId = orderId.trim().replace(/^#/, "");
     if (!trimmedId) {
       setError(t("noOrderId"));
       return;
@@ -125,9 +126,29 @@ export function OrderTrackingClient({
     setOrder(null);
 
     try {
-      const { data } = await api.get(`/api/orders/${trimmedId}`);
-      if (data && typeof data === "object" && data._id) {
-        setOrder(data);
+      let found: any = null;
+      const isFullObjectId = /^[0-9a-fA-F]{24}$/.test(trimmedId);
+
+      if (isFullObjectId) {
+        const { data } = await api.get(`/api/orders/${trimmedId}`);
+        if (data && typeof data === "object" && !Array.isArray(data) && data._id) {
+          found = data;
+        }
+      } else {
+        // Short display ID (last 5–8 hex chars) — match against the user's orders
+        const { data } = await api.get(`/api/orders`);
+        const orders = Array.isArray(data) ? data : [];
+        const needle = trimmedId.toUpperCase();
+        found =
+          orders.find((o: any) =>
+            String(o?._id ?? "")
+              .toUpperCase()
+              .endsWith(needle),
+          ) ?? null;
+      }
+
+      if (found?._id) {
+        setOrder(found);
       } else {
         setError(t("orderNotFound"));
       }

@@ -3,7 +3,7 @@
     "_id": "a20000000000000000000001",
     "name": "Round Gold Mirror",
     "slug": "round-gold-mirror",
-    "description": "<p>Round Gold Mirror \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Round Gold Mirror — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 159,
     "purchasePrice": 79.5,
     "profitMargin": 50,
@@ -46,13 +46,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "How do I hang the Round Gold Mirror safely?",
+        "answer": "Use the included mounting hardware on a stud or with suitable wall anchors. For heavy mirrors, we recommend professional installation and checking that your wall can support the weight."
+      },
+      {
+        "question": "Is the glass shatter-resistant?",
+        "answer": "The mirror uses quality glass with a protective backing. Handle carefully during unpacking and avoid impacts to the edges."
+      },
+      {
+        "question": "Can I choose different sizes or finishes?",
+        "answer": "Yes. Available size, color, and weight options are listed on the product page so you can match your space and wall type."
+      },
+      {
+        "question": "What is the return policy?",
+        "answer": "Unopened items in original packaging can be returned within 30 days. Contact support if your item arrives damaged."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000002",
     "name": "Oak Frame Mirror",
     "slug": "oak-frame-mirror",
-    "description": "<p>Oak Frame Mirror \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Oak Frame Mirror — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 129,
     "purchasePrice": 64.5,
     "profitMargin": 50,
@@ -95,13 +113,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "How do I hang the Oak Frame Mirror safely?",
+        "answer": "Use the included mounting hardware on a stud or with suitable wall anchors. For heavy mirrors, we recommend professional installation and checking that your wall can support the weight."
+      },
+      {
+        "question": "Is the glass shatter-resistant?",
+        "answer": "The mirror uses quality glass with a protective backing. Handle carefully during unpacking and avoid impacts to the edges."
+      },
+      {
+        "question": "Can I choose different sizes or finishes?",
+        "answer": "Yes. Available size, color, and weight options are listed on the product page so you can match your space and wall type."
+      },
+      {
+        "question": "What is the return policy?",
+        "answer": "Unopened items in original packaging can be returned within 30 days. Contact support if your item arrives damaged."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000003",
     "name": "Wall Shelf Duo",
     "slug": "wall-shelf-duo",
-    "description": "<p>Wall Shelf Duo \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Wall Shelf Duo — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 89,
     "purchasePrice": 44.5,
     "profitMargin": 50,
@@ -133,13 +169,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Wall Shelf Duo made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000004",
     "name": "Entryway Console Hook",
     "slug": "entryway-console-hook",
-    "description": "<p>Entryway Console Hook \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Entryway Console Hook — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 45,
     "purchasePrice": 22.5,
     "profitMargin": 50,
@@ -171,13 +225,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Entryway Console Hook made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000005",
     "name": "Storage Bench Seat",
     "slug": "storage-bench-seat",
-    "description": "<p>Storage Bench Seat \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Storage Bench Seat — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 219,
     "purchasePrice": 109.5,
     "profitMargin": 50,
@@ -220,13 +292,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Storage Bench Seat made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000006",
     "name": "Folding Side Tray",
     "slug": "folding-side-tray",
-    "description": "<p>Folding Side Tray \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Folding Side Tray — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 55,
     "purchasePrice": 27.5,
     "profitMargin": 50,
@@ -258,13 +348,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Folding Side Tray made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000007",
     "name": "Utility Basket Stand",
     "slug": "utility-basket-stand",
-    "description": "<p>Utility Basket Stand \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Utility Basket Stand — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 69,
     "purchasePrice": 34.5,
     "profitMargin": 50,
@@ -307,13 +415,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Utility Basket Stand made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000008",
     "name": "Modular Cube Organizer",
     "slug": "modular-cube-organizer",
-    "description": "<p>Modular Cube Organizer \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Modular Cube Organizer — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 79,
     "purchasePrice": 39.5,
     "profitMargin": 50,
@@ -345,13 +471,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Modular Cube Organizer made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000009",
     "name": "Marble Console Table",
     "slug": "marble-console-table",
-    "description": "<p>Marble Console Table \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Marble Console Table — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 349,
     "purchasePrice": 174.5,
     "profitMargin": 50,
@@ -394,13 +538,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Marble Console Table made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000010",
     "name": "Brass Accent Table",
     "slug": "brass-accent-table",
-    "description": "<p>Brass Accent Table \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Brass Accent Table — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 189,
     "purchasePrice": 94.5,
     "profitMargin": 50,
@@ -443,13 +605,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Brass Accent Table made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000011",
     "name": "Rattan Accent Chair",
     "slug": "rattan-accent-chair",
-    "description": "<p>Rattan Accent Chair \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Rattan Accent Chair — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 279,
     "purchasePrice": 139.5,
     "profitMargin": 50,
@@ -481,13 +661,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Rattan Accent Chair made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000012",
     "name": "Walnut Media Console",
     "slug": "walnut-media-console",
-    "description": "<p>Walnut Media Console \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Walnut Media Console — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 499,
     "purchasePrice": 249.5,
     "profitMargin": 50,
@@ -530,13 +728,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Walnut Media Console made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000013",
     "name": "Boucle Ottoman",
     "slug": "boucle-ottoman",
-    "description": "<p>Boucle Ottoman \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Boucle Ottoman — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 159,
     "purchasePrice": 79.5,
     "profitMargin": 50,
@@ -568,13 +784,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Boucle Ottoman made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000014",
     "name": "Oak Dining Bench",
     "slug": "oak-dining-bench",
-    "description": "<p>Oak Dining Bench \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Oak Dining Bench — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 299,
     "purchasePrice": 149.5,
     "profitMargin": 50,
@@ -617,13 +851,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Oak Dining Bench made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000015",
     "name": "Sculptural Side Table",
     "slug": "sculptural-side-table",
-    "description": "<p>Sculptural Side Table \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Sculptural Side Table — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 169,
     "purchasePrice": 84.5,
     "profitMargin": 50,
@@ -655,13 +907,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Sculptural Side Table made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000016",
     "name": "Velvet Lounge Chair",
     "slug": "velvet-lounge-chair",
-    "description": "<p>Velvet Lounge Chair \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Velvet Lounge Chair — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 399,
     "purchasePrice": 199.5,
     "profitMargin": 50,
@@ -704,13 +974,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Velvet Lounge Chair made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000017",
     "name": "Wave Pendant Light",
     "slug": "wave-pendant-light",
-    "description": "<p>Wave Pendant Light \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Wave Pendant Light — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 229,
     "purchasePrice": 114.5,
     "profitMargin": 50,
@@ -753,13 +1041,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Wave Pendant Light use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000018",
     "name": "Arc Floor Lamp",
     "slug": "arc-floor-lamp",
-    "description": "<p>Arc Floor Lamp \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Arc Floor Lamp — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 189,
     "purchasePrice": 94.5,
     "profitMargin": 50,
@@ -802,13 +1108,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Arc Floor Lamp use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000019",
     "name": "Ceramic Table Lamp",
     "slug": "ceramic-table-lamp",
-    "description": "<p>Ceramic Table Lamp \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Ceramic Table Lamp — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 89,
     "purchasePrice": 44.5,
     "profitMargin": 50,
@@ -840,13 +1164,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Ceramic Table Lamp use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000020",
     "name": "Handblown Pendant Light",
     "slug": "handblown-pendant-light",
-    "description": "<p>Handblown Pendant Light \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Handblown Pendant Light — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 199,
     "purchasePrice": 99.5,
     "profitMargin": 50,
@@ -889,13 +1231,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Handblown Pendant Light use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000021",
     "name": "Minimal Wall Sconce",
     "slug": "minimal-wall-sconce",
-    "description": "<p>Minimal Wall Sconce \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Minimal Wall Sconce — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 75,
     "purchasePrice": 37.5,
     "profitMargin": 50,
@@ -927,13 +1287,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Minimal Wall Sconce use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000022",
     "name": "Dome Ceiling Light",
     "slug": "dome-ceiling-light",
-    "description": "<p>Dome Ceiling Light \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Dome Ceiling Light — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 149,
     "purchasePrice": 74.5,
     "profitMargin": 50,
@@ -976,13 +1354,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Dome Ceiling Light use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000023",
     "name": "Tripod Floor Lamp",
     "slug": "tripod-floor-lamp",
-    "description": "<p>Tripod Floor Lamp \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Tripod Floor Lamp — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 169,
     "purchasePrice": 84.5,
     "profitMargin": 50,
@@ -1014,13 +1410,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Tripod Floor Lamp use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000024",
     "name": "Glass Globe Lamp",
     "slug": "glass-globe-lamp",
-    "description": "<p>Glass Globe Lamp \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Glass Globe Lamp — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 99,
     "purchasePrice": 49.5,
     "profitMargin": 50,
@@ -1063,13 +1477,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What bulb does the Glass Globe Lamp use?",
+        "answer": "It is compatible with standard LED bulbs (bulb sold separately unless noted). Check the product specs for max wattage and base type before purchase."
+      },
+      {
+        "question": "Is assembly required?",
+        "answer": "Light assembly may be needed for the shade, stem, or mounting plate. Clear instructions are included in the box."
+      },
+      {
+        "question": "Can this be used with a dimmer switch?",
+        "answer": "Most of our lighting works with compatible LED dimmers when paired with a dimmable bulb. Confirm your switch and bulb are dimmable for best results."
+      },
+      {
+        "question": "How do I clean the fixture?",
+        "answer": "Turn off power and wipe with a soft dry cloth. Avoid harsh cleaners on metal finishes and glass shades."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000025",
     "name": "Ceramic Vase Set",
     "slug": "ceramic-vase-set",
-    "description": "<p>Ceramic Vase Set \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Ceramic Vase Set — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 59,
     "purchasePrice": 29.5,
     "profitMargin": 50,
@@ -1112,13 +1544,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Ceramic Vase Set made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000026",
     "name": "Pampas Grass Bundle",
     "slug": "pampas-grass-bundle",
-    "description": "<p>Pampas Grass Bundle \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Pampas Grass Bundle — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 35,
     "purchasePrice": 17.5,
     "profitMargin": 50,
@@ -1150,13 +1600,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Pampas Grass Bundle made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000027",
     "name": "Travertine Tray",
     "slug": "travertine-tray",
-    "description": "<p>Travertine Tray \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Travertine Tray — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 49,
     "purchasePrice": 24.5,
     "profitMargin": 50,
@@ -1188,13 +1656,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Travertine Tray made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000028",
     "name": "Porcelain Bud Vase",
     "slug": "porcelain-bud-vase",
-    "description": "<p>Porcelain Bud Vase \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Porcelain Bud Vase — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 29,
     "purchasePrice": 14.5,
     "profitMargin": 50,
@@ -1237,13 +1723,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Porcelain Bud Vase made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000029",
     "name": "Sculptural Bookend Set",
     "slug": "sculptural-bookend-set",
-    "description": "<p>Sculptural Bookend Set \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Sculptural Bookend Set — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 39,
     "purchasePrice": 19.5,
     "profitMargin": 50,
@@ -1275,13 +1779,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Sculptural Bookend Set made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000030",
     "name": "Glass Domed Cloche",
     "slug": "glass-domed-cloche",
-    "description": "<p>Glass Domed Cloche \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Glass Domed Cloche — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 55,
     "purchasePrice": 27.5,
     "profitMargin": 50,
@@ -1324,13 +1846,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Glass Domed Cloche made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000031",
     "name": "Stoneware Bowl",
     "slug": "stoneware-bowl",
-    "description": "<p>Stoneware Bowl \u2014 curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
+    "description": "<p>Stoneware Bowl — curated for Ibra Casa. Choose size, color, and weight options on the product page. Upload photos later from admin.</p>",
     "price": 42,
     "purchasePrice": 21.0,
     "profitMargin": 50,
@@ -1373,13 +1913,31 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Stoneware Bowl made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   },
   {
     "_id": "a20000000000000000000032",
     "name": "Woven Storage Basket",
     "slug": "woven-storage-basket",
-    "description": "<p>Woven Storage Basket \u2014 curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
+    "description": "<p>Woven Storage Basket — curated for Ibra Casa. Simple product with fixed pricing. Upload photos later from admin.</p>",
     "price": 45,
     "purchasePrice": 22.5,
     "profitMargin": 50,
@@ -1411,6 +1969,24 @@
     "views": [],
     "createdAt": "2026-07-21T00:00:00.000Z",
     "updatedAt": "2026-07-21T00:00:00.000Z",
-    "__v": 0
+    "__v": 0,
+    "faqs": [
+      {
+        "question": "What materials is the Woven Storage Basket made from?",
+        "answer": "It is crafted from quality materials selected for everyday home use. See the product options and description for finish and material details."
+      },
+      {
+        "question": "Do I need to assemble it myself?",
+        "answer": "Some pieces ship flat-packed with simple hardware and instructions. Others arrive ready to place — check the listing details before ordering."
+      },
+      {
+        "question": "How should I care for and clean it?",
+        "answer": "Dust regularly with a soft cloth. Avoid soaking wood or fabric surfaces, and use coasters or mats to protect tabletops."
+      },
+      {
+        "question": "Can I change size, color, or weight options?",
+        "answer": "Yes. Where available, size, color, and weight variants appear on the product page so you can tailor the piece to your room."
+      }
+    ]
   }
 ]

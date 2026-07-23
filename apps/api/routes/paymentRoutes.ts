@@ -4,6 +4,7 @@ import {
   createPaymentIntent,
   createCheckoutSession,
   handleStripeWebhook,
+  verifyCheckoutSession,
 } from "../controllers/paymentController.js";
 
 const router = express.Router();
@@ -112,5 +113,14 @@ router.post("/create-intent", protect, createPaymentIntent);
  *         description: Server error
  */
 router.post("/create-checkout-session", optionalAuth, createCheckoutSession);
+
+/**
+ * @swagger
+ * /api/payments/verify-session:
+ *   post:
+ *     summary: Verify a Stripe Checkout session and mark the order paid
+ *     tags: [Payments]
+ */
+router.post("/verify-session", optionalAuth, verifyCheckoutSession);
 
 export default router;

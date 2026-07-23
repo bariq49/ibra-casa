@@ -38,7 +38,6 @@ const TodaysTopOffer = async ({ locale }: TodaysTopOfferProps) => {
           data.description || "Up to 69% discount for limited time 🔥"
         }
         endsAt={data.endsAt}
-        bgColor={data.bgColor || "#F4F3F5"}
       />
     );
   } catch (err) {

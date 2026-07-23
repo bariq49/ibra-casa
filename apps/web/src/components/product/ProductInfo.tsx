@@ -120,53 +120,54 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
     variantPricing.originalPrice > variantPricing.discountedPrice;
 
   return (
-    <div className="bg-white border border-light-divider border-solid flex flex-col gap-6 items-start p-6 rounded-3xl size-full">
+    <div className="flex flex-col gap-4 w-full h-full">
+      <div className="bg-white border border-light-divider border-solid flex flex-col gap-3 items-start p-5 rounded-3xl w-full">
       {/* Title & Badge */}
-      <div className="flex flex-col gap-6 items-start w-full">
-        <div className="flex gap-2.5 items-center">
-          {hasDiscount && (
-            <div className="flex justify-center items-center bg-warning-lighter px-2 py-0.5 rounded-sm">
-              <span className="font-medium text-[14px] text-black">SALES</span>
-            </div>
-          )}
-          {product.isNewItem && (
-            <p className="font-bold text-[12px] text-info uppercase">
-              New Arrival
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-start justify-between w-full gap-4">
-          <h1 className="font-bold text-[32px] overflow-hidden text-light-primary-text leading-12">
-            {product.name}
-          </h1>
+      <div className="flex flex-col gap-2 items-start w-full">
+        <div className="flex items-center justify-between w-full gap-3">
+          <div className="flex gap-2.5 items-center min-h-8">
+            {hasDiscount && (
+              <div className="flex justify-center items-center bg-warning-lighter px-2 py-0.5 rounded-sm">
+                <span className="font-medium text-[14px] text-black">SALES</span>
+              </div>
+            )}
+            {product.isNewItem && (
+              <p className="font-bold text-[12px] text-info uppercase">
+                New Arrival
+              </p>
+            )}
+          </div>
           <div className="shrink-0">
             <WishlistBtn product={cartProduct} />
           </div>
         </div>
+
+        <h1 className="font-bold text-[28px] overflow-hidden text-light-primary-text leading-9">
+          {product.name}
+        </h1>
 
         <div className="flex items-center gap-3">
           <Ratings
             rating={product.averageRating || 0}
             totalReviews={product.numReviews || 0}
           />
-          <p className="text-light-secondary-text text-[16px]">
+          <p className="text-light-secondary-text text-[14px]">
             ({((product.numReviews || 0) / 1000).toFixed(2)}k reviews)
           </p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          <p className="font-bold text-[24px] text-light-primary-text">
+          <p className="font-bold text-[22px] text-light-primary-text">
             <PriceFormatter amount={variantPricing.discountedPrice} />
           </p>
           {hasDiscount && (
             <>
-              <div className="w-px h-6 bg-light-disabled-text/20" />
-              <p className="font-normal text-[24px] text-light-disabled-text line-through">
+              <div className="w-px h-5 bg-light-disabled-text/20" />
+              <p className="font-normal text-[20px] text-light-disabled-text line-through">
                 <PriceFormatter amount={variantPricing.originalPrice} />
               </p>
               <div className="flex justify-center items-center bg-warning px-2 py-0.5 rounded-sm">
-                <span className="font-medium text-[14px] text-black">
+                <span className="font-medium text-[13px] text-black">
                   {variantPricing.discountPercentage}% OFF
                 </span>
               </div>
@@ -178,8 +179,8 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
       <div className="border-t border-dashed border-light-disabled-text/30 w-full" />
 
       {product.colors && product.colors.length > 0 && (
-        <div className="flex flex-col gap-4 w-full items-start">
-          <div className="flex items-center gap-2.5 text-[16px]">
+        <div className="flex flex-col gap-2 w-full items-start">
+          <div className="flex items-center gap-2 text-[15px]">
             <p className="font-semibold text-light-primary-text">Color :</p>
             <p className="text-light-primary-text">{selectedColor?.name}</p>
           </div>
@@ -190,7 +191,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                 type="button"
                 onClick={() => setSelectedColor(color)}
                 className={cn(
-                  "size-10 rounded-full border-2 p-1 transition-all flex items-center justify-center bg-white",
+                  "size-9 rounded-full border-2 p-0.5 transition-all flex items-center justify-center bg-white",
                   selectedColor?.slug === color.slug ||
                     selectedColor?.name === color.name
                     ? "border-sellzy-teal"
@@ -208,21 +209,21 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
       )}
 
       {product.sizes && product.sizes.length > 0 && (
-        <div className="flex flex-col gap-4 w-full mt-2 items-start">
+        <div className="flex flex-col gap-2 w-full items-start">
           <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2.5 text-[16px]">
+            <div className="flex items-center gap-2 text-[15px]">
               <p className="font-semibold text-light-primary-text">Size :</p>
               <p className="text-light-primary-text">{selectedSize?.name}</p>
             </div>
             <button
               type="button"
               onClick={() => setIsSizeChartOpen(true)}
-              className="text-[14px] text-light-secondary-text underline hover:text-light-primary-text"
+              className="text-[13px] text-light-secondary-text underline hover:text-light-primary-text"
             >
               See size chart
             </button>
           </div>
-          <div className="flex flex-wrap gap-4 w-full">
+          <div className="flex flex-wrap gap-2 w-full">
             <TooltipProvider delayDuration={200}>
               {product.sizes.map((size) => {
                 const initials = size.name.split(" ")[0];
@@ -236,7 +237,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                         type="button"
                         onClick={() => setSelectedSize(size)}
                         className={cn(
-                          "flex-1 h-10 min-w-17.5 rounded-[100px] font-semibold text-[14px] transition-all flex items-center justify-center",
+                          "flex-1 h-9 min-w-17.5 rounded-[100px] font-semibold text-[14px] transition-all flex items-center justify-center",
                           isSelected
                             ? "bg-sellzy-teal text-foreground shadow-color-primary border-transparent"
                             : "border border-[rgba(145,158,171,0.32)] text-light-primary-text hover:bg-muted bg-white",
@@ -263,12 +264,12 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
       )}
 
       {product.weights && product.weights.length > 0 && (
-        <div className="flex flex-col gap-4 w-full mt-2 items-start">
-          <div className="flex items-center gap-2.5 text-[16px]">
+        <div className="flex flex-col gap-2 w-full items-start">
+          <div className="flex items-center gap-2 text-[15px]">
             <p className="font-semibold text-light-primary-text">Weight :</p>
             <p className="text-light-primary-text">{selectedWeight?.name}</p>
           </div>
-          <div className="flex flex-wrap gap-3 w-full">
+          <div className="flex flex-wrap gap-2 w-full">
             {product.weights.map((weight) => {
               const isSelected =
                 selectedWeight?.slug === weight.slug ||
@@ -279,7 +280,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                   type="button"
                   onClick={() => setSelectedWeight(weight)}
                   className={cn(
-                    "rounded-full border px-4 py-2 font-semibold text-[14px] transition-all",
+                    "rounded-full border px-3.5 py-1.5 font-semibold text-[14px] transition-all",
                     isSelected
                       ? "bg-sellzy-teal text-foreground border-transparent"
                       : "border border-[rgba(145,158,171,0.32)] text-light-primary-text hover:bg-muted bg-white",
@@ -293,12 +294,12 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         </div>
       )}
 
-      <div className="flex flex-col gap-4 w-full mt-2 items-start">
-        <p className="font-semibold text-[16px] text-light-primary-text">
+      <div className="flex flex-col gap-2 w-full items-start">
+        <p className="font-semibold text-[15px] text-light-primary-text">
           Quantity
         </p>
-        <div className="flex xl:flex-row flex-col items-start gap-4 w-full">
-          <div className="border border-[rgba(145,158,171,0.32)] flex items-center justify-between px-4 py-3 rounded-[80px] w-full sm:w-45 h-12 bg-white">
+        <div className="flex xl:flex-row flex-col items-start gap-3 w-full">
+          <div className="border border-[rgba(145,158,171,0.32)] flex items-center justify-between px-4 py-2.5 rounded-[80px] w-full sm:w-40 h-11 bg-white">
             <button
               type="button"
               onClick={decrementQty}
@@ -317,7 +318,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
               <Plus className="size-5" />
             </button>
           </div>
-          <div className="flex sm:flex-row flex-col items-center gap-4 w-full flex-1">
+          <div className="flex sm:flex-row flex-col items-center gap-3 w-full flex-1">
             <Button
               onClick={() => {
                 const req = useCartStore
@@ -341,7 +342,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                   router.push("/cart");
                 }
               }}
-              className="w-full sm:flex-1 h-12 rounded-[80px] bg-warning hover:bg-warning/90 text-foreground font-semibold text-[16px] shadow-color-warning border-none"
+              className="w-full sm:flex-1 h-11 rounded-[80px] bg-warning hover:bg-warning/90 text-foreground font-semibold text-[15px] shadow-color-warning border-none"
             >
               Buy Now
             </Button>
@@ -371,7 +372,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                   });
                 }
               }}
-              className="w-full sm:flex-1 h-12 rounded-[80px] bg-sellzy-teal hover:bg-primary text-foreground hover:text-primary-foreground font-semibold text-[16px] gap-2 shadow-color-primary border-none"
+              className="w-full sm:flex-1 h-11 rounded-[80px] bg-sellzy-teal hover:bg-primary text-foreground hover:text-primary-foreground font-semibold text-[15px] gap-2 shadow-color-primary border-none"
             >
               <ShoppingCart className="size-5" />
               Add to Cart
@@ -380,46 +381,46 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         </div>
       </div>
 
-      <div className="border-t border-dashed border-light-disabled-text/30 w-full mt-4" />
+      <div className="border-t border-dashed border-light-disabled-text/30 w-full" />
 
       <div className="flex items-center gap-4 w-full">
         <button
           type="button"
           onClick={handleShare}
-          className="flex items-center gap-2.5 text-light-primary-text hover:text-primary transition-colors"
+          className="flex items-center gap-2 text-light-primary-text hover:text-primary transition-colors"
         >
-          <Share2 className="size-5" />
-          <span className="text-[16px]">Share</span>
+          <Share2 className="size-4" />
+          <span className="text-[15px]">Share</span>
         </button>
         <div className="w-px h-3 bg-[rgba(145,158,171,0.24)]" />
         <button
           type="button"
           onClick={handleCompare}
           className={cn(
-            "flex items-center gap-2.5 transition-colors",
+            "flex items-center gap-2 transition-colors",
             isCompared
               ? "text-primary"
               : "text-light-primary-text hover:text-primary",
           )}
         >
-          <GitCompare className="size-5" />
-          <span className="text-[16px]">
+          <GitCompare className="size-4" />
+          <span className="text-[15px]">
             {isCompared ? "Remove from Compare" : "Compare"}
           </span>
         </button>
       </div>
 
-      <div className="flex flex-col gap-4 w-full mt-2">
-        <div className="flex items-start gap-4 w-full">
-          <p className="font-semibold text-light-primary-text w-30 shrink-0">
+      <div className="flex flex-col gap-1.5 w-full text-[14px]">
+        <div className="flex items-start gap-3 w-full">
+          <p className="font-semibold text-light-primary-text w-28 shrink-0">
             Free Shipping :
           </p>
           <p className="text-light-secondary-text">
             Estimated Delivery Time 5-7 Days
           </p>
         </div>
-        <div className="flex items-start gap-4 w-full">
-          <p className="font-semibold text-light-primary-text w-30 shrink-0">
+        <div className="flex items-start gap-3 w-full">
+          <p className="font-semibold text-light-primary-text w-28 shrink-0">
             Categories :
           </p>
           <p className="text-light-secondary-text">
@@ -428,6 +429,15 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
               "N/A"}
           </p>
         </div>
+      </div>
+      </div>
+
+      <div className="w-full px-1">
+        <img
+          src="/images/payment-methods.png"
+          alt="Payment Methods"
+          className="block w-full h-12"
+        />
       </div>
 
       <SizeChartSidebar

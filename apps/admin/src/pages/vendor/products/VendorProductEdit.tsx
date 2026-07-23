@@ -51,6 +51,12 @@ export default function VendorProductEdit() {
           bg: p.bg ?? "",
           isNewItem: !!p.isNewItem,
           images: imgs,
+          faqs: Array.isArray(p.faqs)
+            ? p.faqs.map((f: { question?: string; answer?: string }) => ({
+                question: f.question ?? "",
+                answer: f.answer ?? "",
+              }))
+            : [],
         });
       })
       .catch(() => setInitial({}));

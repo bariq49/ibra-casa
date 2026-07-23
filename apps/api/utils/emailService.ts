@@ -892,11 +892,224 @@ const sendPasswordResetOtpEmail = async (
   }
 };
 
+const escapeHtml = (value: string): string =>
+  String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+export type ContactEmailPayload = {
+  firstName: string;
+  lastName?: string;
+  phone?: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
+const getAdminInbox = () =>
+  process.env.SUPPORT_EMAIL ||
+  process.env.SENDER_EMAIL_ADDRESS ||
+  BRAND.supportEmail;
+
+const buildContactEmailShell = ({
+  title,
+  subtitle,
+  greeting,
+  bodyHtml,
+}: {
+  title: string;
+  subtitle: string;
+  greeting: string;
+  bodyHtml: string;
+}) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title} - ${BRAND.name}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: ${BRAND.softBg}; line-height: 1.6;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: ${BRAND.softBg}; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: ${BRAND.white}; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(27, 31, 35, 0.08);">
+          <tr>
+            <td style="background-color: ${BRAND.lime}; padding: 40px 30px; text-align: center;">
+              <div style="background-color: ${BRAND.dark}; display: inline-block; padding: 14px 28px; border-radius: 999px; margin-bottom: 20px;">
+                <h1 style="margin: 0; color: ${BRAND.lime}; font-size: 26px; font-weight: 700; letter-spacing: 0.5px;">${BRAND.name}</h1>
+              </div>
+              <h2 style="margin: 0; color: ${BRAND.dark}; font-size: 24px; font-weight: 700;">${title}</h2>
+              <p style="margin: 10px 0 0 0; color: ${BRAND.muted}; font-size: 16px;">${subtitle}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 30px 10px 30px;">
+              <h3 style="margin: 0 0 12px 0; color: ${BRAND.dark}; font-size: 20px; font-weight: 600;">${greeting}</h3>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              ${bodyHtml}
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: ${BRAND.dark}; padding: 30px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: ${BRAND.lime}; font-size: 13px;">
+                Best regards,<br>
+                <strong>The ${BRAND.name} Team</strong>
+              </p>
+              <p style="margin: 0; color: #919EAB; font-size: 12px;">
+                © ${new Date().getFullYear()} ${BRAND.name}. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
+const generateContactUserEmailHTML = (payload: ContactEmailPayload): string => {
+  const name = escapeHtml(
+    [payload.firstName, payload.lastName].filter(Boolean).join(" ").trim() ||
+      "there",
+  );
+  const subject = escapeHtml(payload.subject);
+  const message = escapeHtml(payload.message).replace(/\n/g, "<br>");
+
+  return buildContactEmailShell({
+    title: "We received your message ✉️",
+    subtitle: "Thanks for contacting us",
+    greeting: `Hi ${name}! 👋`,
+    bodyHtml: `
+      <p style="margin: 0 0 20px 0; color: ${BRAND.muted}; font-size: 15px; line-height: 1.6;">
+        Thank you for reaching out to ${BRAND.name}. We've received your message and our team will get back to you as soon as possible.
+      </p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: ${BRAND.softBg}; border-radius: 8px; border: 1px solid ${BRAND.border}; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+          <td style="padding: 20px;">
+            <div style="font-size: 13px; color: ${BRAND.muted}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Subject</div>
+            <div style="font-size: 18px; font-weight: 700; color: ${BRAND.dark};">${subject}</div>
+          </td>
+        </tr>
+      </table>
+      <div style="background-color: ${BRAND.softBg}; border: 1px solid ${BRAND.border}; border-radius: 8px; padding: 20px;">
+        <div style="font-size: 13px; color: ${BRAND.muted}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Your Message</div>
+        <p style="margin: 0; color: ${BRAND.dark}; font-size: 15px; line-height: 1.7;">${message}</p>
+      </div>
+      <p style="margin: 20px 0 0 0; color: ${BRAND.muted}; font-size: 14px; line-height: 1.6;">
+        If you need urgent help, reply to this email or contact us at
+        <a href="mailto:${getAdminInbox()}" style="color: ${BRAND.dark}; font-weight: 600; text-decoration: none;">${getAdminInbox()}</a>.
+      </p>
+    `,
+  });
+};
+
+const generateContactAdminEmailHTML = (
+  payload: ContactEmailPayload,
+): string => {
+  const fullName = escapeHtml(
+    [payload.firstName, payload.lastName].filter(Boolean).join(" ").trim(),
+  );
+  const email = escapeHtml(payload.email);
+  const phone = escapeHtml(payload.phone || "—");
+  const subject = escapeHtml(payload.subject);
+  const message = escapeHtml(payload.message).replace(/\n/g, "<br>");
+
+  const detailRow = (label: string, value: string) => `
+    <tr>
+      <td style="padding: 12px 16px; border-bottom: 1px solid ${BRAND.border}; width: 140px; color: ${BRAND.muted}; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; vertical-align: top;">${label}</td>
+      <td style="padding: 12px 16px; border-bottom: 1px solid ${BRAND.border}; color: ${BRAND.dark}; font-size: 15px; font-weight: 600;">${value}</td>
+    </tr>
+  `;
+
+  return buildContactEmailShell({
+    title: "New Contact Message 📩",
+    subtitle: "A customer submitted the contact form",
+    greeting: "Hello Admin,",
+    bodyHtml: `
+      <p style="margin: 0 0 20px 0; color: ${BRAND.muted}; font-size: 15px; line-height: 1.6;">
+        You have a new message from the website contact form. Details are below.
+      </p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: ${BRAND.softBg}; border-radius: 8px; border: 1px solid ${BRAND.border}; overflow: hidden; margin-bottom: 20px;">
+        ${detailRow("Name", fullName)}
+        ${detailRow("Email", `<a href="mailto:${email}" style="color: ${BRAND.dark}; text-decoration: none;">${email}</a>`)}
+        ${detailRow("Phone", phone)}
+        ${detailRow("Subject", subject)}
+      </table>
+      <div style="background-color: ${BRAND.softBg}; border: 1px solid ${BRAND.border}; border-radius: 8px; padding: 20px;">
+        <div style="font-size: 13px; color: ${BRAND.muted}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Message</div>
+        <p style="margin: 0; color: ${BRAND.dark}; font-size: 15px; line-height: 1.7;">${message}</p>
+      </div>
+    `,
+  });
+};
+
+/**
+ * Sends branded contact emails to the customer (confirmation) and admin (notification).
+ */
+const sendContactEmails = async (payload: ContactEmailPayload) => {
+  const transporter = createTransporter();
+  const adminTo = getAdminInbox();
+  const customerName =
+    [payload.firstName, payload.lastName].filter(Boolean).join(" ").trim() ||
+    "Customer";
+
+  const userHtml = generateContactUserEmailHTML(payload);
+  const adminHtml = generateContactAdminEmailHTML(payload);
+
+  const userText = `Hi ${customerName},\n\nThank you for contacting ${BRAND.name}. We received your message about "${payload.subject}" and will get back to you soon.\n\nYour message:\n${payload.message}\n\n— The ${BRAND.name} Team`;
+  const adminText = `New contact form submission\n\nName: ${customerName}\nEmail: ${payload.email}\nPhone: ${payload.phone || "—"}\nSubject: ${payload.subject}\n\nMessage:\n${payload.message}`;
+
+  const [userResult, adminResult] = await Promise.allSettled([
+    transporter.sendMail({
+      from: brandFrom(),
+      to: payload.email,
+      subject: `We received your message - ${BRAND.name}`,
+      text: userText,
+      html: userHtml,
+      replyTo: adminTo,
+    }),
+    transporter.sendMail({
+      from: brandFrom(),
+      to: adminTo,
+      subject: `New contact: ${payload.subject} - ${BRAND.name}`,
+      text: adminText,
+      html: adminHtml,
+      replyTo: payload.email,
+    }),
+  ]);
+
+  if (userResult.status === "rejected") {
+    console.error("Contact user email failed:", userResult.reason);
+  } else {
+    console.log("Contact user email sent:", userResult.value.messageId);
+  }
+
+  if (adminResult.status === "rejected") {
+    console.error("Contact admin email failed:", adminResult.reason);
+  } else {
+    console.log("Contact admin email sent:", adminResult.value.messageId);
+  }
+
+  return {
+    userSent: userResult.status === "fulfilled",
+    adminSent: adminResult.status === "fulfilled",
+  };
+};
+
 export {
   sendInvoiceEmail,
   sendEmail,
   sendOrderConfirmationEmail,
   sendPasswordResetEmail,
   sendPasswordResetOtpEmail,
+  sendContactEmails,
   generateNewsletterEmailHTML,
 };

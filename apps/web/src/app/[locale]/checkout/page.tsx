@@ -12,7 +12,7 @@ export default async function CheckoutPage() {
   const { isLoggedIn } = await getServerSession();
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen">
       <CheckoutClient isLoggedIn={isLoggedIn} />
     </div>
   );

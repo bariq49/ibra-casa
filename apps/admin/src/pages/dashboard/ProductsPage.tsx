@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
 import { usePermissions } from "@/hooks/usePermissions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { productSchema } from "@/lib/validation";
 import { DEFAULT_PER_PAGE } from "@/lib/pagination";
@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import {
@@ -122,6 +123,7 @@ type Product = {
     _id: string;
     name: string;
   };
+  faqs?: { question: string; answer: string }[];
   createdAt: string;
 };
 
@@ -383,6 +385,7 @@ export default function ProductsPage() {
       colors: [],
       weights: [],
       isNewItem: false,
+      faqs: [],
     },
   });
 
@@ -406,7 +409,26 @@ export default function ProductsPage() {
       colors: [],
       weights: [],
       isNewItem: false,
+      faqs: [],
     },
+  });
+
+  const {
+    fields: addFaqFields,
+    append: appendAddFaq,
+    remove: removeAddFaq,
+  } = useFieldArray({
+    control: formAdd.control,
+    name: "faqs",
+  });
+
+  const {
+    fields: editFaqFields,
+    append: appendEditFaq,
+    remove: removeEditFaq,
+  } = useFieldArray({
+    control: formEdit.control,
+    name: "faqs",
   });
 
   // Watch for active Product Base in Add and Edit forms to filter dependencies dynamically
@@ -729,6 +751,11 @@ export default function ProductsPage() {
           typeof w === "object" ? w._id : w,
         ) || [],
       isNewItem: (product as any).isNewItem || false,
+      faqs:
+        product.faqs?.map((f) => ({
+          question: f.question || "",
+          answer: f.answer || "",
+        })) || [],
     });
     setIsEditModalOpen(true);
   };
@@ -772,6 +799,11 @@ export default function ProductsPage() {
           typeof w === "object" ? w._id : w,
         ) || [],
       isNewItem: false,
+      faqs:
+        product.faqs?.map((f) => ({
+          question: f.question || "",
+          answer: f.answer || "",
+        })) || [],
     });
     setIsAddModalOpen(true);
   };
@@ -2430,6 +2462,95 @@ export default function ProductsPage() {
                 weights={availableWeights}
               />
 
+              <div className="space-y-3 rounded-lg border border-border p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium">Product FAQs</p>
+                    <p className="text-xs text-muted-foreground">
+                      Shown in the FAQs tab on the product detail page
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      appendAddFaq({ question: "", answer: "" })
+                    }
+                    disabled={formLoading}
+                  >
+                    <Plus className="mr-1 h-4 w-4" />
+                    Add FAQ
+                  </Button>
+                </div>
+                {addFaqFields.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    No FAQs yet. Add questions customers often ask about this
+                    product.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {addFaqFields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className="space-y-3 rounded-md border border-dashed border-border p-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            FAQ {index + 1}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-destructive"
+                            onClick={() => removeAddFaq(index)}
+                            disabled={formLoading}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <FormField<FormData>
+                          control={formAdd.control}
+                          name={`faqs.${index}.question`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Question</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="e.g. What materials is this made of?"
+                                  disabled={formLoading}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField<FormData>
+                          control={formAdd.control}
+                          name={`faqs.${index}.answer`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Answer</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  className="min-h-[80px]"
+                                  placeholder="Write a clear answer for customers..."
+                                  disabled={formLoading}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <FormField<FormData>
                 control={formAdd.control}
                 name="images"
@@ -2990,6 +3111,96 @@ export default function ProductsPage() {
                 colors={availableColors}
                 weights={availableWeights}
               />
+
+              <div className="space-y-3 rounded-lg border border-border p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium">Product FAQs</p>
+                    <p className="text-xs text-muted-foreground">
+                      Shown in the FAQs tab on the product detail page
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      appendEditFaq({ question: "", answer: "" })
+                    }
+                    disabled={formLoading}
+                  >
+                    <Plus className="mr-1 h-4 w-4" />
+                    Add FAQ
+                  </Button>
+                </div>
+                {editFaqFields.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    No FAQs yet. Add questions customers often ask about this
+                    product.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {editFaqFields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className="space-y-3 rounded-md border border-dashed border-border p-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            FAQ {index + 1}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-destructive"
+                            onClick={() => removeEditFaq(index)}
+                            disabled={formLoading}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <FormField<FormData>
+                          control={formEdit.control}
+                          name={`faqs.${index}.question`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Question</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="e.g. What materials is this made of?"
+                                  disabled={formLoading}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField<FormData>
+                          control={formEdit.control}
+                          name={`faqs.${index}.answer`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Answer</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  className="min-h-[80px]"
+                                  placeholder="Write a clear answer for customers..."
+                                  disabled={formLoading}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <FormField<FormData>
                 control={formEdit.control}
                 name="images"

@@ -69,7 +69,7 @@ const SingleProudctPage = async ({
       <Breadcrumb />
 
       <Container>
-        <section className="pb-20">
+        <section className="pb-10">
           <div>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
               <div className="lg:col-span-7">
@@ -82,8 +82,6 @@ const SingleProudctPage = async ({
             </div>
           </div>
         </section>
-
-        <SupportInfo />
         <ProductTabs product={product} />
         <ProductReviews product={product} />
         <RelatedProducts

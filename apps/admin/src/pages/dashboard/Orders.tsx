@@ -482,13 +482,16 @@ export default function OrdersPage({ isDashboard = true }: OrdersPageProps) {
           if (!order._id) {
             return false;
           }
-          if (!order.user || !order.user._id) {
-            return false;
-          }
+          // Guest orders may not have a real user account — still show them
           return true;
         })
         .map((order: Order) => ({
           ...order,
+          user: order.user || {
+            _id: `guest-${order._id}`,
+            name: "Guest Customer",
+            email: (order as any).guestEmail || "No Email",
+          },
           items:
             order.items?.map((item: OrderItem) => {
               // Handle the actual server response structure
@@ -585,14 +588,16 @@ export default function OrdersPage({ isDashboard = true }: OrdersPageProps) {
             console.warn(`Order at index ${index} missing _id:`, order);
             return false;
           }
-          if (!order.user || !order.user._id) {
-            console.warn(`Order at index ${index} missing user data:`, order);
-            return false;
-          }
+          // Guest orders may not have a real user account — still show them
           return true;
         })
         .map((order: Order) => ({
           ...order,
+          user: order.user || {
+            _id: `guest-${order._id}`,
+            name: "Guest Customer",
+            email: (order as any).guestEmail || "No Email",
+          },
           items:
             order.items?.map((item: OrderItem) => {
               // Handle the actual server response structure
@@ -936,8 +941,6 @@ export default function OrdersPage({ isDashboard = true }: OrdersPageProps) {
       order &&
       order._id &&
       order.orderId &&
-      order.user &&
-      order.user._id &&
       order.items &&
       Array.isArray(order.items),
   );

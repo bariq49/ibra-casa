@@ -50,6 +50,7 @@ export interface FullProduct {
   sizes: ProductVariantOption[];
   weights: ProductVariantOption[];
   reviews: IReview[];
+  faqs?: { question: string; answer: string }[];
 }
 
 export const useProductBySlug = (slug: string) => {

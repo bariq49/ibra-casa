@@ -1079,7 +1079,13 @@ export const getAllOrdersAdmin = asyncHandler(
 
       const userIds = matchingUsers.map((u) => u._id);
 
-      filter.$or = [{ userId: { $in: userIds } }];
+      filter.$or = [
+        { userId: { $in: userIds } },
+        { guestEmail: { $regex: searchTerm, $options: "i" } },
+        { "shippingAddress.firstName": { $regex: searchTerm, $options: "i" } },
+        { "shippingAddress.lastName": { $regex: searchTerm, $options: "i" } },
+        { "shippingAddress.emailAddress": { $regex: searchTerm, $options: "i" } },
+      ];
 
       const cleanSearchTerm = searchTerm.replace(/^ORD-/i, "");
       if (cleanSearchTerm.match(/^[0-9a-fA-F]{24}$/)) {
@@ -1170,23 +1176,46 @@ export const getAllOrdersAdmin = asyncHandler(
     const totalPages = Math.ceil(total / perPage);
 
     // Transform data to match frontend expectations
-    const transformedOrders = orders.map((order) => ({
+    const transformedOrders = orders.map((order) => {
+      const populatedUser = order.userId as any;
+      const isGuestOrder = Boolean(order.isGuest) || !populatedUser;
+      const guestEmail =
+        order.guestEmail ||
+        (order.shippingAddress as any)?.emailAddress ||
+        (order.shippingAddress as any)?.email ||
+        "No Email";
+
+      return {
       _id: order._id,
       orderId: `ORD-${order._id.toString().slice(-6).toUpperCase()}`,
-      user: {
-        _id: (order.userId as any)?._id || null,
-        name: (order.userId as any)?.name || "Unknown User",
-        email: (order.userId as any)?.email || "No Email",
-      },
+      isGuest: isGuestOrder,
+      guestEmail: isGuestOrder ? guestEmail : undefined,
+      user: isGuestOrder
+        ? {
+            _id: `guest-${order._id}`,
+            name: "Guest Customer",
+            email: guestEmail,
+          }
+        : {
+            _id: populatedUser._id,
+            name: populatedUser.name || "Unknown User",
+            email: populatedUser.email || "No Email",
+          },
       items:
         order.items
-          ?.filter((item) => item && item.productId) // Filter out items with missing products
+          ?.filter((item) => item && (item.productId || item.name)) // Keep line items even if product was deleted
           .map((item) => ({
             product: {
-              _id: (item.productId as any)._id,
-              name: (item.productId as any).name || "Unknown Product",
-              price: (item.productId as any).price || 0,
-              image: (item.productId as any).image || "/placeholder-image.jpg",
+              _id: (item.productId as any)?._id || item.productId || "",
+              name:
+                (item.productId as any)?.name ||
+                item.name ||
+                "Unknown Product",
+              price: (item.productId as any)?.price || item.price || 0,
+              image:
+                (item.productId as any)?.image ||
+                item.image ||
+                "/placeholder-image.jpg",
             },
             quantity: item.quantity || 1,
             price: item.price || 0,
@@ -1213,7 +1242,8 @@ export const getAllOrdersAdmin = asyncHandler(
       status_updates: order.status_updates || {},
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    }));
+    };
+    });
 
     res.json({
       orders: transformedOrders,

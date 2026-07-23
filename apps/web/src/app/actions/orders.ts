@@ -46,3 +46,27 @@ export async function fetchOrderByIdAction(orderId: string) {
     };
   }
 }
+
+export async function verifyStripeSessionAction(
+  orderId: string,
+  sessionId: string,
+) {
+  try {
+    const res = await api.post(
+      "/api/payments/verify-session",
+      { orderId, sessionId },
+      NO_CACHE,
+    );
+    return {
+      success: Boolean(res.data?.success),
+      order: res.data?.order,
+      message: res.data?.message,
+    };
+  } catch (error: any) {
+    console.error("Verify Stripe Session Error:", error.data || error.message);
+    return {
+      success: false,
+      message: error.data?.message || "Failed to verify Stripe session",
+    };
+  }
+}

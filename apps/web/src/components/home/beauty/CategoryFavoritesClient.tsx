@@ -6,6 +6,7 @@ import { Link } from "@/i18n/routing";
 import { ArrowUpRight } from "lucide-react";
 import { Category } from "@/hooks/useCategories";
 import Container from "../../common/Container";
+import { SectionHeader } from "../../common/SectionHeader";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -46,28 +47,12 @@ const CategoryFavoritesClient = ({
   return (
     <section className="py-10 md:py-14 lg:py-[70px] bg-white">
       <Container>
-        <div className="mb-8 sm:mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.45 }}
-            className="max-w-2xl"
-          >
-            <h2
-              className="text-light-primary-text text-2xl sm:text-3xl md:text-4xl font-bold leading-tight mb-2"
-              style={{ fontFamily: "'Urbanist', sans-serif" }}
-            >
-              Featured Categories
-            </h2>
-            <p
-              className="text-light-secondary-text text-[15px] sm:text-base md:text-lg leading-relaxed max-w-xl"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              Discover furniture designed for the future of living, work, and
-              relaxation.
-            </p>
-          </motion.div>
+        <div className="mb-8 sm:mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <SectionHeader
+            title="Featured Categories"
+            description="Curated collections for modern living."
+            align="left"
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 12 }}

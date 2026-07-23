@@ -36,7 +36,7 @@ const AboutPage = async () => {
   }
 
   return (
-    <main className="bg-background">
+    <main className="">
       <Breadcrumb />
       <AboutHero data={aboutData} />
       <AboutFeatures features={aboutData?.features} />

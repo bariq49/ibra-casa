@@ -3,8 +3,9 @@
 import React from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
-import { ArrowUpRight, Calendar, MessageSquare } from "lucide-react";
+import { ArrowUpRight, Calendar } from "lucide-react";
 import Container from "../common/Container";
+import { SectionHeader } from "../common/SectionHeader";
 import { Blog } from "./LatestBlogs";
 import { chatIcon } from "@/images";
 
@@ -16,13 +17,15 @@ export default function LatestBlogsClient({ blogs }: { blogs: Blog[] }) {
       <Container>
         <div className="flex flex-col gap-10">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <h2 className="font-['Urbanist',sans-serif] text-[32px] font-bold text-light-primary-text leading-[48px]">
-              Latest Blogs
-            </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <SectionHeader
+              title="Latest Blogs"
+              description="Fresh ideas, tips, and stories from our journal."
+              align="left"
+            />
             <Link
               href="/blogs"
-              className="bg-white hover:bg-white/90 transition-colors duration-300 inline-flex items-center gap-[6px] py-[8px] pl-[20px] pr-[10px] rounded-[59px] group/btn shadow-sm border border-light-divider"
+              className="bg-white hover:bg-white/90 transition-colors duration-300 inline-flex items-center gap-[6px] py-[8px] pl-[20px] pr-[10px] rounded-[59px] group/btn shadow-sm border border-light-divider shrink-0 self-start sm:self-auto"
             >
               <span className="font-['DM_Sans',sans-serif] font-semibold leading-[26px] text-primary text-[16px] whitespace-nowrap">
                 View All Blogs

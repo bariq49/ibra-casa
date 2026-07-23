@@ -13,7 +13,7 @@ export default async function OrderTrackingPage() {
   const { isLoggedIn } = await getServerSession();
 
   return (
-    <div className="bg-muted min-h-screen pb-16">
+    <div className="min-h-screen pb-16">
       <Container>
         <OrderTrackingClient isLoggedIn={isLoggedIn} />
       </Container>

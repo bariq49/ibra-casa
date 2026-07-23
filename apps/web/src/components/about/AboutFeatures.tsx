@@ -9,7 +9,7 @@ import {
 
 const AboutFeatures = ({ features }: { features?: any[] }) => {
   return (
-    <section className="py-20 md:py-32 bg-background flex flex-col gap-24 overflow-hidden">
+    <section className="py-20 md:py-32 flex flex-col gap-24 overflow-hidden">
       <Container>
         {/* Feature 1: Faster Free Delivery */}
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">

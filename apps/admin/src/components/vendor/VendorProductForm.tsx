@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Save, RefreshCw } from "lucide-react";
+import { ArrowLeft, Plus, Save, RefreshCw, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   Form,
@@ -60,6 +61,15 @@ const vendorProductSchema = z.object({
   weights: z.array(z.string()).optional(),
   bg: z.string().optional(),
   isNewItem: z.boolean().optional(),
+  faqs: z
+    .array(
+      z.object({
+        question: z.string().min(1, "Question is required"),
+        answer: z.string().min(1, "Answer is required"),
+      }),
+    )
+    .optional()
+    .default([]),
   images: z
     .array(z.string())
     .min(1, "Please upload at least one image")
@@ -132,9 +142,19 @@ export default function VendorProductForm({
       weights: [],
       bg: "",
       isNewItem: false,
+      faqs: [],
       images: [],
       ...initialValues,
     },
+  });
+
+  const {
+    fields: faqFields,
+    append: appendFaq,
+    remove: removeFaq,
+  } = useFieldArray({
+    control: form.control,
+    name: "faqs",
   });
 
   // Reset when initial values arrive (edit mode loads asynchronously).
@@ -158,6 +178,7 @@ export default function VendorProductForm({
         weights: [],
         bg: "",
         isNewItem: false,
+        faqs: [],
         images: [],
         ...initialValues,
       });
@@ -734,6 +755,94 @@ export default function VendorProductForm({
             colors={colors}
             weights={weights}
           />
+        </section>
+
+        {/* Product FAQs */}
+        <section className="bg-background rounded-2xl border border-border p-5 md:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="font-semibold text-grey-900">Product FAQs</h2>
+              <p className="text-xs text-grey-500">
+                Shown in the FAQs tab on the product detail page
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              onClick={() => appendFaq({ question: "", answer: "" })}
+              disabled={submitting}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Add FAQ
+            </Button>
+          </div>
+          {faqFields.length === 0 ? (
+            <p className="text-xs text-grey-500">
+              No FAQs yet. Add questions customers often ask about this product.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {faqFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="space-y-3 rounded-xl border border-dashed border-border p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-grey-500">
+                      FAQ {index + 1}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-destructive"
+                      onClick={() => removeFaq(index)}
+                      disabled={submitting}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name={`faqs.${index}.question`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Question</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. What materials is this made of?"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`faqs.${index}.answer`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Answer</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="min-h-[80px]"
+                            placeholder="Write a clear answer for customers..."
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Images */}

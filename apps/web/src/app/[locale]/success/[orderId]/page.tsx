@@ -16,7 +16,7 @@ import {
 import PriceFormatter from "@/components/common/products/PriceFormatter";
 import Container from "@/components/common/Container";
 import QualityPriority from "@/components/common/QualityPriority";
-import { fetchOrderByIdAction } from "@/app/actions/orders";
+import { fetchOrderByIdAction, verifyStripeSessionAction } from "@/app/actions/orders";
 import { getServerSession } from "@/lib/auth";
 import { successIcon } from "@/images";
 import type { Metadata } from "next";
@@ -31,14 +31,22 @@ export async function generateMetadata({ params }: { params: Promise<{ orderId: 
 
 export default async function OrderSuccessPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ orderId: string; locale: string }>;
+  searchParams: Promise<{ session_id?: string }>;
 }) {
   const unwrappedParams = await params;
   const orderId = unwrappedParams.orderId;
+  const { session_id: sessionId } = await searchParams;
 
   // Check if user is logged in
   const { isLoggedIn } = await getServerSession();
+
+  // If Stripe redirected with session_id, verify payment even when webhook was missed
+  if (sessionId) {
+    await verifyStripeSessionAction(orderId, sessionId);
+  }
 
   // Server-side fetch (guest orders are publicly readable by ID)
   const orderResponse = await fetchOrderByIdAction(orderId);
@@ -89,7 +97,7 @@ export default async function OrderSuccessPage({
       : Math.max(0, order.total - computedSubtotal - displayTax);
 
   return (
-    <div className="bg-muted min-h-screen pb-16">
+    <div className="min-h-screen pb-16">
       <Container className="container pt-8 pb-12">
         <div className="breadcrumb hidden md:block">
           <div className="flex items-center gap-1 sm:gap-2 text-sm text-muted-foreground pb-4 mb-4">

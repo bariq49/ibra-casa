@@ -17,7 +17,7 @@ export default async function CartPage() {
       <CartClient />
 
       {/* ========== Quality Priority Section ========== */}
-      <QualityPriority />
+      {/* <QualityPriority /> */}
 
       {/* ========== New Branded Products Carousel ========== */}
       <NewBrandedProducts />

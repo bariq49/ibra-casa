@@ -62,7 +62,7 @@ const HeroContent = ({
   if (isLoading && initialSlides.length === 0) {
     return (
       <section className="w-full px-4 pt-3 rounded-2xl">
-        <div className="w-full h-[420px] md:h-[600px] rounded-2xl bg-gray-100 animate-pulse" />
+        <div className="w-full h-[520px] md:h-[720px] rounded-2xl bg-gray-100 animate-pulse" />
       </section>
     );
   }
@@ -83,7 +83,7 @@ const HeroContent = ({
 
   return (
     <section
-      className={`relative w-full overflow-x-hidden transition-[background] duration-700 ${compact ? "pt-3 pb-6" : "pt-3 md:pt-4 pb-6 md:pb-8"}`}
+      className={`relative w-full overflow-x-hidden transition-[background] duration-700 ${compact ? "pt-3" : "pt-3 md:pt-4"}`}
       style={bandStyle}
     >
       <div className="relative z-10 w-full px-4">
@@ -109,7 +109,7 @@ const HeroContent = ({
               return (
                 <CarouselItem
                   key={slide._id}
-                  className={`pl-0 relative w-full ${compact ? "h-[320px] md:h-[470px]" : "h-[420px] sm:h-[480px] md:h-[600px]"}`}
+                  className={`pl-0 relative w-full ${compact ? "h-[380px] md:h-[560px]" : "h-[520px] sm:h-[580px] md:h-[720px]"}`}
                   style={{ backgroundColor: slideBg }}
                 >
                   <div
@@ -175,35 +175,24 @@ const HeroContent = ({
             })}
           </CarouselContent>
 
-          <div
-            className="hidden md:block absolute left-1/2 -translate-x-1/2 bottom-0 z-10 w-[160px] h-[60px] bg-white transition-all duration-500"
-            style={{
-              ["--shape-bg" as any]: slides[current]?.bgColor || "#05535c",
-            }}
-          >
-            <div className="absolute -left-[86px] top-0 z-10 w-[86px] h-full bg-[url('/images/banner-left-shape.png')] bg-no-repeat transition-colors duration-500"></div>
-            <div className="absolute -right-[86px] top-0 z-10 bg-[url('/images/banner-right-shape.png')] bg-no-repeat w-[86px] h-full transition-colors duration-500"></div>
-          </div>
-
-          <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-x-2.5 sm:gap-x-3 items-center justify-center">
+          {/* Simple flat slide indicators */}
+          <div className="absolute bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center gap-2 sm:gap-2.5">
             {slides.map((s, index) => {
               const isActive = current === index;
-              const slideColor = s.bgColor || "#0A1F2D";
               return (
                 <button
                   key={s._id}
                   onClick={() => api?.scrollTo(index)}
-                  className="group relative flex items-center justify-center p-1"
+                  className="group relative flex items-center justify-center p-0.5"
                   aria-label={`Go to slide ${index + 1}`}
                   aria-current={isActive ? "true" : undefined}
                 >
-                  <div
-                    className={`transition-all duration-500 ease-in-out rounded-full ${
+                  <span
+                    className={`block rounded-full transition-all duration-300 ease-out ${
                       isActive
-                        ? "w-[56px] sm:w-[78px] h-3 sm:h-3.5"
-                        : "w-3 h-3 sm:w-3.5 sm:h-3.5 opacity-40 group-hover:opacity-70"
+                        ? "h-2 w-8 sm:h-2.5 sm:w-10 bg-white"
+                        : "size-2 sm:size-2.5 bg-white/45 group-hover:bg-white/70"
                     }`}
-                    style={{ backgroundColor: slideColor }}
                   />
                 </button>
               );
@@ -224,9 +213,9 @@ const Hero = ({ compact = false, initialSlides = [] }: HeroProps) => {
   return (
     <Suspense
       fallback={
-        <section className="w-full px-4 pt-3 md:pt-4 pb-6 md:pb-8">
+        <section className="w-full px-4 pt-3 md:pt-4">
           <div
-            className={`w-full rounded-2xl bg-gray-100 animate-pulse ${compact ? "h-[320px] md:h-[360px]" : "h-[420px] md:h-[600px]"}`}
+            className={`w-full rounded-2xl bg-gray-100 animate-pulse ${compact ? "h-[380px] md:h-[560px]" : "h-[520px] md:h-[720px]"}`}
           />
         </section>
       }

@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Phone, Mail, MapPin, Clock, Truck, Edit2 } from "lucide-react";
+import { User, Phone, Mail, MapPin, Truck, Edit2 } from "lucide-react";
 
 interface SelectedAddressCardProps {
   address: any;
@@ -85,13 +85,6 @@ export default function SelectedAddressCard({
                 {address.apartment ? `${address.apartment}, ` : ""}
                 {address.city}, {address.state}, {address.zipCode},{" "}
                 {address.country}
-              </p>
-            </div>
-
-            <div className="flex gap-[12px] items-start w-full">
-              <Clock className="shrink-0 size-5 text-light-secondary-text mt-0.5" />
-              <p className="flex-1 font-dm-sans font-normal leading-[24px] text-light-primary-text text-[16px]">
-                {address.deliveryTime || "Anytime"}
               </p>
             </div>
 

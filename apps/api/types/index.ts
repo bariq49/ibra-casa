@@ -24,6 +24,7 @@ export interface IProduct {
   productBase?: string; // ID of ProductBase
   productTypes?: string[]; // Array of Product Type IDs
   badge?: string; // Badge ID
+  faqs?: { question: string; answer: string }[];
   createdAt: string;
 }
 

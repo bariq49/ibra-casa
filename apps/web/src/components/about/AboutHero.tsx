@@ -97,7 +97,7 @@ const AboutHero = ({ data }: AboutHeroProps) => {
   const heroImageSmall = data.heroImageSmall || "";
 
   return (
-    <section className="pb-16 bg-background">
+    <section className="pb-16">
       <Container>
         <div className="flex flex-col lg:flex-row justify-between items-start gap-16 lg:gap-8">
           {/* Left Column: Text & Stats */}

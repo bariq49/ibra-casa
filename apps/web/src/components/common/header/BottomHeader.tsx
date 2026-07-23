@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import {
   ChevronDown,
   ChevronRight,
@@ -20,6 +20,7 @@ import { NavItem } from "@/constants/data";
 import Image from "next/image";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useCartStore } from "@/store/useCartStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const MAX_VISIBLE_CATEGORIES = 12;
 
@@ -66,6 +67,8 @@ const BottomHeader = ({
   const { tree: categoryTree, isLoading: categoriesLoading } =
     useCategoryTree(initialCategoryTree);
   const { onCartOpen, onAuthOpen } = useHeaderStore();
+  const { isAuthenticated, user } = useAuthStore();
+  const router = useRouter();
   const cartItems = useCartStore((state) => state.cartItems);
   const totalItems = cartItems.length ? cartItems.length : 0;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -384,7 +387,17 @@ const BottomHeader = ({
 
             <button
               type="button"
-              onClick={() => onAuthOpen("login")}
+              onClick={() => {
+                if (isAuthenticated) {
+                  router.push(
+                    user?.role === "vendor"
+                      ? "/vendor-dashboard"
+                      : "/user/dashboard",
+                  );
+                  return;
+                }
+                onAuthOpen("login");
+              }}
               className={`inline-flex items-center justify-center size-11 transition-colors ${onDarkHero ? "text-white hover:text-white/80" : "text-foreground hover:text-primary"}`}
               aria-label="Account"
             >

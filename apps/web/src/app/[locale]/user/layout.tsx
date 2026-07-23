@@ -18,7 +18,7 @@ export default async function UserLayout({
   }
 
   return (
-    <div className="bg-muted min-h-screen pt-8 pb-16">
+    <div className="min-h-screen pt-8 pb-16">
       <Container>
         <div className="flex flex-col xl:flex-row gap-6 items-start">
           <UserSidebar />

@@ -5,6 +5,7 @@ import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import Container from "@/components/common/Container";
+import { SectionHeader } from "@/components/common/SectionHeader";
 
 export const staticTestimonials = [
   {
@@ -136,7 +137,9 @@ interface AboutTestimonialsProps {
   reviews?: CustomerReview[];
 }
 
-export default function AboutTestimonials({ reviews = [] }: AboutTestimonialsProps) {
+export default function AboutTestimonials({
+  reviews = [],
+}: AboutTestimonialsProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     loop: false,
@@ -154,127 +157,103 @@ export default function AboutTestimonials({ reviews = [] }: AboutTestimonialsPro
   const displayReviews = reviews.length > 0 ? reviews : staticTestimonials;
 
   return (
-    <Container className="w-full relative mt-16 mb-20 overflow-hidden flex flex-col items-center">
-      {/* SVG Background (Desktop Only) */}
-      {/* <div className="hidden lg:block absolute inset-0 z-0 overflow-hidden rounded-2xl px-6 sm:px-8 md:px-10 lg:px-12">
-        <svg
-          className="w-full h-full"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1728 611"
-          fill="none"
-        >
-          <path
-            d="M1728 595C1728 603.837 1720.837 611 1712 611H16C7.163 611 0 603.837 0 595V16C0 7.163 7.163 0 16 0H464.229C490.65 0 511.137 22.4607 523.036 46.0506C540.075 79.8315 575.081 103 615.5 103H1112.5C1152.92 103 1187.92 79.8315 1204.96 46.0506C1216.86 22.4607 1237.35 0 1263.77 0H1712C1719.837 0 1728 7.163 1728 16V595Z"
-            fill="#F4F3F5"
-          />
-        </svg>
-      </div> */}
+    <section className="py-10 md:py-14 lg:py-[70px]">
+      <Container>
+        <div className="relative w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 md:mb-10">
+            <SectionHeader
+              title="Trusted by Customers"
+              description="Join thousands of happy customers around the globe."
+              align="left"
+            />
 
-      {/* Solid Background (Mobile/Tablet Only) */}
-      {/* <div
-        className="absolute inset-0 z-0 bg-[#F4F3F5] lg:hidden rounded-2xl"
-        aria-hidden
-      /> */}
-
-      {/* Title sits in the SVG notch */}
-      <div className="relative z-10 text-center max-w-2xl mx-auto px-4 pt-2 sm:pt-3 lg:pt-1 mb-8 lg:mb-20">
-        <h2 className="text-3xl md:text-4xl lg:text-[40px] font-urbanist font-bold text-light-primary-text leading-tight">
-          Trusted by Customers
-        </h2>
-        <p className="text-base font-dm-sans text-light-secondary-text mt-1">
-          Join thousands of happy customers around the globe.
-        </p>
-      </div>
-
-      {/* Cards / nav — horizontal inset inside the gray band */}
-      <div className="relative z-10 w-full flex flex-col items-center px-4 sm:px-6 md:px-8 lg:pb-16 pb-6">
-        {/* Embla Carousel */}
-        <div className="overflow-hidden mb-10 w-full" ref={emblaRef}>
-          <div className="flex -ml-4 md:-ml-6 pb-4">
-            {displayReviews.map((testimonial) => (
-              <div
-                key={testimonial._id}
-                className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0 pl-4 md:pl-6"
+            <div className="flex items-center gap-4 shrink-0 self-start sm:self-auto">
+              <button
+                onClick={scrollPrev}
+                className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-light-primary-text shadow-sm hover:shadow-md transition-shadow border border-light-divider focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Previous testimonials"
               >
-                <div className="bg-white rounded-2xl p-5 md:p-6 shadow-sm h-full flex flex-col justify-between border border-gray-100 hover:shadow-md transition-shadow">
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0">
-                        <Image
-                          src={
-                            testimonial.avatar ||
-                            "/images/avatar-placeholder.png"
-                          }
-                          alt={testimonial.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-urbanist font-bold text-light-primary-text text-base truncate">
-                          {testimonial.name}
-                        </p>
-                        <p className="font-dm-sans text-light-secondary-text text-sm">
-                          {testimonial.date}
-                        </p>
-                      </div>
-                    </div>
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={scrollNext}
+                className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-light-primary-text shadow-sm hover:shadow-md transition-shadow border border-light-divider focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Next testimonials"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
 
-                    <div className="flex items-center gap-2 mb-4 flex-wrap">
-                      <div className="flex items-center gap-1.5">
-                        <RatingStars rating={testimonial.rating} />
-                        <span className="font-dm-sans text-sm font-bold text-light-primary-text leading-none">
-                          {Number(testimonial.rating).toFixed(1)}
+          <div className="overflow-hidden w-full" ref={emblaRef}>
+            <div className="flex -ml-4 md:-ml-6 pb-1">
+              {displayReviews.map((testimonial) => (
+                <div
+                  key={testimonial._id}
+                  className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0 pl-4 md:pl-6"
+                >
+                  <div className="bg-white rounded-2xl p-5 md:p-6 shadow-sm h-full flex flex-col justify-between border border-gray-100 hover:shadow-md transition-shadow">
+                    <div>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0">
+                          <Image
+                            src={
+                              testimonial.avatar ||
+                              "/images/avatar-placeholder.png"
+                            }
+                            alt={testimonial.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-urbanist font-bold text-light-primary-text text-base truncate">
+                            {testimonial.name}
+                          </p>
+                          <p className="font-dm-sans text-light-secondary-text text-sm">
+                            {testimonial.date}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 mb-4 flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <RatingStars rating={testimonial.rating} />
+                          <span className="font-dm-sans text-sm font-bold text-light-primary-text leading-none">
+                            {Number(testimonial.rating).toFixed(1)}
+                          </span>
+                        </div>
+
+                        {testimonial.isVerified && (
+                          <>
+                            <div className="w-px h-4 bg-gray-200" />
+                            <div className="flex items-center gap-1.5">
+                              <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                              <span className="font-dm-sans text-sm text-primary font-medium">
+                                Verified purchase
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      <p className="font-dm-sans text-light-secondary-text text-[15px] leading-relaxed">
+                        <span className="font-urbanist font-bold text-xl leading-none text-light-secondary-text/40">
+                          “
+                        </span>{" "}
+                        {testimonial.text}{" "}
+                        <span className="font-urbanist font-bold text-xl leading-none text-light-secondary-text/40">
+                          ”
                         </span>
-                      </div>
-
-                      {testimonial.isVerified && (
-                        <>
-                          <div className="w-px h-4 bg-gray-200" />
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                            <span className="font-dm-sans text-sm text-primary font-medium">
-                              Verified purchase
-                            </span>
-                          </div>
-                        </>
-                      )}
+                      </p>
                     </div>
-
-                    <p className="font-dm-sans text-light-secondary-text text-[15px] leading-relaxed">
-                      <span className="font-urbanist font-bold text-xl leading-none text-light-secondary-text/40">
-                        “
-                      </span>{" "}
-                      {testimonial.text}{" "}
-                      <span className="font-urbanist font-bold text-xl leading-none text-light-secondary-text/40">
-                        ”
-                      </span>
-                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={scrollPrev}
-            className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-light-primary-text shadow-sm hover:shadow-md transition-shadow border border-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label="Previous testimonials"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={scrollNext}
-            className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-light-primary-text shadow-sm hover:shadow-md transition-shadow border border-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label="Next testimonials"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-    </Container>
+      </Container>
+    </section>
   );
 }

@@ -303,6 +303,10 @@ export const handleStripeWebhook = asyncHandler(
               console.log(
                 `✅ Order ${orderIdFromSession} marked as paid from checkout.session.completed`,
               );
+            } else {
+              console.error(
+                `❌ checkout.session.completed: order not found (${orderIdFromSession})`,
+              );
             }
           } catch (error) {
             console.error(
@@ -310,6 +314,11 @@ export const handleStripeWebhook = asyncHandler(
               error,
             );
           }
+        } else {
+          console.error(
+            "❌ checkout.session.completed missing orderId in metadata/client_reference_id",
+            session.id,
+          );
         }
         break;
       }
@@ -397,5 +406,102 @@ export const handleStripeWebhook = asyncHandler(
 
     // Send success response
     res.json({ received: true });
+  },
+);
+
+// @desc    Verify Stripe Checkout session and mark order paid (success-page fallback)
+// @route   POST /api/payments/verify-session
+// @access  Public (guest) / optional auth
+export const verifyCheckoutSession = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { sessionId, orderId } = req.body || {};
+
+    if (!sessionId || !orderId) {
+      res.status(400).json({
+        success: false,
+        message: "sessionId and orderId are required",
+      });
+      return;
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      res.status(404).json({ success: false, message: "Order not found" });
+      return;
+    }
+
+    if (order.isPaid || order.paymentStatus === "paid") {
+      res.status(200).json({
+        success: true,
+        alreadyPaid: true,
+        order,
+        message: "Order is already paid",
+      });
+      return;
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(String(sessionId));
+
+    const sessionOrderId =
+      session.metadata?.orderId || session.client_reference_id;
+    if (!sessionOrderId || sessionOrderId !== String(orderId)) {
+      res.status(400).json({
+        success: false,
+        message: "Checkout session does not match this order",
+      });
+      return;
+    }
+
+    const isPaid =
+      session.payment_status === "paid" ||
+      session.status === "complete";
+
+    if (!isPaid) {
+      res.status(200).json({
+        success: false,
+        paymentStatus: session.payment_status,
+        message: "Payment is not completed yet",
+      });
+      return;
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      {
+        paymentStatus: "paid",
+        isPaid: true,
+        paidAt: new Date(),
+        paymentMethod: "stripe",
+        stripeSessionId: session.id,
+        paymentIntentId:
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : undefined,
+        payment_info: {
+          gateway: "stripe",
+          stripe: {
+            paymentIntentId:
+              typeof session.payment_intent === "string"
+                ? session.payment_intent
+                : undefined,
+            sessionId: session.id,
+          },
+          paidAmount: session.amount_total ? session.amount_total / 100 : 0,
+          currency: session.currency?.toUpperCase(),
+          paidAt: new Date(),
+        },
+      },
+      { new: true },
+    );
+
+    console.log(
+      `✅ Order ${orderId} marked as paid from verify-session (${session.id})`,
+    );
+
+    res.status(200).json({
+      success: true,
+      order: updatedOrder,
+      message: "Payment verified successfully",
+    });
   },
 );

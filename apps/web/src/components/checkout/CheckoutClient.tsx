@@ -8,7 +8,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { ChevronRight, Home } from "lucide-react";
 import PriceFormatter from "@/components/common/products/PriceFormatter";
-import PaymentMethods from "./PaymentMethods";
 import ShipmentAddressForm from "./ShipmentAddressForm";
 import SelectedAddressCard from "./SelectedAddressCard";
 import AddressSidebar from "./AddressSidebar";
@@ -50,7 +49,6 @@ const CheckoutClient = ({
     step: OrderStep;
     message: string;
   } | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [checkoutSnapshot, setCheckoutSnapshot] = useState<CartItem[] | null>(null);
   const [guestAddress, setGuestAddress] = useState<Record<string, any> | null>(
     null,
@@ -116,12 +114,22 @@ const CheckoutClient = ({
 
   if (!mounted) return null;
 
-  const resolveShippingAddress = (): {
+  const resolveShippingAddress = (
+    override?: Record<string, any> | null,
+  ): {
     street: string;
     postalCode: string;
     emailAddress?: string;
     [key: string]: any;
   } | null => {
+    if (override) {
+      return {
+        ...override,
+        street: override.apartment || override.city || "N/A",
+        postalCode: override.zipCode,
+        emailAddress: override.emailAddress,
+      };
+    }
     if (isLoggedIn && activeAddressObj) {
       return {
         ...activeAddressObj,
@@ -142,10 +150,10 @@ const CheckoutClient = ({
     return null;
   };
 
-  const handlePlaceOrder = async () => {
-    const shippingAddress = resolveShippingAddress();
+  const handlePlaceOrder = async (addressOverride?: Record<string, any>) => {
+    const shippingAddress = resolveShippingAddress(addressOverride || null);
     if (!shippingAddress) {
-      toast.error("Please confirm your shipping address");
+      toast.error("Please fill in your shipping address");
       return;
     }
 
@@ -176,61 +184,41 @@ const CheckoutClient = ({
 
       let newOrder;
 
-      if (paymentMethod === "cash") {
-        setOrderStatus({
-          step: "securing",
-          message: "Placing order securely...",
-        });
-        const payload = {
-          items: itemsPayload,
-          shippingAddress,
-          ...(!isLoggedIn
-            ? { guestEmail: shippingAddress.emailAddress }
-            : {}),
-        };
-        const response = await api.post("/api/orders/cod", payload);
-        newOrder = response.data?.data || response.data?.order;
-        setOrderStatus({
-          step: "success",
-          message: "Order setup complete. Finalizing...",
-        });
-      } else {
-        setOrderStatus({
-          step: "securing",
-          message: "Placing order securely...",
-        });
-        const payload = {
-          items: itemsPayload,
-          shippingAddress,
-          paymentMethod: "stripe",
-          ...(!isLoggedIn
-            ? { guestEmail: shippingAddress.emailAddress }
-            : {}),
-        };
-        const response = await api.post("/api/orders", payload);
-        newOrder = response.data?.order;
+      setOrderStatus({
+        step: "securing",
+        message: "Placing order securely...",
+      });
+      const payload = {
+        items: itemsPayload,
+        shippingAddress,
+        paymentMethod: "stripe",
+        ...(!isLoggedIn
+          ? { guestEmail: shippingAddress.emailAddress }
+          : {}),
+      };
+      const response = await api.post("/api/orders", payload);
+      newOrder = response.data?.order;
 
-        if (newOrder?._id) {
+      if (newOrder?._id) {
+        setOrderStatus({
+          step: "gateway",
+          message: "Initializing payment gateway...",
+        });
+        const sessionResponse = await api.post(
+          "/api/payments/create-checkout-session",
+          { orderId: newOrder._id },
+        );
+        if (sessionResponse.data?.url) {
           setOrderStatus({
-            step: "gateway",
-            message: "Initializing payment gateway...",
+            step: "success",
+            message: "Ready to Checkout. Redirecting to payment...",
           });
-          const sessionResponse = await api.post(
-            "/api/payments/create-checkout-session",
-            { orderId: newOrder._id },
-          );
-          if (sessionResponse.data?.url) {
-            setOrderStatus({
-              step: "success",
-              message: "Ready to Checkout. Redirecting to payment...",
-            });
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            useCartStore.getState().clearCart();
-            window.location.href = sessionResponse.data.url;
-            return;
-          } else {
-            throw new Error("Failed to initialize Stripe checkout.");
-          }
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          useCartStore.getState().clearCart();
+          window.location.href = sessionResponse.data.url;
+          return;
+        } else {
+          throw new Error("Failed to initialize Stripe checkout.");
         }
       }
 
@@ -317,8 +305,15 @@ const CheckoutClient = ({
                   Welcome back{user?.name ? `, ${user.name}` : ""}!
                 </h3>
                 <p className="font-dm-sans text-light-secondary-text text-[15px] mt-1">
-                  You are securely checked into your account. Please complete
-                  your shipping details below.
+                  You are securely checked into your account. Manage or add
+                  shipping addresses anytime from your{" "}
+                  <Link
+                    href="/user/addresses"
+                    className="text-primary font-semibold hover:underline"
+                  >
+                    dashboard
+                  </Link>
+                  .
                 </p>
               </div>
             )}
@@ -332,8 +327,7 @@ const CheckoutClient = ({
                   setAddressSidebarOpen(true);
                 }}
                 onAddNewClick={() => {
-                  setAddressSidebarMode("add");
-                  setAddressSidebarOpen(true);
+                  router.push("/user/addresses");
                 }}
                 hasMultipleAddresses={existingAddresses.length > 1}
               />
@@ -341,6 +335,8 @@ const CheckoutClient = ({
               <ShipmentAddressForm
                 onAddressValid={setHasValidAddress}
                 onGuestAddressChange={setGuestAddress}
+                onProcessToPay={handlePlaceOrder}
+                isProcessingPay={isPlacingOrder}
               />
             )}
             <AddressSidebar
@@ -351,14 +347,6 @@ const CheckoutClient = ({
               mode={addressSidebarMode}
               onModeChange={setAddressSidebarMode}
             />
-
-            <div className="mt-2">
-              <PaymentMethods
-                isLoggedIn={isLoggedIn}
-                selectedMethod={paymentMethod}
-                onMethodChange={setPaymentMethod}
-              />
-            </div>
           </div>
 
           {/* Right Column: Order Summary */}
@@ -485,7 +473,7 @@ const CheckoutClient = ({
               </div>
 
               <button
-                onClick={handlePlaceOrder}
+                onClick={() => handlePlaceOrder()}
                 disabled={
                   activeCartItems.length === 0 ||
                   !hasValidAddress ||
@@ -493,7 +481,7 @@ const CheckoutClient = ({
                 }
                 className="w-full h-[52px] mt-2 bg-primary hover:bg-primary-dark disabled:bg-gray-400 disabled:opacity-50 text-white font-dm-sans font-bold text-[16px] rounded-[80px] shadow-color-primary transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
               >
-                {isPlacingOrder ? "Placing Order..." : "Place Order"}
+                {isPlacingOrder ? "Processing..." : "Process to Pay"}
               </button>
             </div>
           </div>

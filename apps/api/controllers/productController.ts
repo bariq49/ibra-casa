@@ -380,6 +380,7 @@ const createProduct = asyncHandler(
       weights,
       badge,
       isNewItem,
+      faqs,
     } = req.body;
 
     // Check if product with same name exists
@@ -470,6 +471,17 @@ const createProduct = asyncHandler(
       weights: weights || [],
       badge: badge || undefined,
       isNewItem: isNewItem || false,
+      faqs: Array.isArray(faqs)
+        ? faqs
+            .filter(
+              (f: { question?: string; answer?: string }) =>
+                f?.question?.trim() && f?.answer?.trim(),
+            )
+            .map((f: { question: string; answer: string }) => ({
+              question: f.question.trim(),
+              answer: f.answer.trim(),
+            }))
+        : [],
     });
 
     if (product) {
@@ -505,6 +517,7 @@ const updateProduct = asyncHandler(
       weights,
       badge,
       isNewItem,
+      faqs,
     } = req.body;
 
     const product = await Product.findById(req.params.id as string);
@@ -554,6 +567,19 @@ const updateProduct = asyncHandler(
       product.badge = badge || product.badge;
       if (isNewItem !== undefined) product.isNewItem = isNewItem;
       if (bg !== undefined) product.bg = bg;
+      if (faqs !== undefined) {
+        product.faqs = Array.isArray(faqs)
+          ? faqs
+              .filter(
+                (f: { question?: string; answer?: string }) =>
+                  f?.question?.trim() && f?.answer?.trim(),
+              )
+              .map((f: { question: string; answer: string }) => ({
+                question: f.question.trim(),
+                answer: f.answer.trim(),
+              }))
+          : [];
+      }
 
       // Get max images from environment or default to 6
       const maxImages = parseInt(process.env.MAX_PRODUCT_IMAGES || "6") || 6;

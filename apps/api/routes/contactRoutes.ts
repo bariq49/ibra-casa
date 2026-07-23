@@ -7,8 +7,8 @@ import { protect, admin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Publicly authenticated submission
-router.route("/").post(protect, createContactMessage);
+// Public contact form submission
+router.route("/").post(createContactMessage);
 
 // Admin retrieval
 router.route("/").get(protect, admin, getContacts);

@@ -72,7 +72,7 @@ const CartClient = () => {
   );
 
   return (
-    <div className="container py-8 md:py-12">
+    <div className=" py-8 md:py-12">
       <div className="breadcrumb hidden md:block">
         <div className="flex items-center gap-1 sm:gap-2 text-sm text-muted-foreground pb-4 mb-6 md:mb-8">
           <Link href="/" className="hover:text-primary transition-colors">
@@ -86,7 +86,7 @@ const CartClient = () => {
       </div>
 
       {cartItems.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 px-4 bg-background border border-border rounded-[16px] w-full">
+        <div className="flex flex-col items-center justify-center py-20 px-4 bg-background border border-border rounded-[16px] w-full mx-auto">
           <div className="bg-muted size-24 rounded-full flex items-center justify-center mb-6">
             <svg
               className="size-12 text-light-disabled-text"
@@ -153,7 +153,7 @@ const CartClient = () => {
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={clearCart}
-                        className="bg-error hover:bg-error/90 text-white"
+                        variant="destructive"
                       >
                         Clear Cart
                       </AlertDialogAction>

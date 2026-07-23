@@ -4,7 +4,46 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { FullProduct } from "@/hooks/useProductBySlug";
 import Image from "next/image";
-type TabId = "description" | "additional";
+import { Plus, Minus } from "lucide-react";
+import { cn } from "@/lib/utils";
+type TabId = "description" | "additional" | "faqs";
+
+function ProductFaqRow({
+  question,
+  answer,
+  isOpen,
+  onClick,
+}: {
+  question: string;
+  answer: string;
+  isOpen: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div className="border-b border-[rgba(145,158,171,0.24)] last:border-0">
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full flex items-center justify-between py-4 text-left focus:outline-none group"
+      >
+        <h4 className="text-[16px] font-semibold font-dm-sans text-foreground group-hover:text-primary transition-colors pr-8">
+          {question}
+        </h4>
+        <div className="shrink-0 size-6 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+          {isOpen ? <Minus className="size-5" /> : <Plus className="size-5" />}
+        </div>
+      </button>
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-300 ease-in-out font-dm-sans text-light-secondary-text text-[16px] leading-6",
+          isOpen ? "max-h-[500px] pb-4 opacity-100" : "max-h-0 opacity-0",
+        )}
+      >
+        <p className="pt-1 whitespace-pre-wrap">{answer}</p>
+      </div>
+    </div>
+  );
+}
 
 // ─── Checkmark Circle SVG (matches Figma checkmark-circle-01, 24×24) ─────────
 function CheckCircleIcon({ className }: { className?: string }) {
@@ -246,6 +285,7 @@ function parseHtmlToNodes(htmlStr: string): ContentNode[] {
 
 export default function ProductTabs({ product }: { product: FullProduct }) {
   const [activeTab, setActiveTab] = useState<TabId>("description");
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const hasDescription =
     product.description &&
@@ -255,9 +295,16 @@ export default function ProductTabs({ product }: { product: FullProduct }) {
   const isRichTextDescription =
     product.description && /<[^>]+>/.test(product.description);
 
+  const productFaqs = (product.faqs || []).filter(
+    (f) => f.question?.trim() && f.answer?.trim(),
+  );
+
   const tabs: { id: TabId; label: string; count?: number }[] = [
     { id: "description", label: "Description" },
     { id: "additional", label: "Additional information" },
+    ...(productFaqs.length > 0
+      ? [{ id: "faqs" as const, label: "FAQs", count: productFaqs.length }]
+      : []),
   ];
 
   // Build additional info rows from product fields
@@ -576,6 +623,38 @@ export default function ProductTabs({ product }: { product: FullProduct }) {
                   No additional information available.
                 </p>
               )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── FAQS TAB ── */}
+        {activeTab === "faqs" && productFaqs.length > 0 && (
+          <motion.div
+            key="faqs"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="w-full border border-border rounded-xl overflow-hidden bg-white"
+          >
+            <div className="bg-gray-200 px-6 py-4 border-b border-border">
+              <h2 className="font-Urbanist font-bold text-[20px] text-foreground leading-7.5">
+                Frequently Asked Questions
+              </h2>
+            </div>
+
+            <div className="p-6 sm:p-8">
+              {productFaqs.map((faq, index) => (
+                <ProductFaqRow
+                  key={`${faq.question}-${index}`}
+                  question={faq.question}
+                  answer={faq.answer}
+                  isOpen={openFaqIndex === index}
+                  onClick={() =>
+                    setOpenFaqIndex((prev) => (prev === index ? null : index))
+                  }
+                />
+              ))}
             </div>
           </motion.div>
         )}

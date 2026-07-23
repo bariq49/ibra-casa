@@ -137,6 +137,15 @@ export const productSchema = z.object({
   weights: z.array(z.string()).optional(),
   productTypes: z.array(z.string()).optional(),
   isNewItem: z.boolean().default(false).optional(),
+  faqs: z
+    .array(
+      z.object({
+        question: z.string().min(1, { message: "Question is required" }),
+        answer: z.string().min(1, { message: "Answer is required" }),
+      }),
+    )
+    .optional()
+    .default([]),
 });
 
 export const ratingSchema = z.object({

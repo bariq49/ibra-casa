@@ -67,7 +67,7 @@ export function slideImageGradient(bgColor: string): string {
 }
 
 /** Approx combined height used for continuous background-size (header + hero). */
-export const HERO_BAND_SIZE = "100% 780px";
+export const HERO_BAND_SIZE = "100% 920px";
 
 /** Approx bottom-header height — used to offset hero gradient. */
 export const BOTTOM_HEADER_OFFSET = 56;

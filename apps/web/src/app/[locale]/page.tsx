@@ -98,7 +98,7 @@ export default async function Home({
   return (
     <main>
       <Hero initialSlides={heroSlides} />
-      <SupportInfo />
+      {/* <SupportInfo /> */}
 
       <Suspense fallback={<SectionSkeleton height="h-[520px]" />}>
         <DeferredTopSelling locale={locale} productTypes={productTypes} />
@@ -120,14 +120,14 @@ export default async function Home({
       {/* <Suspense fallback={<SectionSkeleton height="h-[500px]" />}>
         <MostLovedProducts slug="most-loved-products" locale={locale} />
       </Suspense> */}
-      
+            <Suspense fallback={<SectionSkeleton height="h-[500px]" />}>
+        <DeferredTestimonials />
+      </Suspense>
       <Suspense fallback={<SectionSkeleton height="h-[400px]" />}>
         <DeferredLatestBlogs locale={locale} />
       </Suspense>
 
-      <Suspense fallback={<SectionSkeleton height="h-[500px]" />}>
-        <DeferredTestimonials />
-      </Suspense>
+
     </main>
   );
 }
